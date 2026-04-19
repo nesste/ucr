@@ -1,7 +1,7 @@
 {
   "name": "@ucr/example-next-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "packageManager": "bun@1.3.4",
   "dependencies": {
     "next": "16.2.4",

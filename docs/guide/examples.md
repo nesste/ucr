@@ -22,6 +22,8 @@ Checked-in composition:
 - presets: `service-preset`, `endpoint-preset`
 - blocks: `entity-contract`, `service-layer`, `memory-repository`, `input-validation`, `health-route`, `json-collection-route`, `json-item-route`, `bun-server`
 
+Cross-reference these installs with [Official Registry](/reference/official-registry) when you want to see the manifest metadata, canonical install recipe, and example-owned file list for each item.
+
 What this example proves:
 
 - shared code lands under `ucr/...`
@@ -64,6 +66,8 @@ Checked-in composition:
 - shared utilities plus Next-only UI utilities
 - presets: `service-preset`, `endpoint-preset`, `form-preset`, `admin-page-preset`
 - blocks: `entity-contract`, `service-layer`, `memory-repository`, `input-validation`, `api-client`, `next-collection-route`, `next-item-route`, `data-table`, `entity-form`, `admin-page`
+
+Cross-reference these installs with [Official Registry](/reference/official-registry) when you want to see the manifest metadata, canonical install recipe, and example-owned file list for each item.
 
 What this example proves:
 

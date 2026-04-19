@@ -152,7 +152,7 @@ ucr self-update
 Pin to a specific release tag when needed:
 
 ```bash
-ucr self-update v0.3.0
+ucr self-update 0.3.0
 ```
 
 Notes:

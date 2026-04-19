@@ -66,6 +66,8 @@ The normal workflow is:
 
 Utilities and presets default their instance id to the item name. Blocks require an explicit `--instance`.
 
+See [Official Registry](/reference/official-registry) for the shipped catalog of utilities, presets, and blocks, including what each one provides and the canonical install recipe.
+
 ## Registry Sources
 
 UCR resolves the registry reference in this order:
@@ -91,5 +93,6 @@ See [Adapters](/reference/adapters) for the full mapping rules.
 - [Quickstart](/guide/quickstart) for standalone install, official registry usage, and contributor local-path usage
 - [Concepts](/guide/concepts) for the item model, registry cache, inputs, capabilities, and state files
 - [Commands](/guide/commands) for the CLI surface
+- [Official Registry](/reference/official-registry) for the concrete `ucr-official` catalog and usage recipes
 - [Examples](/guide/examples) for the checked-in Bun and Next targets
 - [Architecture](/internals/architecture) for the contributor-facing package layout

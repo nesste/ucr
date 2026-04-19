@@ -1,0 +1,122 @@
+name: main-release
+
+on:
+  workflow_run:
+    workflows: ["ci"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: main-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'main'
+      }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Skip stale workflow runs
+        id: head
+        env:
+          EXPECTED_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          current_head="$(git rev-parse HEAD)"
+
+          if [ "$current_head" != "$EXPECTED_HEAD_SHA" ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "Current main head is $current_head, workflow was triggered for $EXPECTED_HEAD_SHA."
+            exit 0
+          fi
+
+          echo "stale=false" >> "$GITHUB_OUTPUT"
+
+      - uses: oven-sh/setup-bun@v2
+        if: steps.head.outputs.stale != 'true'
+        with:
+          bun-version: 1.3.4
+
+      - name: Resolve release plan
+        if: steps.head.outputs.stale != 'true'
+        id: plan
+        run: |
+          existing_tag="$(
+            git tag --points-at HEAD --sort=-v:refname \
+              | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+              | head -n 1 || true
+          )"
+          next_version="$(bun run release:next-version)"
+          manifest_version="$(bun run release:manifest-version || true)"
+
+          if [ -n "$existing_tag" ]; then
+            echo "action=release" >> "$GITHUB_OUTPUT"
+            echo "version=$existing_tag" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$manifest_version" = "$next_version" ]; then
+            echo "action=release" >> "$GITHUB_OUTPUT"
+            echo "version=$manifest_version" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "action=bump" >> "$GITHUB_OUTPUT"
+          echo "version=$next_version" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the GitHub release already exists
+        if: steps.plan.outputs.action == 'release'
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.plan.outputs.version }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump release manifest versions
+        if: steps.plan.outputs.action == 'bump'
+        env:
+          RELEASE_TAG: ${{ steps.plan.outputs.version }}
+        run: bun run release:set-version "$RELEASE_TAG"
+
+      - name: Commit and push release version bump
+        if: steps.plan.outputs.action == 'bump'
+        env:
+          RELEASE_TAG: ${{ steps.plan.outputs.version }}
+        run: |
+          if git diff --quiet -- package.json packages/cli/package.json packages/core/package.json packages/schema/package.json; then
+            echo "Release manifests are already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json packages/cli/package.json packages/core/package.json packages/schema/package.json
+          git commit -m "chore(release): $RELEASE_TAG"
+          git push origin HEAD:main
+
+      - name: Create tag and GitHub release
+        if: steps.plan.outputs.action == 'release' && steps.release.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.plan.outputs.version }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            --target "$(git rev-parse HEAD)" \
+            --title "$RELEASE_TAG" \
+            --generate-notes

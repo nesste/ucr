@@ -18,7 +18,7 @@ export default defineConfig({
       },
       {
         text: "Reference",
-        link: "/reference/registry-spec",
+        link: "/reference/official-registry",
       },
       {
         text: "Internals",
@@ -58,16 +58,20 @@ export default defineConfig({
           text: "Reference",
           items: [
             {
+              text: "Official Registry",
+              link: "/reference/official-registry",
+            },
+            {
               text: "Registry Spec",
               link: "/reference/registry-spec",
             },
             {
-              text: "Project Files",
-              link: "/reference/project-files",
-            },
-            {
               text: "Adapters",
               link: "/reference/adapters",
+            },
+            {
+              text: "Project Files",
+              link: "/reference/project-files",
             },
           ],
         },

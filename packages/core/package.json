@@ -1,6 +1,6 @@
 {
   "name": "@ucr/core",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Core parser, resolver, installer, diff and upgrade planner.",
   "type": "commonjs",
   "main": "dist/index.js",

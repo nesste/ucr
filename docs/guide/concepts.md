@@ -14,6 +14,8 @@ Every registry document contains `items[]`. Each item is one of three kinds:
 
 Utilities and presets are reusable items. Their instance id defaults to the item name. Blocks are instance-specific and require `--instance`.
 
+For the concrete shipped catalog, see [Official Registry](/reference/official-registry). That page documents every item in `ucr-official`, what it requires, what it outputs, and how to install it.
+
 ## Targets And Surfaces
 
 Two dimensions control where outputs can go:

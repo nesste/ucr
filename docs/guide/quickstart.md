@@ -49,6 +49,8 @@ Inspect one item:
 ucr show entity-contract
 ```
 
+For the complete shipped catalog, see [Official Registry](/reference/official-registry). It expands the high-level CLI output with per-item purpose, requirements, outputs, and usage recipes.
+
 Install a block with typed inputs:
 
 ```bash
@@ -128,4 +130,5 @@ This repository keeps the examples because they demonstrate:
 
 - [Concepts](/guide/concepts) for instance ids, capabilities, cache behavior, and state files
 - [Commands](/guide/commands) for all flags and examples
+- [Official Registry](/reference/official-registry) for the concrete `ucr-official` item catalog
 - [Examples](/guide/examples) for the checked-in Bun and Next compositions

@@ -16,11 +16,11 @@
     },
     "examples/bun-service": {
       "name": "@ucr/example-bun-service",
-      "version": "0.0.0",
+      "version": "0.0.1",
     },
     "examples/next-app": {
       "name": "@ucr/example-next-app",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "next": "16.2.4",
         "react": "19.2.4",
@@ -35,7 +35,7 @@
     },
     "packages/cli": {
       "name": "@ucr/cli",
-      "version": "0.1.0",
+      "version": "0.0.1",
       "bin": {
         "ucr": "dist/bin.js",
       },
@@ -45,7 +45,7 @@
     },
     "packages/core": {
       "name": "@ucr/core",
-      "version": "0.1.0",
+      "version": "0.0.1",
       "dependencies": {
         "@ucr/schema": "workspace:*",
         "fflate": "^0.8.2",
@@ -53,7 +53,7 @@
     },
     "packages/schema": {
       "name": "@ucr/schema",
-      "version": "0.1.0",
+      "version": "0.0.1",
     },
   },
   "packages": {
