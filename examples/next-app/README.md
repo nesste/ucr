@@ -17,3 +17,4 @@ The checked-in generated files show a full `posts` admin flow composed from:
 - `data-table`
 - `entity-form`
 - `admin-page`
+- `entity-detail-page`

@@ -53,6 +53,12 @@ List the remote catalog:
 ucr list
 ```
 
+The official catalog is grouped for day-to-day usage:
+
+- start with `Project Foundations`
+- add either a starter CRUD block or the granular `Entity/API Flows`
+- add `Admin UI` blocks last for `next-app-router` projects
+
 Inspect one item:
 
 ```bash
@@ -61,10 +67,23 @@ ucr show entity-contract
 
 For the complete shipped catalog, see [Official Registry](/reference/official-registry). It expands the high-level CLI output with per-item purpose, requirements, outputs, and usage recipes.
 
-Install a block with typed inputs:
+Fastest starter path for a Next resource:
+
+```bash
+ucr add next-crud-resource --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+```
+
+Granular path for the same resource:
 
 ```bash
 ucr add entity-contract --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+```
+
+On Next projects, add admin/detail UI after the API flow is in place:
+
+```bash
+ucr add admin-page --instance posts --input entity=Post --input plural=posts
+ucr add entity-detail-page --instance posts --input entity=Post --input plural=posts
 ```
 
 Compare local state with upstream:

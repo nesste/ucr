@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import {
   createFormState,
@@ -20,15 +20,32 @@ const fieldStyle = {
 };
 
 export interface PostFormProps {
+  initialValues?: Partial<CreatePostInput>;
   onSubmit(input: CreatePostInput): Promise<void> | void;
+  submitLabel?: string;
 }
 
-export function PostForm({ onSubmit }: PostFormProps) {
-  const [formState, setFormState] = useState(() =>
-    createFormState(
-      createEmptyPostInput() as unknown as Record<string, unknown>,
-    ),
+function createInitialValues(
+  initialValues?: Partial<CreatePostInput>,
+): Record<string, unknown> {
+  return mergeDefined(
+    createEmptyPostInput() as unknown as Record<string, unknown>,
+    (initialValues ?? {}) as Record<string, unknown>,
   );
+}
+
+export function PostForm({
+  initialValues,
+  onSubmit,
+  submitLabel,
+}: PostFormProps) {
+  const [formState, setFormState] = useState(() =>
+    createFormState(createInitialValues(initialValues)),
+  );
+
+  useEffect(() => {
+    setFormState(createFormState(createInitialValues(initialValues)));
+  }, [initialValues]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,11 +58,13 @@ export function PostForm({ onSubmit }: PostFormProps) {
 
     try {
       await onSubmit(formState.values as unknown as CreatePostInput);
-      setFormState(
-        createFormState(
-          createEmptyPostInput() as unknown as Record<string, unknown>,
-        ),
-      );
+      setFormState(createFormState(
+        initialValues
+          ? createInitialValues(
+              formState.values as unknown as Partial<CreatePostInput>,
+            )
+          : createInitialValues(),
+      ));
     } catch (error) {
       setFormState((current) =>
         reduceEvent(current, {
@@ -111,7 +130,7 @@ export function PostForm({ onSubmit }: PostFormProps) {
       {formState.error ? <p>{formState.error}</p> : null}
 
       <button disabled={formState.isSubmitting} type="submit">
-        {formState.isSubmitting ? "Saving..." : "Create Post"}
+        {formState.isSubmitting ? "Saving..." : (submitLabel ?? "Create Post")}
       </button>
     </form>
   );

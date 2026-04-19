@@ -1,9 +1,13 @@
 {
-  "version": 2,
+  "version": 3,
   "registry": {
     "name": "ucr-official",
     "version": "3.0.0",
-    "source": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json"
+    "transport": "file",
+    "source": "fixtures/registries/ucr-official/registry.json",
+    "manifestUrl": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json",
+    "bundleUrl": null,
+    "bundleChecksum": null
   },
   "installs": {
     "ts-runtime:ts-runtime": {
@@ -499,7 +503,7 @@
       "files": [
         "src/ucr/posts/domain/api-client.ts"
       ],
-      "updatedAt": "2026-04-19T10:18:29.938Z"
+      "updatedAt": "2026-04-19T20:13:33.215Z"
     },
     "next-collection-route:posts": {
       "itemKind": "block",
@@ -618,6 +622,30 @@
         "src/app/posts/page.tsx"
       ],
       "updatedAt": "2026-04-19T10:18:30.439Z"
+    },
+    "entity-detail-page:posts": {
+      "itemKind": "block",
+      "itemName": "entity-detail-page",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "api-client:posts",
+        "entity-form:posts",
+        "next-item-route:posts"
+      ],
+      "provides": [
+        "entity-detail-page:posts"
+      ],
+      "files": [
+        "src/app/posts/[id]/page.tsx"
+      ],
+      "updatedAt": "2026-04-19T20:13:33.241Z"
     }
   }
 }

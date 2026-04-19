@@ -40,6 +40,8 @@ export interface GenerateOfficialRegistryDocOptions {
   exampleSources: OfficialRegistryDocExampleSource[];
 }
 
+type CatalogSection = "foundation" | "entity-api" | "admin-ui" | "building-block";
+
 const ALLOWED_OVERLAY_KEYS = new Set([
   "itemName",
   "useWhen",
@@ -57,6 +59,19 @@ const KIND_LABELS: Record<RegistryItemKind, string> = {
   preset: "Presets",
   block: "Blocks",
 };
+const CATALOG_SECTION_ORDER: CatalogSection[] = [
+  "foundation",
+  "entity-api",
+  "admin-ui",
+  "building-block",
+];
+const CATALOG_SECTION_LABELS: Record<CatalogSection, string> = {
+  foundation: "Project Foundations",
+  "entity-api": "Entity/API Flows",
+  "admin-ui": "Admin UI",
+  "building-block": "Building Blocks",
+};
+const VALID_CATALOG_SECTIONS = new Set<CatalogSection>(CATALOG_SECTION_ORDER);
 
 function compareText(left: string, right: string): number {
   return left.localeCompare(right, "en", {
@@ -111,6 +126,21 @@ function getImportPath(item: RegistryItem): string | null {
   }
 
   return null;
+}
+
+function getCatalogSection(item: RegistryItem): CatalogSection | null {
+  const rawValue = item.metadata?.catalogSection?.trim();
+
+  if (!rawValue || !VALID_CATALOG_SECTIONS.has(rawValue as CatalogSection)) {
+    return null;
+  }
+
+  return rawValue as CatalogSection;
+}
+
+function getCatalogOrder(item: RegistryItem): string | null {
+  const rawValue = item.metadata?.catalogOrder?.trim();
+  return rawValue && rawValue.length > 0 ? rawValue : null;
 }
 
 function getTargetCount(registry: RegistryDocument, target: RegistryTarget): number {
@@ -278,6 +308,31 @@ function renderListField(label: string, values: readonly string[] | undefined): 
   return `- ${label}: ${formatCodeList(values)}`;
 }
 
+function compareCatalogItems(left: RegistryItem, right: RegistryItem): number {
+  const leftSection = getCatalogSection(left);
+  const rightSection = getCatalogSection(right);
+
+  if (leftSection && rightSection) {
+    const sectionOrder =
+      CATALOG_SECTION_ORDER.indexOf(leftSection) -
+      CATALOG_SECTION_ORDER.indexOf(rightSection);
+
+    if (sectionOrder !== 0) {
+      return sectionOrder;
+    }
+  }
+
+  const orderComparison = (getCatalogOrder(left) ?? "").localeCompare(
+    getCatalogOrder(right) ?? "",
+  );
+
+  if (orderComparison !== 0) {
+    return orderComparison;
+  }
+
+  return compareText(left.name, right.name);
+}
+
 function renderExampleInstalls(
   examples: readonly OfficialRegistryDocExampleInstall[],
   overlay: OfficialRegistryDocOverlayEntry,
@@ -366,6 +421,7 @@ function renderItemSection(
     "- Kind: " + `\`${item.kind}\``,
     "- Category: " + `\`${item.category}\``,
     "- Targets: " + formatCodeList(item.targets),
+    renderListField("Tags", item.tags),
     ...renderImportDetails(item),
     renderListField("Requires", item.requires),
     renderListField("Provides", item.provides),
@@ -397,6 +453,48 @@ function renderItemSection(
   }
 
   lines.push("", ...renderExampleInstalls(examples, overlay), "");
+
+  return lines;
+}
+
+function renderRecommendedByWorkflow(
+  registry: RegistryDocument,
+  overlayByItemName: Record<string, OfficialRegistryDocOverlayEntry>,
+): string[] {
+  const catalogItems = registry.items.filter(
+    (item) => getCatalogSection(item) !== null && getCatalogOrder(item) !== null,
+  );
+
+  if (catalogItems.length === 0) {
+    return [];
+  }
+
+  const lines = [
+    "## Recommended By Workflow",
+    "",
+    "Use this section as the default browsing path in `ucr list`: foundations first, adapter-specific API flows second, and admin UI last for Next projects.",
+    "",
+  ];
+
+  for (const section of CATALOG_SECTION_ORDER) {
+    const sectionItems = catalogItems
+      .filter((item) => getCatalogSection(item) === section)
+      .sort(compareCatalogItems);
+
+    if (sectionItems.length === 0) {
+      continue;
+    }
+
+    lines.push(`### ${CATALOG_SECTION_LABELS[section]}`, "");
+
+    for (const item of sectionItems) {
+      lines.push(
+        `- \`${item.name}\`: ${overlayByItemName[item.name]?.useWhen ?? item.description ?? "No description provided."}`,
+      );
+    }
+
+    lines.push("");
+  }
 
   return lines;
 }
@@ -460,6 +558,7 @@ export function generateOfficialRegistryDoc(
     "",
     "Blocks always require an explicit `--instance`, even when their generated files land at fixed logical paths.",
     "",
+    ...renderRecommendedByWorkflow(options.registry, options.overlayByItemName),
     ...renderSummary(options.registry),
   ];
 

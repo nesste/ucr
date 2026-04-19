@@ -24,6 +24,12 @@ Checked-in composition:
 
 Cross-reference these installs with [Official Registry](/reference/official-registry) when you want to see the manifest metadata, canonical install recipe, and example-owned file list for each item.
 
+Recommended browsing flow for Bun projects:
+
+- foundations first: `health-route`, `bun-server`, and optional `request-context`
+- API flow second: either the `bun-crud-resource` starter or the granular entity and route chain
+- UI is not applicable for the Bun adapter
+
 What this example proves:
 
 - shared code lands under `ucr/...`
@@ -65,9 +71,15 @@ Checked-in composition:
 - runtime: `ts-runtime`
 - shared utilities plus Next-only UI utilities
 - presets: `service-preset`, `endpoint-preset`, `form-preset`, `admin-page-preset`
-- blocks: `entity-contract`, `service-layer`, `memory-repository`, `input-validation`, `api-client`, `next-collection-route`, `next-item-route`, `data-table`, `entity-form`, `admin-page`
+- blocks: `entity-contract`, `service-layer`, `memory-repository`, `input-validation`, `api-client`, `next-collection-route`, `next-item-route`, `data-table`, `entity-form`, `admin-page`, `entity-detail-page`
 
 Cross-reference these installs with [Official Registry](/reference/official-registry) when you want to see the manifest metadata, canonical install recipe, and example-owned file list for each item.
+
+Recommended browsing flow for Next projects:
+
+- foundations first
+- API flow second: either `next-crud-resource` or the granular entity and route chain
+- admin/detail UI last: `admin-page`, `entity-detail-page`, or the lower-level table and form blocks
 
 What this example proves:
 

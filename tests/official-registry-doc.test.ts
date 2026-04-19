@@ -87,10 +87,16 @@ test("official registry docs generator renders all item headings and representat
     expect(output).toContain(`### \`${item.name}\``);
   }
 
+  expect(output).toContain("## Recommended By Workflow");
+  expect(output).toContain("### Project Foundations");
+  expect(output).toContain("### Entity/API Flows");
+  expect(output).toContain("### Admin UI");
+  expect(output).toContain("### Building Blocks");
   expect(output).toContain("- Import path: `<ucr-root>/utilities/result-utility`");
   expect(output).toContain(
     "- Exported helpers: `ok`, `err`, `mapResult`, `mapError`, `matchResult`",
   );
+  expect(output).toContain("- Tags: `advanced`, `shared`");
   expect(output).toContain(
     "- Composes: `result-utility`, `async-utility`, `validation-utility`",
   );
@@ -98,9 +104,15 @@ test("official registry docs generator renders all item headings and representat
     "ucr add entity-contract --target . --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json",
   );
   expect(output).toContain(
+    "ucr add bun-crud-resource --target . --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json",
+  );
+  expect(output).toContain(
     "ucr add bun-server --target . --instance server --input-file routeModules=./route-modules.json",
   );
   expect(output).toContain(
     "- `bun-service` (bun-http, instance `server`): `server/index.ts`",
+  );
+  expect(output).toContain(
+    "- `next-app` (next-app-router, instance `posts`): `src/app/posts/[id]/page.tsx`",
   );
 });

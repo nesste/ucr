@@ -9,10 +9,20 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Typed composition runtime for utility-first TypeScript blocks.",
-      "targets": ["shared"],
-      "provides": ["runtime:ts"],
+      "targets": [
+        "shared"
+      ],
+      "provides": [
+        "runtime:ts"
+      ],
+      "tags": [
+        "advanced",
+        "shared"
+      ],
       "metadata": {
-        "exports": "defineUtility,definePreset,compose"
+        "exports": "defineUtility,definePreset,compose",
+        "catalogSection": "building-block",
+        "catalogOrder": "010"
       },
       "outputs": [
         {
@@ -28,11 +38,23 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Small result helpers for predictable service and transport flows.",
-      "targets": ["shared"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:result-utility"],
+      "targets": [
+        "shared"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:result-utility"
+      ],
+      "tags": [
+        "advanced",
+        "shared"
+      ],
       "metadata": {
-        "exports": "ok,err,mapResult,mapError,matchResult"
+        "exports": "ok,err,mapResult,mapError,matchResult",
+        "catalogSection": "building-block",
+        "catalogOrder": "020"
       },
       "outputs": [
         {
@@ -48,11 +70,23 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Composable async helpers for retries, sequencing, and timeouts.",
-      "targets": ["shared"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:async-utility"],
+      "targets": [
+        "shared"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:async-utility"
+      ],
+      "tags": [
+        "advanced",
+        "shared"
+      ],
       "metadata": {
-        "exports": "retry,parallel,sequence,withTimeout"
+        "exports": "retry,parallel,sequence,withTimeout",
+        "catalogSection": "building-block",
+        "catalogOrder": "030"
       },
       "outputs": [
         {
@@ -68,11 +102,23 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Object helpers for picking, omitting, and merging defined values.",
-      "targets": ["shared"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:object-utility"],
+      "targets": [
+        "shared"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:object-utility"
+      ],
+      "tags": [
+        "advanced",
+        "shared"
+      ],
       "metadata": {
-        "exports": "pick,omit,mergeDefined"
+        "exports": "pick,omit,mergeDefined",
+        "catalogSection": "building-block",
+        "catalogOrder": "040"
       },
       "outputs": [
         {
@@ -88,11 +134,23 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Collection helpers for grouping, indexing, and sorting records.",
-      "targets": ["shared"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:collection-utility"],
+      "targets": [
+        "shared"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:collection-utility"
+      ],
+      "tags": [
+        "advanced",
+        "shared"
+      ],
       "metadata": {
-        "exports": "groupBy,indexBy,sortBy"
+        "exports": "groupBy,indexBy,sortBy",
+        "catalogSection": "building-block",
+        "catalogOrder": "050"
       },
       "outputs": [
         {
@@ -108,11 +166,23 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Validation helpers for record checking and field-error shaping.",
-      "targets": ["shared"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:validation-utility"],
+      "targets": [
+        "shared"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:validation-utility"
+      ],
+      "tags": [
+        "advanced",
+        "shared"
+      ],
       "metadata": {
-        "exports": "assertRecord,assertShape,toFieldErrors"
+        "exports": "assertRecord,assertShape,toFieldErrors",
+        "catalogSection": "building-block",
+        "catalogOrder": "060"
       },
       "outputs": [
         {
@@ -128,11 +198,24 @@
       "version": "1.0.0",
       "category": "typescript-ui",
       "description": "Variant helpers for UI state and appearance selection.",
-      "targets": ["next-app-router"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:variant-utility"],
+      "targets": [
+        "next-app-router"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:variant-utility"
+      ],
+      "tags": [
+        "advanced",
+        "ui",
+        "next"
+      ],
       "metadata": {
-        "exports": "createVariants,pickVariant,compoundVariants"
+        "exports": "createVariants,pickVariant,compoundVariants",
+        "catalogSection": "building-block",
+        "catalogOrder": "070"
       },
       "outputs": [
         {
@@ -148,11 +231,24 @@
       "version": "1.0.0",
       "category": "typescript-ui",
       "description": "Slot helpers for predictable UI regions and shared view props.",
-      "targets": ["next-app-router"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:slot-utility"],
+      "targets": [
+        "next-app-router"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:slot-utility"
+      ],
+      "tags": [
+        "advanced",
+        "ui",
+        "next"
+      ],
       "metadata": {
-        "exports": "createSlots,mergeSlots,resolveSlots"
+        "exports": "createSlots,mergeSlots,resolveSlots",
+        "catalogSection": "building-block",
+        "catalogOrder": "080"
       },
       "outputs": [
         {
@@ -168,11 +264,24 @@
       "version": "1.0.0",
       "category": "typescript-ui",
       "description": "State helpers for async, form, and event-driven UI flows.",
-      "targets": ["next-app-router"],
-      "requires": ["runtime:ts"],
-      "provides": ["utility:state-utility"],
+      "targets": [
+        "next-app-router"
+      ],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:state-utility"
+      ],
+      "tags": [
+        "advanced",
+        "ui",
+        "next"
+      ],
       "metadata": {
-        "exports": "createAsyncState,createFormState,reduceEvent"
+        "exports": "createAsyncState,createFormState,reduceEvent",
+        "catalogSection": "building-block",
+        "catalogOrder": "090"
       },
       "outputs": [
         {
@@ -188,7 +297,9 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Shared service preset for result, async, and validation helpers.",
-      "targets": ["shared"],
+      "targets": [
+        "shared"
+      ],
       "compose": [
         "result-utility",
         "async-utility",
@@ -200,7 +311,18 @@
         "utility:async-utility",
         "utility:validation-utility"
       ],
-      "provides": ["preset:service-preset"],
+      "provides": [
+        "preset:service-preset"
+      ],
+      "tags": [
+        "advanced",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "building-block",
+        "catalogOrder": "100"
+      },
       "outputs": [
         {
           "template": "templates/service-preset/preset/service-preset.ts.tpl",
@@ -215,7 +337,9 @@
       "version": "1.0.0",
       "category": "typescript",
       "description": "Transport preset for endpoint-safe shared helpers.",
-      "targets": ["shared"],
+      "targets": [
+        "shared"
+      ],
       "compose": [
         "service-preset",
         "object-utility",
@@ -227,7 +351,18 @@
         "utility:object-utility",
         "utility:collection-utility"
       ],
-      "provides": ["preset:endpoint-preset"],
+      "provides": [
+        "preset:endpoint-preset"
+      ],
+      "tags": [
+        "advanced",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "building-block",
+        "catalogOrder": "110"
+      },
       "outputs": [
         {
           "template": "templates/endpoint-preset/preset/endpoint-preset.ts.tpl",
@@ -242,7 +377,9 @@
       "version": "1.0.0",
       "category": "typescript-ui",
       "description": "UI form preset for validation, object updates, and state changes.",
-      "targets": ["next-app-router"],
+      "targets": [
+        "next-app-router"
+      ],
       "compose": [
         "validation-utility",
         "object-utility",
@@ -254,7 +391,18 @@
         "utility:object-utility",
         "utility:state-utility"
       ],
-      "provides": ["preset:form-preset"],
+      "provides": [
+        "preset:form-preset"
+      ],
+      "tags": [
+        "advanced",
+        "ui",
+        "next"
+      ],
+      "metadata": {
+        "catalogSection": "building-block",
+        "catalogOrder": "120"
+      },
       "outputs": [
         {
           "template": "templates/form-preset/preset/form-preset.ts.tpl",
@@ -269,7 +417,9 @@
       "version": "1.0.0",
       "category": "typescript-ui",
       "description": "UI preset for admin layouts, slots, state, and collection rendering.",
-      "targets": ["next-app-router"],
+      "targets": [
+        "next-app-router"
+      ],
       "compose": [
         "variant-utility",
         "slot-utility",
@@ -283,7 +433,18 @@
         "utility:state-utility",
         "utility:collection-utility"
       ],
-      "provides": ["preset:admin-page-preset"],
+      "provides": [
+        "preset:admin-page-preset"
+      ],
+      "tags": [
+        "advanced",
+        "ui",
+        "next"
+      ],
+      "metadata": {
+        "catalogSection": "building-block",
+        "catalogOrder": "130"
+      },
       "outputs": [
         {
           "template": "templates/admin-page-preset/preset/admin-page-preset.ts.tpl",
@@ -298,8 +459,21 @@
       "version": "1.0.0",
       "category": "foundation",
       "description": "Typed environment helpers for Bun-managed projects.",
-      "targets": ["shared"],
-      "provides": ["env-config"],
+      "targets": [
+        "shared"
+      ],
+      "provides": [
+        "env-config"
+      ],
+      "tags": [
+        "foundation",
+        "starter",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "010"
+      },
       "outputs": [
         {
           "template": "templates/env-config/config/env.ts.tpl",
@@ -314,8 +488,20 @@
       "version": "1.0.0",
       "category": "foundation",
       "description": "Small Result helpers for predictable service and transport flows.",
-      "targets": ["shared"],
-      "provides": ["result-errors"],
+      "targets": [
+        "shared"
+      ],
+      "provides": [
+        "result-errors"
+      ],
+      "tags": [
+        "specialized",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "building-block",
+        "catalogOrder": "140"
+      },
       "outputs": [
         {
           "template": "templates/result-errors/domain/result.ts.tpl",
@@ -330,8 +516,21 @@
       "version": "1.0.0",
       "category": "foundation",
       "description": "Simple structured logger wrapper for app-local code.",
-      "targets": ["shared"],
-      "provides": ["logger"],
+      "targets": [
+        "shared"
+      ],
+      "provides": [
+        "logger"
+      ],
+      "tags": [
+        "foundation",
+        "starter",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "020"
+      },
       "outputs": [
         {
           "template": "templates/logger/config/logger.ts.tpl",
@@ -346,8 +545,21 @@
       "version": "1.0.0",
       "category": "bun-http",
       "description": "Small request context helpers for Bun HTTP handlers.",
-      "targets": ["bun-http"],
-      "provides": ["request-context"],
+      "targets": [
+        "bun-http"
+      ],
+      "provides": [
+        "request-context"
+      ],
+      "tags": [
+        "foundation",
+        "advanced",
+        "bun"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "050"
+      },
       "outputs": [
         {
           "template": "templates/request-context/config/request-context.ts.tpl",
@@ -362,7 +574,9 @@
       "version": "1.0.0",
       "category": "entity",
       "description": "Typed entity model, create/update inputs, and field metadata.",
-      "targets": ["shared"],
+      "targets": [
+        "shared"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -380,7 +594,19 @@
           "description": "Field metadata used to render entity code."
         }
       ],
-      "provides": ["entity-contract:{{instanceId}}"],
+      "provides": [
+        "entity-contract:{{instanceId}}"
+      ],
+      "tags": [
+        "advanced",
+        "crud",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "010"
+      },
       "outputs": [
         {
           "template": "templates/entity-contract/contract/model.ts.tpl",
@@ -395,7 +621,9 @@
       "version": "1.0.0",
       "category": "entity",
       "description": "Repository contract plus service methods for one entity.",
-      "targets": ["shared"],
+      "targets": [
+        "shared"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -416,6 +644,16 @@
         "repository-contract:{{instanceId}}",
         "service-layer:{{instanceId}}"
       ],
+      "tags": [
+        "advanced",
+        "crud",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "020"
+      },
       "outputs": [
         {
           "template": "templates/service-layer/domain/repository.ts.tpl",
@@ -435,7 +673,9 @@
       "version": "1.0.0",
       "category": "entity",
       "description": "In-memory repository plus singleton service runtime for one entity.",
-      "targets": ["shared"],
+      "targets": [
+        "shared"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -458,6 +698,16 @@
         "memory-repository:{{instanceId}}",
         "service-runtime:{{instanceId}}"
       ],
+      "tags": [
+        "starter",
+        "crud",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "030"
+      },
       "outputs": [
         {
           "template": "templates/memory-repository/domain/memory-repository.ts.tpl",
@@ -477,7 +727,9 @@
       "version": "1.0.0",
       "category": "entity",
       "description": "Unknown input validation for create and update entity payloads.",
-      "targets": ["shared"],
+      "targets": [
+        "shared"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -494,7 +746,19 @@
         "entity-contract:{{instanceId}}",
         "utility:validation-utility"
       ],
-      "provides": ["validation:{{instanceId}}"],
+      "provides": [
+        "validation:{{instanceId}}"
+      ],
+      "tags": [
+        "advanced",
+        "crud",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "040"
+      },
       "outputs": [
         {
           "template": "templates/input-validation/contract/validation.ts.tpl",
@@ -508,8 +772,10 @@
       "kind": "block",
       "version": "1.0.0",
       "category": "entity",
-      "description": "Small fetch client for one entity collection.",
-      "targets": ["shared"],
+      "description": "Small fetch client for one entity collection and item routes.",
+      "targets": [
+        "shared"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -526,7 +792,18 @@
         "entity-contract:{{instanceId}}",
         "utility:async-utility"
       ],
-      "provides": ["api-client:{{instanceId}}"],
+      "provides": [
+        "api-client:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "shared"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "050"
+      },
       "outputs": [
         {
           "template": "templates/api-client/domain/api-client.ts.tpl",
@@ -541,7 +818,9 @@
       "version": "1.0.0",
       "category": "next",
       "description": "Next App Router collection handler for one entity.",
-      "targets": ["next-app-router"],
+      "targets": [
+        "next-app-router"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -558,8 +837,21 @@
         "service-runtime:{{instanceId}}",
         "validation:{{instanceId}}"
       ],
-      "provides": ["next-collection-route:{{instanceId}}"],
-      "entrypoints": ["{{pluralKebab}}/route.ts"],
+      "provides": [
+        "next-collection-route:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "next"
+      ],
+      "entrypoints": [
+        "{{pluralKebab}}/route.ts"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "080"
+      },
       "outputs": [
         {
           "template": "templates/next-collection-route/transport/route.ts.tpl",
@@ -574,7 +866,9 @@
       "version": "1.0.0",
       "category": "next",
       "description": "Next App Router item handler for one entity.",
-      "targets": ["next-app-router"],
+      "targets": [
+        "next-app-router"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -591,8 +885,21 @@
         "service-runtime:{{instanceId}}",
         "validation:{{instanceId}}"
       ],
-      "provides": ["next-item-route:{{instanceId}}"],
-      "entrypoints": ["{{pluralKebab}}/[id]/route.ts"],
+      "provides": [
+        "next-item-route:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "next"
+      ],
+      "entrypoints": [
+        "{{pluralKebab}}/[id]/route.ts"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "090"
+      },
       "outputs": [
         {
           "template": "templates/next-item-route/transport/route.ts.tpl",
@@ -607,7 +914,9 @@
       "version": "1.0.0",
       "category": "next",
       "description": "Minimal entity table component for admin pages.",
-      "targets": ["next-app-router"],
+      "targets": [
+        "next-app-router"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -624,7 +933,18 @@
         "entity-contract:{{instanceId}}",
         "preset:admin-page-preset"
       ],
-      "provides": ["data-table:{{instanceId}}"],
+      "provides": [
+        "data-table:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "ui",
+        "next"
+      ],
+      "metadata": {
+        "catalogSection": "admin-ui",
+        "catalogOrder": "010"
+      },
       "outputs": [
         {
           "template": "templates/data-table/ui/data-table.tsx.tpl",
@@ -638,8 +958,10 @@
       "kind": "block",
       "version": "1.0.0",
       "category": "next",
-      "description": "Minimal create form component for one entity.",
-      "targets": ["next-app-router"],
+      "description": "Minimal create/edit form component for one entity.",
+      "targets": [
+        "next-app-router"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -656,7 +978,18 @@
         "entity-contract:{{instanceId}}",
         "preset:form-preset"
       ],
-      "provides": ["entity-form:{{instanceId}}"],
+      "provides": [
+        "entity-form:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "ui",
+        "next"
+      ],
+      "metadata": {
+        "catalogSection": "admin-ui",
+        "catalogOrder": "020"
+      },
       "outputs": [
         {
           "template": "templates/entity-form/ui/entity-form.tsx.tpl",
@@ -671,7 +1004,9 @@
       "version": "1.0.0",
       "category": "next",
       "description": "Client-side admin page composed from table, form, and API client blocks.",
-      "targets": ["next-app-router"],
+      "targets": [
+        "next-app-router"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -691,8 +1026,22 @@
         "entity-form:{{instanceId}}",
         "preset:admin-page-preset"
       ],
-      "provides": ["admin-page:{{instanceId}}"],
-      "entrypoints": ["{{pluralKebab}}/page.tsx"],
+      "provides": [
+        "admin-page:{{instanceId}}"
+      ],
+      "tags": [
+        "starter",
+        "crud",
+        "ui",
+        "next"
+      ],
+      "entrypoints": [
+        "{{pluralKebab}}/page.tsx"
+      ],
+      "metadata": {
+        "catalogSection": "admin-ui",
+        "catalogOrder": "030"
+      },
       "outputs": [
         {
           "template": "templates/admin-page/ui/page.tsx.tpl",
@@ -707,7 +1056,9 @@
       "version": "1.0.0",
       "category": "bun-http",
       "description": "Static route registry plus Bun.serve bootstrap.",
-      "targets": ["bun-http"],
+      "targets": [
+        "bun-http"
+      ],
       "inputs": [
         {
           "name": "routeModules",
@@ -715,8 +1066,21 @@
           "description": "Route import metadata for the server entrypoint."
         }
       ],
-      "provides": ["bun-server"],
-      "entrypoints": ["index.ts"],
+      "provides": [
+        "bun-server"
+      ],
+      "tags": [
+        "foundation",
+        "starter",
+        "bun"
+      ],
+      "entrypoints": [
+        "index.ts"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "040"
+      },
       "outputs": [
         {
           "template": "templates/bun-server/entrypoint/index.ts.tpl",
@@ -731,8 +1095,21 @@
       "version": "1.0.0",
       "category": "bun-http",
       "description": "Static health route for Bun HTTP services.",
-      "targets": ["bun-http"],
-      "provides": ["health-route"],
+      "targets": [
+        "bun-http"
+      ],
+      "provides": [
+        "health-route"
+      ],
+      "tags": [
+        "foundation",
+        "starter",
+        "bun"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "030"
+      },
       "outputs": [
         {
           "template": "templates/health-route/transport/health.ts.tpl",
@@ -747,7 +1124,9 @@
       "version": "1.0.0",
       "category": "bun-http",
       "description": "Bun HTTP collection route for one entity.",
-      "targets": ["bun-http"],
+      "targets": [
+        "bun-http"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -764,7 +1143,18 @@
         "service-runtime:{{instanceId}}",
         "validation:{{instanceId}}"
       ],
-      "provides": ["json-collection-route:{{instanceId}}"],
+      "provides": [
+        "json-collection-route:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "bun"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "060"
+      },
       "outputs": [
         {
           "template": "templates/json-collection-route/transport/index.ts.tpl",
@@ -779,7 +1169,9 @@
       "version": "1.0.0",
       "category": "bun-http",
       "description": "Bun HTTP item route for one entity.",
-      "targets": ["bun-http"],
+      "targets": [
+        "bun-http"
+      ],
       "inputs": [
         {
           "name": "entity",
@@ -796,12 +1188,287 @@
         "service-runtime:{{instanceId}}",
         "validation:{{instanceId}}"
       ],
-      "provides": ["json-item-route:{{instanceId}}"],
+      "provides": [
+        "json-item-route:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "bun"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "070"
+      },
       "outputs": [
         {
           "template": "templates/json-item-route/transport/item.ts.tpl",
           "target": "{{pluralKebab}}/[id].ts",
           "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "bun-crud-resource",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "bun-http",
+      "description": "Starter CRUD resource for Bun HTTP services.",
+      "targets": [
+        "bun-http"
+      ],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "description": "Field metadata used to render entity code."
+        }
+      ],
+      "requires": [
+        "preset:service-preset",
+        "preset:endpoint-preset",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "entity-contract:{{instanceId}}",
+        "repository-contract:{{instanceId}}",
+        "service-layer:{{instanceId}}",
+        "memory-repository:{{instanceId}}",
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}",
+        "json-collection-route:{{instanceId}}",
+        "json-item-route:{{instanceId}}"
+      ],
+      "tags": [
+        "starter",
+        "crud",
+        "api",
+        "bun"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "100"
+      },
+      "outputs": [
+        {
+          "template": "templates/entity-contract/contract/model.ts.tpl",
+          "target": "model.ts",
+          "surface": "contract"
+        },
+        {
+          "template": "templates/service-layer/domain/repository.ts.tpl",
+          "target": "repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/service-layer/domain/service.ts.tpl",
+          "target": "service.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/memory-repository.ts.tpl",
+          "target": "memory-repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/runtime.ts.tpl",
+          "target": "runtime.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/input-validation/contract/validation.ts.tpl",
+          "target": "validation.ts",
+          "surface": "contract"
+        },
+        {
+          "template": "templates/json-collection-route/transport/index.ts.tpl",
+          "target": "{{pluralKebab}}/index.ts",
+          "surface": "transport"
+        },
+        {
+          "template": "templates/json-item-route/transport/item.ts.tpl",
+          "target": "{{pluralKebab}}/[id].ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "next-crud-resource",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Starter CRUD resource for Next App Router projects.",
+      "targets": [
+        "next-app-router"
+      ],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "description": "Field metadata used to render entity code."
+        }
+      ],
+      "requires": [
+        "preset:service-preset",
+        "preset:endpoint-preset",
+        "utility:validation-utility",
+        "utility:async-utility",
+        "preset:form-preset",
+        "preset:admin-page-preset"
+      ],
+      "provides": [
+        "entity-contract:{{instanceId}}",
+        "repository-contract:{{instanceId}}",
+        "service-layer:{{instanceId}}",
+        "memory-repository:{{instanceId}}",
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}",
+        "api-client:{{instanceId}}",
+        "next-collection-route:{{instanceId}}",
+        "next-item-route:{{instanceId}}",
+        "data-table:{{instanceId}}",
+        "entity-form:{{instanceId}}",
+        "admin-page:{{instanceId}}"
+      ],
+      "tags": [
+        "starter",
+        "crud",
+        "api",
+        "next"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "110"
+      },
+      "outputs": [
+        {
+          "template": "templates/entity-contract/contract/model.ts.tpl",
+          "target": "model.ts",
+          "surface": "contract"
+        },
+        {
+          "template": "templates/service-layer/domain/repository.ts.tpl",
+          "target": "repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/service-layer/domain/service.ts.tpl",
+          "target": "service.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/memory-repository.ts.tpl",
+          "target": "memory-repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/runtime.ts.tpl",
+          "target": "runtime.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/input-validation/contract/validation.ts.tpl",
+          "target": "validation.ts",
+          "surface": "contract"
+        },
+        {
+          "template": "templates/api-client/domain/api-client.ts.tpl",
+          "target": "api-client.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/next-collection-route/transport/route.ts.tpl",
+          "target": "{{pluralKebab}}/route.ts",
+          "surface": "transport"
+        },
+        {
+          "template": "templates/next-item-route/transport/route.ts.tpl",
+          "target": "{{pluralKebab}}/[id]/route.ts",
+          "surface": "transport"
+        },
+        {
+          "template": "templates/data-table/ui/data-table.tsx.tpl",
+          "target": "{{pluralKebab}}/data-table.tsx",
+          "surface": "ui"
+        },
+        {
+          "template": "templates/entity-form/ui/entity-form.tsx.tpl",
+          "target": "{{resourceKebab}}/entity-form.tsx",
+          "surface": "ui"
+        },
+        {
+          "template": "templates/admin-page/ui/page.tsx.tpl",
+          "target": "{{pluralKebab}}/page.tsx",
+          "surface": "ui"
+        }
+      ]
+    },
+    {
+      "name": "entity-detail-page",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Client-side detail page for viewing and editing one entity.",
+      "targets": [
+        "next-app-router"
+      ],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "api-client:{{instanceId}}",
+        "next-item-route:{{instanceId}}",
+        "entity-form:{{instanceId}}"
+      ],
+      "provides": [
+        "entity-detail-page:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "ui",
+        "next"
+      ],
+      "entrypoints": [
+        "{{pluralKebab}}/[id]/page.tsx"
+      ],
+      "metadata": {
+        "catalogSection": "admin-ui",
+        "catalogOrder": "040"
+      },
+      "outputs": [
+        {
+          "template": "templates/entity-detail-page/ui/page.tsx.tpl",
+          "target": "{{pluralKebab}}/[id]/page.tsx",
+          "surface": "ui"
         }
       ]
     }

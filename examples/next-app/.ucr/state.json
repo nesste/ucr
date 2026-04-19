@@ -1,9 +1,13 @@
 {
-  "version": 4,
+  "version": 5,
   "registry": {
     "name": "ucr-official",
     "version": "3.0.0",
-    "source": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json"
+    "transport": "file",
+    "source": "fixtures/registries/ucr-official/registry.json",
+    "manifestUrl": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json",
+    "bundleUrl": null,
+    "bundleChecksum": null
   },
   "installs": {
     "ts-runtime:ts-runtime": {
@@ -320,13 +324,13 @@
         "src/ucr/posts/domain/api-client.ts": {
           "template": "templates/api-client/domain/api-client.ts.tpl",
           "surface": "domain",
-          "hash": "1c2817274ee4d539daa4dd6e9dc327b3967483460eafcbd8a4046b955bf123e9",
-          "snapshot": "import type {\n  CreatePostInput,\n  UpdatePostInput,\n  Post,\n} from \"../contract/model\";\nimport { retry, withTimeout } from \"../../utilities/async-utility\";\n\nasync function readJson<T>(response: Response): Promise<T> {\n  if (!response.ok) {\n    const payload = (await response.json().catch(() => null)) as\n      | { error?: string }\n      | null;\n    throw new Error(\n      payload?.error ?? `Request failed with status ${response.status}.`,\n    );\n  }\n\n  return (await response.json()) as T;\n}\n\nasync function sendRequest(\n  input: string,\n  init?: RequestInit,\n): Promise<Response> {\n  return withTimeout(\n    () =>\n      retry(() => fetch(input, init), {\n        attempts: 2,\n        delayMs: 25,\n      }),\n    3000,\n  );\n}\n\nconst basePath = \"/api/posts\";\n\nexport async function listPosts(): Promise<Post[]> {\n  const payload = await readJson<{ items: Post[] }>(\n    await sendRequest(basePath, {\n      cache: \"no-store\",\n    }),\n  );\n\n  return payload.items;\n}\n\nexport async function createPost(\n  input: CreatePostInput,\n): Promise<Post> {\n  const payload = await readJson<{ item: Post }>(\n    await sendRequest(basePath, {\n      method: \"POST\",\n      headers: {\n        \"content-type\": \"application/json\",\n      },\n      body: JSON.stringify(input),\n    }),\n  );\n\n  return payload.item;\n}\n\nexport async function updatePost(\n  id: string,\n  input: UpdatePostInput,\n): Promise<Post> {\n  const payload = await readJson<{ item: Post }>(\n    await sendRequest(`${basePath}/${id}`, {\n      method: \"PUT\",\n      headers: {\n        \"content-type\": \"application/json\",\n      },\n      body: JSON.stringify(input),\n    }),\n  );\n\n  return payload.item;\n}\n\nexport async function removePost(id: string): Promise<void> {\n  await readJson<{ ok: true }>(\n    await sendRequest(`${basePath}/${id}`, {\n      method: \"DELETE\",\n    }),\n  );\n}\n",
+          "hash": "527c2a7ebd7bd16bb1aa4caefcc1fd3cecaea9ee9e7624b004d6daa32a25a246",
+          "snapshot": "import type {\n  CreatePostInput,\n  UpdatePostInput,\n  Post,\n} from \"../contract/model\";\nimport { retry, withTimeout } from \"../../utilities/async-utility\";\n\nasync function readJson<T>(response: Response): Promise<T> {\n  if (!response.ok) {\n    const payload = (await response.json().catch(() => null)) as\n      | { error?: string }\n      | null;\n    throw new Error(\n      payload?.error ?? `Request failed with status ${response.status}.`,\n    );\n  }\n\n  return (await response.json()) as T;\n}\n\nasync function sendRequest(\n  input: string,\n  init?: RequestInit,\n): Promise<Response> {\n  return withTimeout(\n    () =>\n      retry(() => fetch(input, init), {\n        attempts: 2,\n        delayMs: 25,\n      }),\n    3000,\n  );\n}\n\nconst basePath = \"/api/posts\";\n\nexport async function listPosts(): Promise<Post[]> {\n  const payload = await readJson<{ items: Post[] }>(\n    await sendRequest(basePath, {\n      cache: \"no-store\",\n    }),\n  );\n\n  return payload.items;\n}\n\nexport async function getPost(id: string): Promise<Post> {\n  const payload = await readJson<{ item: Post }>(\n    await sendRequest(`${basePath}/${id}`, {\n      cache: \"no-store\",\n    }),\n  );\n\n  return payload.item;\n}\n\nexport async function createPost(\n  input: CreatePostInput,\n): Promise<Post> {\n  const payload = await readJson<{ item: Post }>(\n    await sendRequest(basePath, {\n      method: \"POST\",\n      headers: {\n        \"content-type\": \"application/json\",\n      },\n      body: JSON.stringify(input),\n    }),\n  );\n\n  return payload.item;\n}\n\nexport async function updatePost(\n  id: string,\n  input: UpdatePostInput,\n): Promise<Post> {\n  const payload = await readJson<{ item: Post }>(\n    await sendRequest(`${basePath}/${id}`, {\n      method: \"PUT\",\n      headers: {\n        \"content-type\": \"application/json\",\n      },\n      body: JSON.stringify(input),\n    }),\n  );\n\n  return payload.item;\n}\n\nexport async function removePost(id: string): Promise<void> {\n  await readJson<{ ok: true }>(\n    await sendRequest(`${basePath}/${id}`, {\n      method: \"DELETE\",\n    }),\n  );\n}\n",
           "itemVersion": "1.0.0",
-          "updatedAt": "2026-04-19T10:18:29.939Z"
+          "updatedAt": "2026-04-19T20:13:33.216Z"
         }
       },
-      "updatedAt": "2026-04-19T10:18:29.939Z"
+      "updatedAt": "2026-04-19T20:13:33.216Z"
     },
     "next-collection-route:posts": {
       "itemName": "next-collection-route",
@@ -412,6 +416,23 @@
         }
       },
       "updatedAt": "2026-04-19T10:18:30.440Z"
+    },
+    "entity-detail-page:posts": {
+      "itemName": "entity-detail-page",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "files": {
+        "src/app/posts/[id]/page.tsx": {
+          "template": "templates/entity-detail-page/ui/page.tsx.tpl",
+          "surface": "ui",
+          "hash": "1a5c5d755dec56a27b67471135e268170d7f3b85417324966ce330badd35328e",
+          "snapshot": "\"use client\";\n\nimport { useEffect, useState, type CSSProperties } from \"react\";\nimport { useParams, useRouter } from \"next/navigation\";\n\nimport type {\n  CreatePostInput,\n  Post,\n} from \"../../../ucr/posts/contract/model\";\nimport {\n  getPost,\n  removePost,\n  updatePost,\n} from \"../../../ucr/posts/domain/api-client\";\nimport { PostForm } from \"../entity-form\";\n\nconst layoutStyle = {\n  padding: \"2rem\",\n  display: \"grid\",\n  gap: \"1.5rem\",\n  maxWidth: \"860px\",\n  margin: \"0 auto\",\n} satisfies CSSProperties;\n\nconst cardStyle = {\n  backgroundColor: \"#ffffff\",\n  borderRadius: \"20px\",\n  padding: \"1.25rem 1.5rem\",\n  boxShadow: \"0 20px 45px rgba(16, 24, 40, 0.08)\",\n} satisfies CSSProperties;\n\nconst metaStyle = {\n  color: \"#4a5565\",\n  marginTop: \"0.5rem\",\n} satisfies CSSProperties;\n\nconst actionsStyle = {\n  display: \"flex\",\n  gap: \"0.75rem\",\n  flexWrap: \"wrap\",\n} satisfies CSSProperties;\n\nconst buttonStyle = {\n  cursor: \"pointer\",\n  border: \"none\",\n  borderRadius: \"999px\",\n  padding: \"0.5rem 0.9rem\",\n  backgroundColor: \"#1f2937\",\n  color: \"#ffffff\",\n} satisfies CSSProperties;\n\nconst dangerButtonStyle = {\n  ...buttonStyle,\n  backgroundColor: \"#b42318\",\n} satisfies CSSProperties;\n\nconst linkStyle = {\n  ...buttonStyle,\n  textDecoration: \"none\",\n  display: \"inline-flex\",\n  alignItems: \"center\",\n} satisfies CSSProperties;\n\nexport default function PostDetailPage() {\n  const params = useParams<{ id: string | string[] }>();\n  const router = useRouter();\n  const itemId = Array.isArray(params.id) ? (params.id[0] ?? \"\") : (params.id ?? \"\");\n  const [state, setState] = useState(() => ({\n    isLoading: true,\n    isDeleting: false,\n    item: null as Post | null,\n    error: null as string | null,\n    notice: null as string | null,\n  }));\n\n  useEffect(() => {\n    if (!itemId) {\n      setState((current) => ({\n        ...current,\n        isLoading: false,\n        error: \"Missing resource id.\",\n      }));\n      return;\n    }\n\n    let active = true;\n\n    async function loadItem(): Promise<void> {\n      setState((current) => ({\n        ...current,\n        isLoading: true,\n        error: null,\n        notice: null,\n      }));\n\n      try {\n        const item = await getPost(itemId);\n\n        if (!active) {\n          return;\n        }\n\n        setState((current) => ({\n          ...current,\n          isLoading: false,\n          item,\n        }));\n      } catch (error) {\n        if (!active) {\n          return;\n        }\n\n        setState((current) => ({\n          ...current,\n          isLoading: false,\n          error: error instanceof Error ? error.message : String(error),\n        }));\n      }\n    }\n\n    void loadItem();\n\n    return () => {\n      active = false;\n    };\n  }, [itemId]);\n\n  async function handleRemove(): Promise<void> {\n    if (!state.item || state.isDeleting) {\n      return;\n    }\n\n    setState((current) => ({\n      ...current,\n      isDeleting: true,\n      error: null,\n      notice: null,\n    }));\n\n    try {\n      await removePost(state.item.id);\n      router.push(\"/posts\");\n    } catch (error) {\n      setState((current) => ({\n        ...current,\n        isDeleting: false,\n        error: error instanceof Error ? error.message : String(error),\n      }));\n    }\n  }\n\n  return (\n    <main style={layoutStyle}>\n      <section style={cardStyle}>\n        <h1>Post Details</h1>\n        <p style={metaStyle}>\n          Review, update, or delete a single Post record.\n        </p>\n        <div style={actionsStyle}>\n          <a href=\"/posts\" style={linkStyle}>\n            Back to Posts\n          </a>\n          <button\n            type=\"button\"\n            disabled={!state.item || state.isDeleting}\n            onClick={() => {\n              void handleRemove();\n            }}\n            style={dangerButtonStyle}\n          >\n            {state.isDeleting ? \"Deleting...\" : \"Delete Post\"}\n          </button>\n        </div>\n        {state.item ? (\n          <p style={metaStyle}>\n            ID: {state.item.id} · Created: {state.item.createdAt} · Updated: {state.item.updatedAt}\n          </p>\n        ) : null}\n        {state.error ? <p>{state.error}</p> : null}\n        {state.notice ? <p>{state.notice}</p> : null}\n      </section>\n\n      <section style={cardStyle}>\n        <h2>Edit Post</h2>\n        {state.isLoading ? (\n          <p>Loading Post...</p>\n        ) : state.item ? (\n          <PostForm\n            initialValues={state.item as unknown as Partial<CreatePostInput>}\n            onSubmit={async (input) => {\n              const item = await updatePost(state.item!.id, input);\n              setState((current) => ({\n                ...current,\n                item,\n                notice: \"Post updated.\",\n                error: null,\n              }));\n            }}\n            submitLabel=\"Save Post\"\n          />\n        ) : (\n          <p>Unable to load Post.</p>\n        )}\n      </section>\n    </main>\n  );\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T20:13:33.243Z"
+        }
+      },
+      "updatedAt": "2026-04-19T20:13:33.243Z"
     }
   }
 }

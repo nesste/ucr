@@ -16,6 +16,19 @@ export interface ResolvedComposeGraph {
   duplicateExports: string[];
 }
 
+export type RegistryCatalogSection =
+  | "foundation"
+  | "entity-api"
+  | "admin-ui"
+  | "building-block";
+
+const VALID_CATALOG_SECTIONS = new Set<RegistryCatalogSection>([
+  "foundation",
+  "entity-api",
+  "admin-ui",
+  "building-block",
+]);
+
 export function getRegistryItem(
   loaded: LoadedRegistry,
   itemName: string,
@@ -80,6 +93,23 @@ export function parseRegistryMetadataList(
       .map((entry) => entry.trim())
       .filter((entry) => entry.length > 0),
   )];
+}
+
+export function getRegistryCatalogSection(
+  item: RegistryItem,
+): RegistryCatalogSection | null {
+  const rawValue = item.metadata?.catalogSection?.trim();
+
+  if (!rawValue || !VALID_CATALOG_SECTIONS.has(rawValue as RegistryCatalogSection)) {
+    return null;
+  }
+
+  return rawValue as RegistryCatalogSection;
+}
+
+export function getRegistryCatalogOrder(item: RegistryItem): string | null {
+  const rawValue = item.metadata?.catalogOrder?.trim();
+  return rawValue && rawValue.length > 0 ? rawValue : null;
 }
 
 export function resolveRegistryComposeNames(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import {
   createFormState,
@@ -20,15 +20,32 @@ const fieldStyle = {
 };
 
 export interface {{entityPascal}}FormProps {
+  initialValues?: Partial<Create{{entityPascal}}Input>;
   onSubmit(input: Create{{entityPascal}}Input): Promise<void> | void;
+  submitLabel?: string;
 }
 
-export function {{entityPascal}}Form({ onSubmit }: {{entityPascal}}FormProps) {
-  const [formState, setFormState] = useState(() =>
-    createFormState(
-      createEmpty{{entityPascal}}Input() as unknown as Record<string, unknown>,
-    ),
+function createInitialValues(
+  initialValues?: Partial<Create{{entityPascal}}Input>,
+): Record<string, unknown> {
+  return mergeDefined(
+    createEmpty{{entityPascal}}Input() as unknown as Record<string, unknown>,
+    (initialValues ?? {}) as Record<string, unknown>,
   );
+}
+
+export function {{entityPascal}}Form({
+  initialValues,
+  onSubmit,
+  submitLabel,
+}: {{entityPascal}}FormProps) {
+  const [formState, setFormState] = useState(() =>
+    createFormState(createInitialValues(initialValues)),
+  );
+
+  useEffect(() => {
+    setFormState(createFormState(createInitialValues(initialValues)));
+  }, [initialValues]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,11 +58,13 @@ export function {{entityPascal}}Form({ onSubmit }: {{entityPascal}}FormProps) {
 
     try {
       await onSubmit(formState.values as unknown as Create{{entityPascal}}Input);
-      setFormState(
-        createFormState(
-          createEmpty{{entityPascal}}Input() as unknown as Record<string, unknown>,
-        ),
-      );
+      setFormState(createFormState(
+        initialValues
+          ? createInitialValues(
+              formState.values as unknown as Partial<Create{{entityPascal}}Input>,
+            )
+          : createInitialValues(),
+      ));
     } catch (error) {
       setFormState((current) =>
         reduceEvent(current, {
@@ -111,7 +130,7 @@ export function {{entityPascal}}Form({ onSubmit }: {{entityPascal}}FormProps) {
       {formState.error ? <p>{formState.error}</p> : null}
 
       <button disabled={formState.isSubmitting} type="submit">
-        {formState.isSubmitting ? "Saving..." : "Create {{entityTitle}}"}
+        {formState.isSubmitting ? "Saving..." : (submitLabel ?? "Create {{entityTitle}}")}
       </button>
     </form>
   );

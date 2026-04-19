@@ -44,6 +44,16 @@ export async function list{{pluralPascal}}(): Promise<{{entityPascal}}[]> {
   return payload.items;
 }
 
+export async function get{{entityPascal}}(id: string): Promise<{{entityPascal}}> {
+  const payload = await readJson<{ item: {{entityPascal}} }>(
+    await sendRequest(`${basePath}/${id}`, {
+      cache: "no-store",
+    }),
+  );
+
+  return payload.item;
+}
+
 export async function create{{entityPascal}}(
   input: Create{{entityPascal}}Input,
 ): Promise<{{entityPascal}}> {

@@ -103,6 +103,21 @@ async function installSharedTypeScriptBase(
   }
 }
 
+async function installNextUiBase(
+  registry: Awaited<ReturnType<typeof loadRegistryDocument>>,
+  targetRoot: string,
+): Promise<void> {
+  for (const itemName of [
+    "variant-utility",
+    "slot-utility",
+    "state-utility",
+    "form-preset",
+    "admin-page-preset",
+  ]) {
+    await installItem(registry, targetRoot, itemName);
+  }
+}
+
 async function createTemporaryRegistry(): Promise<string> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "ucr-registry-"));
   const registryFile = path.join(root, "registry.json");
@@ -337,6 +352,23 @@ async function withRegistryAuthHeader<T>(
   }
 }
 
+async function captureConsoleLogs(action: () => Promise<void>): Promise<string> {
+  const originalLog = console.log;
+  const lines: string[] = [];
+
+  console.log = (...args: unknown[]) => {
+    lines.push(args.map((value) => String(value)).join(" "));
+  };
+
+  try {
+    await action();
+  } finally {
+    console.log = originalLog;
+  }
+
+  return lines.join("\n");
+}
+
 test("project inspection distinguishes bun-http and next-app-router", async () => {
   const bunRoot = await createTempProject();
   const nextRoot = await createTempProject({ next: true });
@@ -452,6 +484,156 @@ test("install plan refuses missing block requirements", async () => {
       },
     ),
   ).rejects.toThrow("service-runtime:posts");
+});
+
+test("list groups the official catalog by workflow and keeps incompatible items last", async () => {
+  const projectRoot = await createTempProject({ next: true });
+  const output = await captureConsoleLogs(async () => {
+    await runListCommand({
+      registryRef: registryPath,
+      targetRoot: projectRoot,
+    });
+  });
+
+  expect(output).toContain("Project Foundations");
+  expect(output).toContain("Entity/API Flows");
+  expect(output).toContain("Admin UI");
+  expect(output).toContain("Building Blocks");
+  expect(output).toContain("Incompatible");
+  expect(output).toContain("Typed environment helpers for Bun-managed projects.");
+  expect(output).toContain("tags=foundation, starter, shared");
+  expect(output.indexOf("Project Foundations")).toBeLessThan(
+    output.indexOf("Entity/API Flows"),
+  );
+  expect(output.indexOf("Entity/API Flows")).toBeLessThan(
+    output.indexOf("Admin UI"),
+  );
+  expect(output.indexOf("Admin UI")).toBeLessThan(
+    output.indexOf("Building Blocks"),
+  );
+  expect(output.indexOf("Building Blocks")).toBeLessThan(
+    output.indexOf("Incompatible"),
+  );
+  expect(output.indexOf("Incompatible")).toBeLessThan(
+    output.indexOf("request-context"),
+  );
+});
+
+test("list falls back to flat ordering for registries without catalog metadata", async () => {
+  const projectRoot = await createTempProject();
+  const tempRegistryPath = await createTemporaryRegistry();
+  const output = await captureConsoleLogs(async () => {
+    await runListCommand({
+      registryRef: tempRegistryPath,
+      targetRoot: projectRoot,
+    });
+  });
+
+  expect(output).not.toContain("Project Foundations");
+  expect(output.indexOf("ts-runtime")).toBeLessThan(output.indexOf("utility-a"));
+  expect(output.indexOf("utility-a")).toBeLessThan(output.indexOf("utility-b"));
+  expect(output.indexOf("utility-b")).toBeLessThan(output.indexOf("broken-preset"));
+});
+
+test("starter CRUD blocks render the full Bun and Next resource chains", async () => {
+  const registry = await loadRegistryDocument(registryPath);
+  const fields = await fs.readFile(fieldsPath, "utf8");
+
+  const bunRoot = await createTempProject();
+  await installSharedTypeScriptBase(registry, bunRoot);
+  await installItem(registry, bunRoot, "bun-crud-resource", {
+    instanceId: "posts",
+    rawInputs: {
+      entity: "Post",
+      plural: "posts",
+      fields,
+    },
+  });
+
+  const bunLock = await readRegistryLock(bunRoot);
+  expect(bunLock?.installs["bun-crud-resource:posts"]?.provides).toContain(
+    "service-runtime:posts",
+  );
+  expect(bunLock?.installs["bun-crud-resource:posts"]?.files).toContain(
+    "server/routes/posts/index.ts",
+  );
+  expect(bunLock?.installs["bun-crud-resource:posts"]?.files).toContain(
+    "ucr/posts/domain/service.ts",
+  );
+
+  const nextRoot = await createTempProject({ next: true });
+  await installSharedTypeScriptBase(registry, nextRoot);
+  await installNextUiBase(registry, nextRoot);
+  await installItem(registry, nextRoot, "next-crud-resource", {
+    instanceId: "posts",
+    rawInputs: {
+      entity: "Post",
+      plural: "posts",
+      fields,
+    },
+  });
+
+  const nextLock = await readRegistryLock(nextRoot);
+  expect(nextLock?.installs["next-crud-resource:posts"]?.provides).toContain(
+    "admin-page:posts",
+  );
+  expect(nextLock?.installs["next-crud-resource:posts"]?.files).toContain(
+    "src/app/posts/page.tsx",
+  );
+  expect(nextLock?.installs["next-crud-resource:posts"]?.files).toContain(
+    "src/ucr/posts/domain/api-client.ts",
+  );
+
+  const nextApiClient = await fs.readFile(
+    path.join(nextRoot, "src", "ucr", "posts", "domain", "api-client.ts"),
+    "utf8",
+  );
+  const nextEntityForm = await fs.readFile(
+    path.join(nextRoot, "src", "app", "posts", "entity-form.tsx"),
+    "utf8",
+  );
+  expect(nextApiClient).toContain("export async function getPost");
+  expect(nextEntityForm).toContain("initialValues?: Partial<CreatePostInput>");
+  expect(nextEntityForm).toContain("submitLabel?: string");
+});
+
+test("entity detail pages install on top of the CRUD resource flow", async () => {
+  const registry = await loadRegistryDocument(registryPath);
+  const fields = await fs.readFile(fieldsPath, "utf8");
+  const projectRoot = await createTempProject({ next: true });
+
+  await installSharedTypeScriptBase(registry, projectRoot);
+  await installNextUiBase(registry, projectRoot);
+  await installItem(registry, projectRoot, "next-crud-resource", {
+    instanceId: "posts",
+    rawInputs: {
+      entity: "Post",
+      plural: "posts",
+      fields,
+    },
+  });
+  await installItem(registry, projectRoot, "entity-detail-page", {
+    instanceId: "posts",
+    rawInputs: {
+      entity: "Post",
+      plural: "posts",
+    },
+  });
+
+  const lock = await readRegistryLock(projectRoot);
+  expect(lock?.installs["entity-detail-page:posts"]?.provides).toContain(
+    "entity-detail-page:posts",
+  );
+  expect(lock?.installs["entity-detail-page:posts"]?.files).toContain(
+    "src/app/posts/[id]/page.tsx",
+  );
+
+  const detailPage = await fs.readFile(
+    path.join(projectRoot, "src", "app", "posts", "[id]", "page.tsx"),
+    "utf8",
+  );
+  expect(detailPage).toContain("getPost");
+  expect(detailPage).toContain("Save Post");
 });
 
 test("preset install rejects duplicate composed exports", async () => {

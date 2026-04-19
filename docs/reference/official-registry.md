@@ -8,9 +8,59 @@ Use `<ucr-root>` below as shorthand for the adapter-managed shared UCR root. In 
 
 Blocks always require an explicit `--instance`, even when their generated files land at fixed logical paths.
 
+## Recommended By Workflow
+
+Use this section as the default browsing path in `ucr list`: foundations first, adapter-specific API flows second, and admin UI last for Next projects.
+
+### Project Foundations
+
+- `env-config`: Start here for project foundations when Bun-managed shared code should read environment variables through a typed local wrapper.
+- `logger`: Start here for project foundations when app-local code needs a tiny structured logger wrapper without pulling in a framework-specific logging layer.
+- `health-route`: Start here for Bun project foundations when you want a lightweight health endpoint without any entity-specific inputs.
+- `bun-server`: Start here for Bun project foundations when you want to stitch route modules into a Bun.serve entrypoint.
+- `request-context`: Use this more advanced Bun foundation when handlers should share request-scoped metadata or helper accessors.
+
+### Entity/API Flows
+
+- `entity-contract`: Start a granular entity/API workflow here. It defines the model, create/update inputs, and field metadata that the rest of the resource blocks build on.
+- `service-layer`: Use it in the granular entity/API flow after `entity-contract` when you want repository contracts and service methods for one resource.
+- `memory-repository`: Use it in the granular entity/API flow when you want a zero-dependency in-memory runtime while keeping service and repository boundaries intact.
+- `input-validation`: Use it in the granular entity/API flow when create and update payloads should be validated against the same field metadata as the entity contract.
+- `api-client`: Use it when shared or UI code should call one entity collection and item endpoint through a small fetch-based client.
+- `json-collection-route`: Use it in the granular Bun entity/API flow to expose collection handlers for one resource.
+- `json-item-route`: Use it in the granular Bun entity/API flow to expose item-by-id handlers for one resource.
+- `next-collection-route`: Use it in the granular Next entity/API flow when you want the collection API route for one resource.
+- `next-item-route`: Use it in the granular Next entity/API flow when you want the item-by-id API route for one resource.
+- `bun-crud-resource`: Use it as the fastest Bun HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.
+- `next-crud-resource`: Use it as the fastest Next App Router starter for one CRUD resource after the shared and UI building blocks are already installed.
+
+### Admin UI
+
+- `data-table`: Use it in Next App Router admin flows to render a minimal table for one resource.
+- `entity-form`: Use it in Next App Router admin flows to render a minimal create/edit form for one resource.
+- `admin-page`: Use it as the fastest granular admin UI entry point in Next App Router to assemble a working resource page from the table, form, API client, and preset blocks.
+- `entity-detail-page`: Use it in Next App Router admin flows when you want a client-side detail page that loads one record and reuses `entity-form` for edits.
+
+### Building Blocks
+
+- `ts-runtime`: Install this advanced shared runtime first when you want to compose utilities, presets, or higher-level blocks from the official registry.
+- `result-utility`: Use this advanced shared primitive as the recommended Result entry point when service or transport code should represent success and failure explicitly.
+- `async-utility`: Use this advanced shared primitive when handwritten code needs small async helpers for retries, sequencing, parallel work, or request timeouts.
+- `object-utility`: Use this advanced shared primitive when feature code frequently picks, omits, or merges partial object values.
+- `collection-utility`: Use this advanced shared primitive when feature code groups, indexes, or sorts arrays of records in a predictable way.
+- `validation-utility`: Use this advanced shared primitive when blocks or handwritten code need record assertions and normalized field-error objects.
+- `variant-utility`: Use this advanced Next UI primitive when you want declarative visual variants instead of inline conditionals.
+- `slot-utility`: Use this advanced Next UI primitive when you share named layout regions or reusable slot props across multiple components.
+- `state-utility`: Use this advanced Next UI primitive when you model async loading, form state, or reducer-style events with small typed helpers.
+- `service-preset`: Use this advanced shared preset when you want one stable import for the Result, async, and validation primitives that service code builds on.
+- `endpoint-preset`: Use this advanced shared preset when repository or transport code wants the service preset plus object and collection helpers from one stable import.
+- `form-preset`: Use this advanced Next UI preset when multiple forms should share validation, object update, and state helpers from one stable import.
+- `admin-page-preset`: Use this advanced Next UI preset when admin-facing screens should share variant, slot, state, and collection helpers from one stable import.
+- `result-errors`: Use this specialized alternative only when you want a concrete Result domain file without installing the recommended `result-utility` building block.
+
 ## Summary
 
-The published `ucr-official` manifest currently contains **31** installable items.
+The published `ucr-official` manifest currently contains **34** installable items.
 
 **By kind**
 
@@ -18,7 +68,7 @@ The published `ucr-official` manifest currently contains **31** installable item
 | --- | --- |
 | `utility` | 9 |
 | `preset` | 4 |
-| `block` | 18 |
+| `block` | 21 |
 
 **By category**
 
@@ -28,18 +78,18 @@ The published `ucr-official` manifest currently contains **31** installable item
 | `utility` | `typescript-ui` | 3 |
 | `preset` | `typescript` | 2 |
 | `preset` | `typescript-ui` | 2 |
-| `block` | `bun-http` | 5 |
+| `block` | `bun-http` | 6 |
 | `block` | `entity` | 5 |
 | `block` | `foundation` | 3 |
-| `block` | `next` | 5 |
+| `block` | `next` | 7 |
 
 **By target**
 
 | Target | Count |
 | --- | --- |
 | `shared` | 16 |
-| `next-app-router` | 10 |
-| `bun-http` | 5 |
+| `next-app-router` | 12 |
+| `bun-http` | 6 |
 
 ## Utilities
 
@@ -47,11 +97,12 @@ The published `ucr-official` manifest currently contains **31** installable item
 
 Composable async helpers for retries, sequencing, and timeouts.
 
-**When to use it:** Use it when shared code needs small async helpers for retries, sequencing, parallel work, or request timeouts.
+**When to use it:** Use this advanced shared primitive when handwritten code needs small async helpers for retries, sequencing, parallel work, or request timeouts.
 
 - Kind: `utility`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `shared`
 - Import path: `<ucr-root>/utilities/async-utility`
 - Exported helpers: `retry`, `parallel`, `sequence`, `withTimeout`
 - Requires: `runtime:ts`
@@ -82,11 +133,12 @@ ucr add async-utility --target .
 
 Collection helpers for grouping, indexing, and sorting records.
 
-**When to use it:** Use it when feature code groups, indexes, or sorts arrays of records in a predictable way.
+**When to use it:** Use this advanced shared primitive when feature code groups, indexes, or sorts arrays of records in a predictable way.
 
 - Kind: `utility`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `shared`
 - Import path: `<ucr-root>/utilities/collection-utility`
 - Exported helpers: `groupBy`, `indexBy`, `sortBy`
 - Requires: `runtime:ts`
@@ -117,11 +169,12 @@ ucr add collection-utility --target .
 
 Object helpers for picking, omitting, and merging defined values.
 
-**When to use it:** Use it when feature code frequently picks, omits, or merges partial object values.
+**When to use it:** Use this advanced shared primitive when feature code frequently picks, omits, or merges partial object values.
 
 - Kind: `utility`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `shared`
 - Import path: `<ucr-root>/utilities/object-utility`
 - Exported helpers: `pick`, `omit`, `mergeDefined`
 - Requires: `runtime:ts`
@@ -152,11 +205,12 @@ ucr add object-utility --target .
 
 Small result helpers for predictable service and transport flows.
 
-**When to use it:** Use it when service or transport code should represent success and failure explicitly instead of relying on thrown exceptions.
+**When to use it:** Use this advanced shared primitive as the recommended Result entry point when service or transport code should represent success and failure explicitly.
 
 - Kind: `utility`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `shared`
 - Import path: `<ucr-root>/utilities/result-utility`
 - Exported helpers: `ok`, `err`, `mapResult`, `mapError`, `matchResult`
 - Requires: `runtime:ts`
@@ -187,11 +241,12 @@ ucr add result-utility --target .
 
 Typed composition runtime for utility-first TypeScript blocks.
 
-**When to use it:** Install this first for any shared TypeScript composition. It provides the runtime helpers that the reusable utilities and presets build on.
+**When to use it:** Install this advanced shared runtime first when you want to compose utilities, presets, or higher-level blocks from the official registry.
 
 - Kind: `utility`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `shared`
 - Import path: `<ucr-root>/runtime`
 - Exported helpers: `defineUtility`, `definePreset`, `compose`
 - Requires: -
@@ -222,11 +277,12 @@ ucr add ts-runtime --target .
 
 Validation helpers for record checking and field-error shaping.
 
-**When to use it:** Use it when blocks or handwritten code need record assertions and normalized field-error objects.
+**When to use it:** Use this advanced shared primitive when blocks or handwritten code need record assertions and normalized field-error objects.
 
 - Kind: `utility`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `shared`
 - Import path: `<ucr-root>/utilities/validation-utility`
 - Exported helpers: `assertRecord`, `assertShape`, `toFieldErrors`
 - Requires: `runtime:ts`
@@ -257,11 +313,12 @@ ucr add validation-utility --target .
 
 Slot helpers for predictable UI regions and shared view props.
 
-**When to use it:** Use it in Next UI code that shares named layout regions or reusable slot props across multiple components.
+**When to use it:** Use this advanced Next UI primitive when you share named layout regions or reusable slot props across multiple components.
 
 - Kind: `utility`
 - Category: `typescript-ui`
 - Targets: `next-app-router`
+- Tags: `advanced`, `ui`, `next`
 - Import path: `<ucr-root>/utilities/slot-utility`
 - Exported helpers: `createSlots`, `mergeSlots`, `resolveSlots`
 - Requires: `runtime:ts`
@@ -291,11 +348,12 @@ ucr add slot-utility --target .
 
 State helpers for async, form, and event-driven UI flows.
 
-**When to use it:** Use it in Next UI code that models async loading, form state, or reducer-style events with small typed helpers.
+**When to use it:** Use this advanced Next UI primitive when you model async loading, form state, or reducer-style events with small typed helpers.
 
 - Kind: `utility`
 - Category: `typescript-ui`
 - Targets: `next-app-router`
+- Tags: `advanced`, `ui`, `next`
 - Import path: `<ucr-root>/utilities/state-utility`
 - Exported helpers: `createAsyncState`, `createFormState`, `reduceEvent`
 - Requires: `runtime:ts`
@@ -325,11 +383,12 @@ ucr add state-utility --target .
 
 Variant helpers for UI state and appearance selection.
 
-**When to use it:** Use it in Next UI code that should choose visual or state variants from declarative maps instead of inline conditionals.
+**When to use it:** Use this advanced Next UI primitive when you want declarative visual variants instead of inline conditionals.
 
 - Kind: `utility`
 - Category: `typescript-ui`
 - Targets: `next-app-router`
+- Tags: `advanced`, `ui`, `next`
 - Import path: `<ucr-root>/utilities/variant-utility`
 - Exported helpers: `createVariants`, `pickVariant`, `compoundVariants`
 - Requires: `runtime:ts`
@@ -361,11 +420,12 @@ ucr add variant-utility --target .
 
 Transport preset for endpoint-safe shared helpers.
 
-**When to use it:** Use it when endpoint or repository code wants the service preset plus object and collection helpers from one preset import.
+**When to use it:** Use this advanced shared preset when repository or transport code wants the service preset plus object and collection helpers from one stable import.
 
 - Kind: `preset`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `api`, `shared`
 - Import path: `<ucr-root>/presets/endpoint-preset`
 - Requires: `runtime:ts`, `preset:service-preset`, `utility:object-utility`, `utility:collection-utility`
 - Provides: `preset:endpoint-preset`
@@ -396,11 +456,12 @@ ucr add endpoint-preset --target .
 
 Shared service preset for result, async, and validation helpers.
 
-**When to use it:** Use it when a service layer should re-export the result, async, and validation helpers from one stable preset import.
+**When to use it:** Use this advanced shared preset when you want one stable import for the Result, async, and validation primitives that service code builds on.
 
 - Kind: `preset`
 - Category: `typescript`
 - Targets: `shared`
+- Tags: `advanced`, `api`, `shared`
 - Import path: `<ucr-root>/presets/service-preset`
 - Requires: `runtime:ts`, `utility:result-utility`, `utility:async-utility`, `utility:validation-utility`
 - Provides: `preset:service-preset`
@@ -431,11 +492,12 @@ ucr add service-preset --target .
 
 UI preset for admin layouts, slots, state, and collection rendering.
 
-**When to use it:** Use it when admin-facing UI should share variant, slot, state, and collection helpers from one preset import.
+**When to use it:** Use this advanced Next UI preset when admin-facing screens should share variant, slot, state, and collection helpers from one stable import.
 
 - Kind: `preset`
 - Category: `typescript-ui`
 - Targets: `next-app-router`
+- Tags: `advanced`, `ui`, `next`
 - Import path: `<ucr-root>/presets/admin-page-preset`
 - Requires: `runtime:ts`, `utility:variant-utility`, `utility:slot-utility`, `utility:state-utility`, `utility:collection-utility`
 - Provides: `preset:admin-page-preset`
@@ -465,11 +527,12 @@ ucr add admin-page-preset --target .
 
 UI form preset for validation, object updates, and state changes.
 
-**When to use it:** Use it when forms should share validation, object update, and UI state helpers from one preset import.
+**When to use it:** Use this advanced Next UI preset when multiple forms should share validation, object update, and state helpers from one stable import.
 
 - Kind: `preset`
 - Category: `typescript-ui`
 - Targets: `next-app-router`
+- Tags: `advanced`, `ui`, `next`
 - Import path: `<ucr-root>/presets/form-preset`
 - Requires: `runtime:ts`, `utility:validation-utility`, `utility:object-utility`, `utility:state-utility`
 - Provides: `preset:form-preset`
@@ -497,15 +560,64 @@ ucr add form-preset --target .
 
 ## Blocks
 
-### `bun-server`
+### `bun-crud-resource`
 
-Static route registry plus Bun.serve bootstrap.
+Starter CRUD resource for Bun HTTP services.
 
-**When to use it:** Use it in Bun HTTP services to stitch route modules into a Bun.serve entrypoint.
+**When to use it:** Use it as the fastest Bun HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.
 
 - Kind: `block`
 - Category: `bun-http`
 - Targets: `bun-http`
+- Tags: `starter`, `crud`, `api`, `bun`
+- Requires: `preset:service-preset`, `preset:endpoint-preset`, `utility:validation-utility`
+- Provides: `entity-contract:{{instanceId}}`, `repository-contract:{{instanceId}}`, `service-layer:{{instanceId}}`, `memory-repository:{{instanceId}}`, `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`, `json-collection-route:{{instanceId}}`, `json-item-route:{{instanceId}}`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `entity` | `string` | yes | Entity name, for example Post. |
+| `plural` | `string` | yes | Plural route segment, for example posts. |
+| `fields` | `json` | yes | Field metadata used to render entity code. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `contract` | `model.ts` | `templates/entity-contract/contract/model.ts.tpl` |
+| `domain` | `repository.ts` | `templates/service-layer/domain/repository.ts.tpl` |
+| `domain` | `service.ts` | `templates/service-layer/domain/service.ts.tpl` |
+| `domain` | `memory-repository.ts` | `templates/memory-repository/domain/memory-repository.ts.tpl` |
+| `domain` | `runtime.ts` | `templates/memory-repository/domain/runtime.ts.tpl` |
+| `contract` | `validation.ts` | `templates/input-validation/contract/validation.ts.tpl` |
+| `transport` | `{{pluralKebab}}/index.ts` | `templates/json-collection-route/transport/index.ts.tpl` |
+| `transport` | `{{pluralKebab}}/[id].ts` | `templates/json-item-route/transport/item.ts.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add bun-crud-resource --target . --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+```
+
+Supply the same entity naming values across the related resource code so the generated contract, service, validation, and Bun routes stay aligned.
+
+This starter block is an alternative entry point. Do not mix it with the equivalent granular installs for the same `--instance`.
+
+**Checked-in examples**
+
+No checked-in example install yet. The checked-in apps stay focused on the granular composition chain, but this starter block is still part of the published official registry.
+
+### `bun-server`
+
+Static route registry plus Bun.serve bootstrap.
+
+**When to use it:** Start here for Bun project foundations when you want to stitch route modules into a Bun.serve entrypoint.
+
+- Kind: `block`
+- Category: `bun-http`
+- Targets: `bun-http`
+- Tags: `foundation`, `starter`, `bun`
 - Requires: -
 - Provides: `bun-server`
 - Entrypoints: `index.ts`
@@ -538,11 +650,12 @@ Provide `routeModules` as a JSON array of `{ importName, importPath }` entries t
 
 Static health route for Bun HTTP services.
 
-**When to use it:** Use it in Bun HTTP services when you want a lightweight health endpoint without any entity-specific inputs.
+**When to use it:** Start here for Bun project foundations when you want a lightweight health endpoint without any entity-specific inputs.
 
 - Kind: `block`
 - Category: `bun-http`
 - Targets: `bun-http`
+- Tags: `foundation`, `starter`, `bun`
 - Requires: -
 - Provides: `health-route`
 
@@ -570,11 +683,12 @@ ucr add health-route --target . --instance health
 
 Bun HTTP collection route for one entity.
 
-**When to use it:** Use it in Bun HTTP services to expose collection handlers for one entity.
+**When to use it:** Use it in the granular Bun entity/API flow to expose collection handlers for one resource.
 
 - Kind: `block`
 - Category: `bun-http`
 - Targets: `bun-http`
+- Tags: `crud`, `api`, `bun`
 - Requires: `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`
 - Provides: `json-collection-route:{{instanceId}}`
 
@@ -605,11 +719,12 @@ ucr add json-collection-route --target . --instance posts --input entity=Post --
 
 Bun HTTP item route for one entity.
 
-**When to use it:** Use it in Bun HTTP services to expose item-by-id handlers for one entity.
+**When to use it:** Use it in the granular Bun entity/API flow to expose item-by-id handlers for one resource.
 
 - Kind: `block`
 - Category: `bun-http`
 - Targets: `bun-http`
+- Tags: `crud`, `api`, `bun`
 - Requires: `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`
 - Provides: `json-item-route:{{instanceId}}`
 
@@ -640,11 +755,12 @@ ucr add json-item-route --target . --instance posts --input entity=Post --input 
 
 Small request context helpers for Bun HTTP handlers.
 
-**When to use it:** Use it in Bun HTTP handlers that should share request-scoped metadata or helper accessors.
+**When to use it:** Use this more advanced Bun foundation when handlers should share request-scoped metadata or helper accessors.
 
 - Kind: `block`
 - Category: `bun-http`
 - Targets: `bun-http`
+- Tags: `foundation`, `advanced`, `bun`
 - Requires: -
 - Provides: `request-context`
 
@@ -670,13 +786,14 @@ No checked-in example install yet. The Bun example keeps its handlers minimal, b
 
 ### `api-client`
 
-Small fetch client for one entity collection.
+Small fetch client for one entity collection and item routes.
 
-**When to use it:** Use it when shared or UI code should call one entity collection through a small fetch-based client.
+**When to use it:** Use it when shared or UI code should call one entity collection and item endpoint through a small fetch-based client.
 
 - Kind: `block`
 - Category: `entity`
 - Targets: `shared`
+- Tags: `crud`, `api`, `shared`
 - Requires: `entity-contract:{{instanceId}}`, `utility:async-utility`
 - Provides: `api-client:{{instanceId}}`
 
@@ -707,11 +824,12 @@ ucr add api-client --target . --instance posts --input entity=Post --input plura
 
 Typed entity model, create/update inputs, and field metadata.
 
-**When to use it:** Start an entity workflow here. It defines the model, create/update inputs, and field metadata that the rest of the entity blocks build on.
+**When to use it:** Start a granular entity/API workflow here. It defines the model, create/update inputs, and field metadata that the rest of the resource blocks build on.
 
 - Kind: `block`
 - Category: `entity`
 - Targets: `shared`
+- Tags: `advanced`, `crud`, `api`, `shared`
 - Requires: -
 - Provides: `entity-contract:{{instanceId}}`
 
@@ -746,11 +864,12 @@ Supply the same entity naming values across the related entity blocks so the gen
 
 Unknown input validation for create and update entity payloads.
 
-**When to use it:** Use it when create and update payloads should be validated against the same field metadata as the entity contract.
+**When to use it:** Use it in the granular entity/API flow when create and update payloads should be validated against the same field metadata as the entity contract.
 
 - Kind: `block`
 - Category: `entity`
 - Targets: `shared`
+- Tags: `advanced`, `crud`, `api`, `shared`
 - Requires: `entity-contract:{{instanceId}}`, `utility:validation-utility`
 - Provides: `validation:{{instanceId}}`
 
@@ -784,11 +903,12 @@ Point `fields` at the same JSON file you used for `entity-contract` so the gener
 
 In-memory repository plus singleton service runtime for one entity.
 
-**When to use it:** Use it to bootstrap a zero-dependency in-memory runtime for an entity while keeping service and repository boundaries intact.
+**When to use it:** Use it in the granular entity/API flow when you want a zero-dependency in-memory runtime while keeping service and repository boundaries intact.
 
 - Kind: `block`
 - Category: `entity`
 - Targets: `shared`
+- Tags: `starter`, `crud`, `api`, `shared`
 - Requires: `entity-contract:{{instanceId}}`, `repository-contract:{{instanceId}}`, `service-layer:{{instanceId}}`, `preset:endpoint-preset`
 - Provides: `memory-repository:{{instanceId}}`, `service-runtime:{{instanceId}}`
 
@@ -821,11 +941,12 @@ ucr add memory-repository --target . --instance posts --input entity=Post --inpu
 
 Repository contract plus service methods for one entity.
 
-**When to use it:** Use it after `entity-contract` when you want repository contracts and service methods for one entity.
+**When to use it:** Use it in the granular entity/API flow after `entity-contract` when you want repository contracts and service methods for one resource.
 
 - Kind: `block`
 - Category: `entity`
 - Targets: `shared`
+- Tags: `advanced`, `crud`, `api`, `shared`
 - Requires: `entity-contract:{{instanceId}}`, `preset:service-preset`
 - Provides: `repository-contract:{{instanceId}}`, `service-layer:{{instanceId}}`
 
@@ -858,11 +979,12 @@ ucr add service-layer --target . --instance posts --input entity=Post --input pl
 
 Typed environment helpers for Bun-managed projects.
 
-**When to use it:** Use it when Bun-managed shared code should read environment variables through a typed local wrapper.
+**When to use it:** Start here for project foundations when Bun-managed shared code should read environment variables through a typed local wrapper.
 
 - Kind: `block`
 - Category: `foundation`
 - Targets: `shared`
+- Tags: `foundation`, `starter`, `shared`
 - Requires: -
 - Provides: `env-config`
 
@@ -890,11 +1012,12 @@ No checked-in example install yet. The example apps stay focused on entity and r
 
 Simple structured logger wrapper for app-local code.
 
-**When to use it:** Use it when app-local code needs a tiny structured logger wrapper without pulling in a framework-specific logging layer.
+**When to use it:** Start here for project foundations when app-local code needs a tiny structured logger wrapper without pulling in a framework-specific logging layer.
 
 - Kind: `block`
 - Category: `foundation`
 - Targets: `shared`
+- Tags: `foundation`, `starter`, `shared`
 - Requires: -
 - Provides: `logger`
 
@@ -922,11 +1045,12 @@ No checked-in example install yet. The example apps stay focused on entity and r
 
 Small Result helpers for predictable service and transport flows.
 
-**When to use it:** Use it when you want a concrete Result domain file in shared code without installing the reusable utility set.
+**When to use it:** Use this specialized alternative only when you want a concrete Result domain file without installing the recommended `result-utility` building block.
 
 - Kind: `block`
 - Category: `foundation`
 - Targets: `shared`
+- Tags: `specialized`, `shared`
 - Requires: -
 - Provides: `result-errors`
 
@@ -954,11 +1078,12 @@ No checked-in example install yet. The example apps stay focused on entity and r
 
 Client-side admin page composed from table, form, and API client blocks.
 
-**When to use it:** Use it in Next App Router to assemble a working admin page from the table, form, API client, and admin-page preset.
+**When to use it:** Use it as the fastest granular admin UI entry point in Next App Router to assemble a working resource page from the table, form, API client, and preset blocks.
 
 - Kind: `block`
 - Category: `next`
 - Targets: `next-app-router`
+- Tags: `starter`, `crud`, `ui`, `next`
 - Requires: `entity-contract:{{instanceId}}`, `api-client:{{instanceId}}`, `data-table:{{instanceId}}`, `entity-form:{{instanceId}}`, `preset:admin-page-preset`
 - Provides: `admin-page:{{instanceId}}`
 - Entrypoints: `{{pluralKebab}}/page.tsx`
@@ -990,11 +1115,12 @@ ucr add admin-page --target . --instance posts --input entity=Post --input plura
 
 Minimal entity table component for admin pages.
 
-**When to use it:** Use it in Next App Router admin pages to render a minimal entity table for one resource.
+**When to use it:** Use it in Next App Router admin flows to render a minimal table for one resource.
 
 - Kind: `block`
 - Category: `next`
 - Targets: `next-app-router`
+- Tags: `crud`, `ui`, `next`
 - Requires: `entity-contract:{{instanceId}}`, `preset:admin-page-preset`
 - Provides: `data-table:{{instanceId}}`
 
@@ -1021,15 +1147,53 @@ ucr add data-table --target . --instance posts --input entity=Post --input plura
 
 - `next-app` (next-app-router, instance `posts`): `src/app/posts/data-table.tsx`
 
-### `entity-form`
+### `entity-detail-page`
 
-Minimal create form component for one entity.
+Client-side detail page for viewing and editing one entity.
 
-**When to use it:** Use it in Next App Router admin pages to render a minimal create form for one resource.
+**When to use it:** Use it in Next App Router admin flows when you want a client-side detail page that loads one record and reuses `entity-form` for edits.
 
 - Kind: `block`
 - Category: `next`
 - Targets: `next-app-router`
+- Tags: `crud`, `ui`, `next`
+- Requires: `api-client:{{instanceId}}`, `next-item-route:{{instanceId}}`, `entity-form:{{instanceId}}`
+- Provides: `entity-detail-page:{{instanceId}}`
+- Entrypoints: `{{pluralKebab}}/[id]/page.tsx`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `entity` | `string` | yes | Entity name, for example Post. |
+| `plural` | `string` | yes | Plural route segment, for example posts. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `ui` | `{{pluralKebab}}/[id]/page.tsx` | `templates/entity-detail-page/ui/page.tsx.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add entity-detail-page --target . --instance posts --input entity=Post --input plural=posts
+```
+
+**Checked-in examples**
+
+- `next-app` (next-app-router, instance `posts`): `src/app/posts/[id]/page.tsx`
+
+### `entity-form`
+
+Minimal create/edit form component for one entity.
+
+**When to use it:** Use it in Next App Router admin flows to render a minimal create/edit form for one resource.
+
+- Kind: `block`
+- Category: `next`
+- Targets: `next-app-router`
+- Tags: `crud`, `ui`, `next`
 - Requires: `entity-contract:{{instanceId}}`, `preset:form-preset`
 - Provides: `entity-form:{{instanceId}}`
 
@@ -1060,11 +1224,12 @@ ucr add entity-form --target . --instance posts --input entity=Post --input plur
 
 Next App Router collection handler for one entity.
 
-**When to use it:** Use it in Next App Router when you want the collection API route for one entity.
+**When to use it:** Use it in the granular Next entity/API flow when you want the collection API route for one resource.
 
 - Kind: `block`
 - Category: `next`
 - Targets: `next-app-router`
+- Tags: `crud`, `api`, `next`
 - Requires: `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`
 - Provides: `next-collection-route:{{instanceId}}`
 - Entrypoints: `{{pluralKebab}}/route.ts`
@@ -1092,15 +1257,68 @@ ucr add next-collection-route --target . --instance posts --input entity=Post --
 
 - `next-app` (next-app-router, instance `posts`): `src/app/api/posts/route.ts`
 
-### `next-item-route`
+### `next-crud-resource`
 
-Next App Router item handler for one entity.
+Starter CRUD resource for Next App Router projects.
 
-**When to use it:** Use it in Next App Router when you want the item-by-id API route for one entity.
+**When to use it:** Use it as the fastest Next App Router starter for one CRUD resource after the shared and UI building blocks are already installed.
 
 - Kind: `block`
 - Category: `next`
 - Targets: `next-app-router`
+- Tags: `starter`, `crud`, `api`, `next`
+- Requires: `preset:service-preset`, `preset:endpoint-preset`, `utility:validation-utility`, `utility:async-utility`, `preset:form-preset`, `preset:admin-page-preset`
+- Provides: `entity-contract:{{instanceId}}`, `repository-contract:{{instanceId}}`, `service-layer:{{instanceId}}`, `memory-repository:{{instanceId}}`, `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`, `api-client:{{instanceId}}`, `next-collection-route:{{instanceId}}`, `next-item-route:{{instanceId}}`, `data-table:{{instanceId}}`, `entity-form:{{instanceId}}`, `admin-page:{{instanceId}}`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `entity` | `string` | yes | Entity name, for example Post. |
+| `plural` | `string` | yes | Plural route segment, for example posts. |
+| `fields` | `json` | yes | Field metadata used to render entity code. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `contract` | `model.ts` | `templates/entity-contract/contract/model.ts.tpl` |
+| `domain` | `repository.ts` | `templates/service-layer/domain/repository.ts.tpl` |
+| `domain` | `service.ts` | `templates/service-layer/domain/service.ts.tpl` |
+| `domain` | `memory-repository.ts` | `templates/memory-repository/domain/memory-repository.ts.tpl` |
+| `domain` | `runtime.ts` | `templates/memory-repository/domain/runtime.ts.tpl` |
+| `contract` | `validation.ts` | `templates/input-validation/contract/validation.ts.tpl` |
+| `domain` | `api-client.ts` | `templates/api-client/domain/api-client.ts.tpl` |
+| `transport` | `{{pluralKebab}}/route.ts` | `templates/next-collection-route/transport/route.ts.tpl` |
+| `transport` | `{{pluralKebab}}/[id]/route.ts` | `templates/next-item-route/transport/route.ts.tpl` |
+| `ui` | `{{pluralKebab}}/data-table.tsx` | `templates/data-table/ui/data-table.tsx.tpl` |
+| `ui` | `{{resourceKebab}}/entity-form.tsx` | `templates/entity-form/ui/entity-form.tsx.tpl` |
+| `ui` | `{{pluralKebab}}/page.tsx` | `templates/admin-page/ui/page.tsx.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add next-crud-resource --target . --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+```
+
+Supply the same entity naming values across the related resource code so the generated contract, API client, routes, and UI stay aligned.
+
+This starter block is an alternative entry point. Do not mix it with the equivalent granular installs for the same `--instance`.
+
+**Checked-in examples**
+
+No checked-in example install yet. The checked-in apps stay focused on the granular composition chain, but this starter block is still part of the published official registry.
+
+### `next-item-route`
+
+Next App Router item handler for one entity.
+
+**When to use it:** Use it in the granular Next entity/API flow when you want the item-by-id API route for one resource.
+
+- Kind: `block`
+- Category: `next`
+- Targets: `next-app-router`
+- Tags: `crud`, `api`, `next`
 - Requires: `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`
 - Provides: `next-item-route:{{instanceId}}`
 - Entrypoints: `{{pluralKebab}}/[id]/route.ts`

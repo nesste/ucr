@@ -44,6 +44,16 @@ export async function listPosts(): Promise<Post[]> {
   return payload.items;
 }
 
+export async function getPost(id: string): Promise<Post> {
+  const payload = await readJson<{ item: Post }>(
+    await sendRequest(`${basePath}/${id}`, {
+      cache: "no-store",
+    }),
+  );
+
+  return payload.item;
+}
+
 export async function createPost(
   input: CreatePostInput,
 ): Promise<Post> {
