@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: main-release
@@ -101,9 +102,10 @@ jobs:
           RELEASE_TAG: ${{ steps.plan.outputs.version }}
         run: bun run release:set-version "$RELEASE_TAG"
 
-      - name: Commit and push release version bump
+      - name: Commit release version bump and open pull request
         if: steps.plan.outputs.action == 'bump'
         env:
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.plan.outputs.version }}
         run: |
           if git diff --quiet -- package.json packages/cli/package.json packages/core/package.json packages/schema/package.json; then
@@ -111,14 +113,39 @@ jobs:
             exit 0
           fi
 
+          branch_name="release/version-bump-$RELEASE_TAG"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$branch_name"
           git add package.json packages/cli/package.json packages/core/package.json packages/schema/package.json
           git commit -m "chore(release): $RELEASE_TAG"
-          git push origin HEAD:main
+          git push --force-with-lease --set-upstream origin "$branch_name"
+
+          pr_number="$(
+            gh pr list \
+              --base main \
+              --head "$branch_name" \
+              --state open \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+
+          if [ -n "$pr_number" ]; then
+            gh pr edit "$pr_number" \
+              --title "chore(release): $RELEASE_TAG" \
+              --body "Automated release manifest bump for \`$RELEASE_TAG\`."
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head "$branch_name" \
+            --title "chore(release): $RELEASE_TAG" \
+            --body "Automated release manifest bump for \`$RELEASE_TAG\`."
 
       - name: Create tag and GitHub release
-        if: steps.head.outputs.stale != 'true' && steps.release.outputs.exists != 'true'
+        if: steps.head.outputs.stale != 'true' && steps.plan.outputs.action == 'release' && steps.release.outputs.exists != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.plan.outputs.version }}
@@ -129,17 +156,17 @@ jobs:
             --generate-notes
 
       - name: Install workspace dependencies
-        if: steps.head.outputs.stale != 'true'
+        if: steps.head.outputs.stale != 'true' && steps.plan.outputs.action == 'release'
         run: bun ci
 
       - name: Build release artifacts
-        if: steps.head.outputs.stale != 'true'
+        if: steps.head.outputs.stale != 'true' && steps.plan.outputs.action == 'release'
         env:
           UCR_OFFICIAL_REGISTRY_URL: ${{ vars.UCR_OFFICIAL_REGISTRY_URL || 'https://ucr.network/registry/ucr-official/latest/registry.json' }}
         run: bun run release:artifacts
 
       - name: Upload release assets
-        if: steps.head.outputs.stale != 'true'
+        if: steps.head.outputs.stale != 'true' && steps.plan.outputs.action == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.plan.outputs.version }}
