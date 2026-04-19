@@ -1,0 +1,16 @@
+{
+  "name": "@ucr/example-bun-service",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "bun@1.3.4",
+  "scripts": {
+    "build": "bun build ./server/index.ts --outfile ./dist/server.js",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "start": "bun run ./server/index.ts",
+    "typecheck": "bun build ./server/index.ts --outfile ./dist/typecheck.js",
+    "test": "bun test",
+    "registry:init": "bun ../../packages/cli/dist/bin.js init --registry ../../fixtures/registries/ucr-official/registry.json --target .",
+    "registry:list": "bun ../../packages/cli/dist/bin.js list --target .",
+    "registry:show": "bun ../../packages/cli/dist/bin.js show bun-server --target ."
+  }
+}

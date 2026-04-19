@@ -1,0 +1,8 @@
+{
+    "git.ignoreLimitWarning": true,
+    "editor.fontFamily": "Monaspace Neon, monospace",
+    "editor.fontWeight": "500",
+    "editor.inlineSuggest.fontFamily": "Monaspace Krypton, monospace",
+    "editor.fontSize": 17,
+    "editor.fontLigatures": "'calt', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'ss09', 'liga'"
+}

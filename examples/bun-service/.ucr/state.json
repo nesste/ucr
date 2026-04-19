@@ -1,0 +1,298 @@
+{
+  "version": 4,
+  "registry": {
+    "name": "ucr-official",
+    "version": "3.0.0",
+    "source": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json"
+  },
+  "installs": {
+    "ts-runtime:ts-runtime": {
+      "itemName": "ts-runtime",
+      "itemVersion": "1.0.0",
+      "instanceId": "ts-runtime",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/runtime/index.ts": {
+          "template": "templates/ts-runtime/utility/index.ts.tpl",
+          "surface": "utility",
+          "hash": "703651b059b4072fde4c8e6bd19d3a65ed555f9098a44b159a3104a5d605e8cd",
+          "snapshot": "type UtilityExports = Record<string, unknown>;\n\nexport interface UtilityDefinition<\n  Name extends string = string,\n  Exports extends UtilityExports = UtilityExports,\n> {\n  kind: \"utility\";\n  name: Name;\n  exports: Exports;\n}\n\nexport interface PresetDefinition<\n  Name extends string = string,\n  Exports extends UtilityExports = UtilityExports,\n> {\n  kind: \"preset\";\n  name: Name;\n  compose: string[];\n  exports: Exports;\n}\n\nexport type ComposableDefinition =\n  | UtilityDefinition\n  | PresetDefinition;\n\ntype UnionToIntersection<Value> =\n  (Value extends unknown ? (input: Value) => void : never) extends (\n    input: infer Intersection,\n  ) => void\n    ? Intersection\n    : never;\n\ntype CombinedExports<Parts extends readonly ComposableDefinition[]> =\n  UnionToIntersection<Parts[number][\"exports\"]>;\n\nfunction mergeExports(\n  parts: readonly ComposableDefinition[],\n  ownExports: UtilityExports = {},\n): UtilityExports {\n  const merged: UtilityExports = {};\n\n  for (const part of parts) {\n    for (const [exportName, exportValue] of Object.entries(part.exports)) {\n      if (exportName in merged) {\n        throw new Error(`Duplicate composed export \"${exportName}\".`);\n      }\n\n      merged[exportName] = exportValue;\n    }\n  }\n\n  for (const [exportName, exportValue] of Object.entries(ownExports)) {\n    if (exportName in merged) {\n      throw new Error(`Preset export \"${exportName}\" duplicates a composed export.`);\n    }\n\n    merged[exportName] = exportValue;\n  }\n\n  return merged;\n}\n\nexport function compose<const Parts extends readonly ComposableDefinition[]>(\n  ...parts: Parts\n): CombinedExports<Parts> {\n  return mergeExports(parts) as CombinedExports<Parts>;\n}\n\nexport function defineUtility<\n  Name extends string,\n  Exports extends UtilityExports,\n>(\n  name: Name,\n  exports: Exports,\n): UtilityDefinition<Name, Exports> {\n  return {\n    kind: \"utility\",\n    name,\n    exports,\n  };\n}\n\nexport function definePreset<\n  Name extends string,\n  const Parts extends readonly ComposableDefinition[],\n  OwnExports extends UtilityExports = {},\n>(\n  name: Name,\n  parts: Parts,\n  ownExports?: OwnExports,\n): PresetDefinition<Name, CombinedExports<Parts> & OwnExports> {\n  return {\n    kind: \"preset\",\n    name,\n    compose: parts.map((part) => part.name),\n    exports: mergeExports(parts, ownExports ?? {}) as CombinedExports<Parts> &\n      OwnExports,\n  };\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:28.180Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:28.180Z"
+    },
+    "result-utility:result-utility": {
+      "itemName": "result-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "result-utility",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/utilities/result-utility.ts": {
+          "template": "templates/result-utility/utility/result-utility.ts.tpl",
+          "surface": "utility",
+          "hash": "e20a9b762ae238897f3c06b95baa0b96a54e78b212a65796bcede5b4097cff07",
+          "snapshot": "import { defineUtility } from \"../runtime\";\n\nexport type Result<T, E = string> =\n  | { ok: true; data: T }\n  | { ok: false; error: E };\n\nexport function ok<T>(data: T): Result<T, never> {\n  return {\n    ok: true,\n    data,\n  };\n}\n\nexport function err<E>(error: E): Result<never, E> {\n  return {\n    ok: false,\n    error,\n  };\n}\n\nexport function mapResult<T, NextValue, E>(\n  result: Result<T, E>,\n  mapper: (value: T) => NextValue,\n): Result<NextValue, E> {\n  return result.ok ? ok(mapper(result.data)) : result;\n}\n\nexport function mapError<T, E, NextError>(\n  result: Result<T, E>,\n  mapper: (value: E) => NextError,\n): Result<T, NextError> {\n  return result.ok ? result : err(mapper(result.error));\n}\n\nexport function matchResult<T, E, Output>(\n  result: Result<T, E>,\n  handlers: {\n    ok(value: T): Output;\n    err(value: E): Output;\n  },\n): Output {\n  return result.ok\n    ? handlers.ok(result.data)\n    : handlers.err(result.error);\n}\n\nexport const resultUtility = defineUtility(\"result-utility\", {\n  ok,\n  err,\n  mapResult,\n  mapError,\n  matchResult,\n});\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:28.282Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:28.282Z"
+    },
+    "async-utility:async-utility": {
+      "itemName": "async-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "async-utility",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/utilities/async-utility.ts": {
+          "template": "templates/async-utility/utility/async-utility.ts.tpl",
+          "surface": "utility",
+          "hash": "dcd5e07b146f0ea98c10b5a2060b11d5fb2948bf5804c92d50168846454d32d2",
+          "snapshot": "import { defineUtility } from \"../runtime\";\n\nexport interface RetryOptions {\n  attempts?: number;\n  delayMs?: number;\n}\n\nasync function delay(ms: number): Promise<void> {\n  await new Promise((resolve) => setTimeout(resolve, ms));\n}\n\nexport async function retry<T>(\n  run: () => Promise<T> | T,\n  options: RetryOptions = {},\n): Promise<T> {\n  const attempts = Math.max(1, options.attempts ?? 2);\n  const delayMs = Math.max(0, options.delayMs ?? 0);\n  let lastError: unknown;\n\n  for (let attempt = 0; attempt < attempts; attempt += 1) {\n    try {\n      return await run();\n    } catch (error) {\n      lastError = error;\n      if (attempt < attempts - 1 && delayMs > 0) {\n        await delay(delayMs);\n      }\n    }\n  }\n\n  throw lastError;\n}\n\nexport async function parallel<\n  const Tasks extends readonly (() => Promise<unknown> | unknown)[],\n>(\n  tasks: Tasks,\n): Promise<{ [Index in keyof Tasks]: Awaited<ReturnType<Tasks[Index]>> }> {\n  return Promise.all(tasks.map((task) => task())) as Promise<{\n    [Index in keyof Tasks]: Awaited<ReturnType<Tasks[Index]>>;\n  }>;\n}\n\nexport async function sequence<T>(\n  steps: Array<() => Promise<T> | T>,\n): Promise<T[]> {\n  const output: T[] = [];\n\n  for (const step of steps) {\n    output.push(await step());\n  }\n\n  return output;\n}\n\nexport async function withTimeout<T>(\n  run: Promise<T> | (() => Promise<T> | T),\n  timeoutMs: number,\n  message = `Timed out after ${timeoutMs}ms.`,\n): Promise<T> {\n  const pending =\n    typeof run === \"function\"\n      ? Promise.resolve().then(run)\n      : run;\n\n  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;\n\n  try {\n    return await Promise.race([\n      pending,\n      new Promise<T>((_resolve, reject) => {\n        timeoutHandle = setTimeout(() => {\n          reject(new Error(message));\n        }, timeoutMs);\n      }),\n    ]);\n  } finally {\n    if (timeoutHandle) {\n      clearTimeout(timeoutHandle);\n    }\n  }\n}\n\nexport const asyncUtility = defineUtility(\"async-utility\", {\n  retry,\n  parallel,\n  sequence,\n  withTimeout,\n});\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:28.389Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:28.389Z"
+    },
+    "object-utility:object-utility": {
+      "itemName": "object-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "object-utility",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/utilities/object-utility.ts": {
+          "template": "templates/object-utility/utility/object-utility.ts.tpl",
+          "surface": "utility",
+          "hash": "eed329d1cbafba0526e2daf9039af02cb909b386dc724432d448c5570a0ef3a6",
+          "snapshot": "import { defineUtility } from \"../runtime\";\n\nexport function pick<\n  Value extends object,\n  const Keys extends readonly (keyof Value)[],\n>(\n  value: Value,\n  keys: Keys,\n): Pick<Value, Keys[number]> {\n  const output = {} as Pick<Value, Keys[number]>;\n\n  for (const key of keys) {\n    output[key] = value[key];\n  }\n\n  return output;\n}\n\nexport function omit<\n  Value extends object,\n  const Keys extends readonly (keyof Value)[],\n>(\n  value: Value,\n  keys: Keys,\n): Omit<Value, Keys[number]> {\n  const output = { ...value } as Value;\n\n  for (const key of keys) {\n    delete (output as Record<keyof Value, unknown>)[key];\n  }\n\n  return output as Omit<Value, Keys[number]>;\n}\n\nexport function mergeDefined<Value extends object>(\n  base: Value,\n  patch: Partial<Value>,\n): Value {\n  const output = { ...base } as Value;\n\n  for (const [key, value] of Object.entries(patch)) {\n    if (value !== undefined) {\n      (output as Record<string, unknown>)[key] = value;\n    }\n  }\n\n  return output;\n}\n\nexport const objectUtility = defineUtility(\"object-utility\", {\n  pick,\n  omit,\n  mergeDefined,\n});\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:19:11.515Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:19:11.515Z"
+    },
+    "collection-utility:collection-utility": {
+      "itemName": "collection-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "collection-utility",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/utilities/collection-utility.ts": {
+          "template": "templates/collection-utility/utility/collection-utility.ts.tpl",
+          "surface": "utility",
+          "hash": "62415029fa0c0c6d1d7e57d03e32116bf3adcd550cd77813e53e32b1766727d9",
+          "snapshot": "import { defineUtility } from \"../runtime\";\n\nexport function groupBy<Value>(\n  items: readonly Value[],\n  getKey: (item: Value) => string,\n): Record<string, Value[]> {\n  const output: Record<string, Value[]> = {};\n\n  for (const item of items) {\n    const key = getKey(item);\n    output[key] ??= [];\n    output[key].push(item);\n  }\n\n  return output;\n}\n\nexport function indexBy<Value>(\n  items: readonly Value[],\n  getKey: (item: Value) => string,\n): Record<string, Value> {\n  const output: Record<string, Value> = {};\n\n  for (const item of items) {\n    output[getKey(item)] = item;\n  }\n\n  return output;\n}\n\nexport function sortBy<Value>(\n  items: readonly Value[],\n  getValue: (item: Value) => string | number | boolean,\n): Value[] {\n  return [...items].sort((left, right) => {\n    const leftValue = getValue(left);\n    const rightValue = getValue(right);\n\n    if (leftValue === rightValue) {\n      return 0;\n    }\n\n    return leftValue > rightValue ? 1 : -1;\n  });\n}\n\nexport const collectionUtility = defineUtility(\"collection-utility\", {\n  groupBy,\n  indexBy,\n  sortBy,\n});\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:28.592Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:28.592Z"
+    },
+    "validation-utility:validation-utility": {
+      "itemName": "validation-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "validation-utility",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/utilities/validation-utility.ts": {
+          "template": "templates/validation-utility/utility/validation-utility.ts.tpl",
+          "surface": "utility",
+          "hash": "064ad88d03a69dc527b5fd0db300cfae4eb03885011159cf0a75a1e9b139e452",
+          "snapshot": "import { defineUtility } from \"../runtime\";\n\nexport interface FieldIssue {\n  field: string;\n  message: string;\n}\n\nexport interface ShapeRule {\n  name: string;\n  label?: string;\n  required?: boolean;\n  coerce(value: unknown): { ok: true; value: unknown } | { ok: false; message: string };\n}\n\nexport type ShapeResult<Value extends object> =\n  | { ok: true; data: Partial<Value> }\n  | { ok: false; errors: Record<string, string> };\n\nexport function assertRecord(\n  value: unknown,\n): value is Record<string, unknown> {\n  return typeof value === \"object\" && value !== null && !Array.isArray(value);\n}\n\nexport function toFieldErrors(\n  issues: readonly FieldIssue[],\n): Record<string, string> {\n  const output: Record<string, string> = {};\n\n  for (const issue of issues) {\n    output[issue.field] = issue.message;\n  }\n\n  return output;\n}\n\nexport function assertShape<Value extends object>(\n  input: Record<string, unknown>,\n  rules: ShapeRule[],\n): ShapeResult<Value> {\n  const issues: FieldIssue[] = [];\n  const output: Partial<Value> = {};\n\n  for (const rule of rules) {\n    const rawValue = input[rule.name];\n\n    if (rawValue === undefined || rawValue === null || rawValue === \"\") {\n      if (rule.required) {\n        issues.push({\n          field: rule.name,\n          message: `Field \"${rule.label ?? rule.name}\" is required.`,\n        });\n      }\n      continue;\n    }\n\n    const parsed = rule.coerce(rawValue);\n\n    if (parsed.ok) {\n      (output as Record<string, unknown>)[rule.name] = parsed.value;\n    } else {\n      issues.push({\n        field: rule.name,\n        message: parsed.message,\n      });\n    }\n  }\n\n  return issues.length > 0\n    ? {\n        ok: false,\n        errors: toFieldErrors(issues),\n      }\n    : {\n        ok: true,\n        data: output,\n      };\n}\n\nexport const validationUtility = defineUtility(\"validation-utility\", {\n  assertRecord,\n  assertShape,\n  toFieldErrors,\n});\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:19:51.640Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:19:51.640Z"
+    },
+    "service-preset:service-preset": {
+      "itemName": "service-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "service-preset",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/presets/service-preset.ts": {
+          "template": "templates/service-preset/preset/service-preset.ts.tpl",
+          "surface": "preset",
+          "hash": "cb8147be07d655ab2446c3b759776982b7a9148a4f199d9aedfda646c1d3819e",
+          "snapshot": "import { definePreset } from \"../runtime\";\nimport {\n  asyncUtility,\n  parallel,\n  retry,\n  sequence,\n  withTimeout,\n} from \"../utilities/async-utility\";\nimport {\n  err,\n  mapError,\n  mapResult,\n  matchResult,\n  ok,\n  resultUtility,\n} from \"../utilities/result-utility\";\nimport {\n  assertRecord,\n  assertShape,\n  toFieldErrors,\n  validationUtility,\n} from \"../utilities/validation-utility\";\n\nexport const servicePreset = definePreset(\"service-preset\", [\n  resultUtility,\n  asyncUtility,\n  validationUtility,\n]);\n\nexport {\n  assertRecord,\n  assertShape,\n  err,\n  mapError,\n  mapResult,\n  matchResult,\n  ok,\n  parallel,\n  retry,\n  sequence,\n  toFieldErrors,\n  withTimeout,\n};\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:28.797Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:28.797Z"
+    },
+    "endpoint-preset:endpoint-preset": {
+      "itemName": "endpoint-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "endpoint-preset",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/presets/endpoint-preset.ts": {
+          "template": "templates/endpoint-preset/preset/endpoint-preset.ts.tpl",
+          "surface": "preset",
+          "hash": "8f83efa73a3aa3747ad723edb171450eac040966075ed2017175df6794015ed4",
+          "snapshot": "import { definePreset } from \"../runtime\";\nimport {\n  collectionUtility,\n  groupBy,\n  indexBy,\n  sortBy,\n} from \"../utilities/collection-utility\";\nimport {\n  mergeDefined,\n  objectUtility,\n  omit,\n  pick,\n} from \"../utilities/object-utility\";\nimport {\n  assertRecord,\n  assertShape,\n  err,\n  mapError,\n  mapResult,\n  matchResult,\n  ok,\n  parallel,\n  retry,\n  sequence,\n  servicePreset,\n  toFieldErrors,\n  withTimeout,\n} from \".//service-preset\";\n\nexport const endpointPreset = definePreset(\"endpoint-preset\", [\n  servicePreset,\n  objectUtility,\n  collectionUtility,\n]);\n\nexport {\n  assertRecord,\n  assertShape,\n  err,\n  groupBy,\n  indexBy,\n  mapError,\n  mapResult,\n  matchResult,\n  mergeDefined,\n  ok,\n  omit,\n  parallel,\n  pick,\n  retry,\n  sequence,\n  sortBy,\n  toFieldErrors,\n  withTimeout,\n};\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:28.901Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:28.901Z"
+    },
+    "entity-contract:posts": {
+      "itemName": "entity-contract",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/posts/contract/model.ts": {
+          "template": "templates/entity-contract/contract/model.ts.tpl",
+          "surface": "contract",
+          "hash": "42976e38865f93a92ea2715dbf483ccba9c142908389c6ebdb046dbce589130d",
+          "snapshot": "export interface Post {\n  id: string;\n  createdAt: string;\n  updatedAt: string;\n  title: string;\n  views: number;\n  published: boolean;\n  publishedAt?: string;\n}\n\nexport interface CreatePostInput {\n  title: string;\n  views: number;\n  published: boolean;\n  publishedAt?: string;\n}\n\nexport interface UpdatePostInput {\n  title?: string;\n  views?: number;\n  published?: boolean;\n  publishedAt?: string;\n}\n\nexport interface PostFieldDefinition {\n  name: keyof CreatePostInput;\n  label: string;\n  tsType: string;\n  inputType: string;\n  required: boolean;\n}\n\nexport const postFieldDefinitions = [\n  {\n    name: \"title\",\n    label: \"Title\",\n    tsType: \"string\",\n    inputType: \"text\",\n    required: true,\n  },\n  {\n    name: \"views\",\n    label: \"Views\",\n    tsType: \"number\",\n    inputType: \"number\",\n    required: true,\n  },\n  {\n    name: \"published\",\n    label: \"Published\",\n    tsType: \"boolean\",\n    inputType: \"checkbox\",\n    required: true,\n  },\n  {\n    name: \"publishedAt\",\n    label: \"Published At\",\n    tsType: \"string\",\n    inputType: \"date\",\n    required: false,\n  },\n] as const satisfies readonly PostFieldDefinition[];\n\nexport function createEmptyPostInput(): CreatePostInput {\n  return {\n    title: \"\",\n    views: 0,\n    published: false,\n    publishedAt: \"\",\n  };\n}\n\nexport function mergePostUpdate(\n  current: Post,\n  input: UpdatePostInput,\n): Post {\n  return {\n    ...current,\n    ...input,\n    updatedAt: new Date().toISOString(),\n  };\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.010Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.010Z"
+    },
+    "service-layer:posts": {
+      "itemName": "service-layer",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/posts/domain/repository.ts": {
+          "template": "templates/service-layer/domain/repository.ts.tpl",
+          "surface": "domain",
+          "hash": "775cfd9c398242b2fde1241238e0865eeaab1e337ed74439cd99eaaa1200886d",
+          "snapshot": "import type {\n  CreatePostInput,\n  UpdatePostInput,\n  Post,\n} from \"../contract/model\";\n\nexport interface PostRepository {\n  list(): Promise<Post[]>;\n  get(id: string): Promise<Post | null>;\n  create(input: CreatePostInput): Promise<Post>;\n  update(\n    id: string,\n    input: UpdatePostInput,\n  ): Promise<Post | null>;\n  remove(id: string): Promise<boolean>;\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.110Z"
+        },
+        "ucr/posts/domain/service.ts": {
+          "template": "templates/service-layer/domain/service.ts.tpl",
+          "surface": "domain",
+          "hash": "ba7b1298a152586e9e144c2c08ac9d96d45a0c504a560679d6950155a7cdce49",
+          "snapshot": "import type {\n  CreatePostInput,\n  UpdatePostInput,\n  Post,\n} from \"../contract/model\";\nimport { withTimeout } from \"../../presets/service-preset\";\nimport type { PostRepository } from \"./repository\";\n\nexport interface PostService {\n  listPosts(): Promise<Post[]>;\n  getPost(id: string): Promise<Post | null>;\n  createPost(\n    input: CreatePostInput,\n  ): Promise<Post>;\n  updatePost(\n    id: string,\n    input: UpdatePostInput,\n  ): Promise<Post | null>;\n  removePost(id: string): Promise<boolean>;\n}\n\nexport function createPostService(\n  repository: PostRepository,\n): PostService {\n  return {\n    listPosts(): Promise<Post[]> {\n      return withTimeout(() => repository.list(), 1500);\n    },\n    getPost(id: string): Promise<Post | null> {\n      return withTimeout(() => repository.get(id), 1500);\n    },\n    createPost(\n      input: CreatePostInput,\n    ): Promise<Post> {\n      return withTimeout(() => repository.create(input), 1500);\n    },\n    updatePost(\n      id: string,\n      input: UpdatePostInput,\n    ): Promise<Post | null> {\n      return withTimeout(() => repository.update(id, input), 1500);\n    },\n    removePost(id: string): Promise<boolean> {\n      return withTimeout(() => repository.remove(id), 1500);\n    },\n  };\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.110Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.110Z"
+    },
+    "memory-repository:posts": {
+      "itemName": "memory-repository",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/posts/domain/memory-repository.ts": {
+          "template": "templates/memory-repository/domain/memory-repository.ts.tpl",
+          "surface": "domain",
+          "hash": "18f0677dc2bdd5de8b61b35966cf9b7c6aa1d4c687af9d7c4d176528cc5bfde2",
+          "snapshot": "import {\n  createEmptyPostInput,\n  mergePostUpdate,\n  type CreatePostInput,\n  type UpdatePostInput,\n  type Post,\n} from \"../contract/model\";\nimport { indexBy, mergeDefined, sortBy } from \"../../presets/endpoint-preset\";\nimport type { PostRepository } from \"./repository\";\n\nfunction createId(): string {\n  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;\n}\n\nfunction cloneItem(item: Post): Post {\n  return {\n    ...item,\n  };\n}\n\nexport function createInMemoryPostRepository(\n  seed: Post[] = [],\n): PostRepository {\n  const storage = new Map<string, Post>(\n    Object.entries(indexBy(seed, (item) => item.id)).map(([id, item]) => [\n      id,\n      cloneItem(item),\n    ]),\n  );\n\n  return {\n    async list(): Promise<Post[]> {\n      return sortBy(Array.from(storage.values()), (item) => item.createdAt).map(\n        cloneItem,\n      );\n    },\n    async get(id: string): Promise<Post | null> {\n      const item = storage.get(id);\n      return item ? cloneItem(item) : null;\n    },\n    async create(input: CreatePostInput): Promise<Post> {\n      const timestamp = new Date().toISOString();\n      const created: Post = {\n        id: createId(),\n        createdAt: timestamp,\n        updatedAt: timestamp,\n        ...createEmptyPostInput(),\n        ...input,\n      };\n\n      storage.set(created.id, created);\n      return cloneItem(created);\n    },\n    async update(\n      id: string,\n      input: UpdatePostInput,\n    ): Promise<Post | null> {\n      const current = storage.get(id);\n      if (!current) {\n        return null;\n      }\n\n      const updated = mergePostUpdate(\n        current,\n        mergeDefined({} as UpdatePostInput, input),\n      );\n      storage.set(id, updated);\n      return cloneItem(updated);\n    },\n    async remove(id: string): Promise<boolean> {\n      return storage.delete(id);\n    },\n  };\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.212Z"
+        },
+        "ucr/posts/domain/runtime.ts": {
+          "template": "templates/memory-repository/domain/runtime.ts.tpl",
+          "surface": "domain",
+          "hash": "3b8bd25f54bcf8ea52688662639a51461625eef496f257b764511963677ba22f",
+          "snapshot": "import { createPostService } from \"./service\";\nimport { createInMemoryPostRepository } from \"./memory-repository\";\n\nexport const postService = createPostService(\n  createInMemoryPostRepository(),\n);\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.212Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.212Z"
+    },
+    "input-validation:posts": {
+      "itemName": "input-validation",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "bun-http",
+      "files": {
+        "ucr/posts/contract/validation.ts": {
+          "template": "templates/input-validation/contract/validation.ts.tpl",
+          "surface": "contract",
+          "hash": "23bff32c47b48f07ecd8236b94637c7ad67e727d3aee6b7ef8ea1b127c6a22e8",
+          "snapshot": "import type {\n  CreatePostInput,\n  UpdatePostInput,\n} from \"./model\";\nimport {\n  assertRecord,\n  assertShape,\n  toFieldErrors,\n} from \"../../utilities/validation-utility\";\n\nexport type ValidationResult<T> =\n  | { ok: true; data: T }\n  | { ok: false; errors: Record<string, string> };\n\nfunction validateCreateField(\n  fieldName: string,\n  label: string,\n  value: unknown,\n): { ok: true; value: unknown } | { ok: false; message: string } {\n  if (fieldName === \"title\") {\n    return typeof value === \"string\"\n      ? { ok: true, value }\n      : { ok: false, message: 'Field \"Title\" must be a string.' };\n  }\n  if (fieldName === \"views\") {\n    if (typeof value === \"number\" && Number.isFinite(value)) {\n      return { ok: true, value };\n    }\n\n    if (\n      typeof value === \"string\" &&\n      value.trim().length > 0 &&\n      Number.isFinite(Number(value))\n    ) {\n      return { ok: true, value: Number(value) };\n    }\n\n    return { ok: false, message: 'Field \"Views\" must be a number.' };\n  }\n  if (fieldName === \"published\") {\n    if (typeof value === \"boolean\") {\n      return { ok: true, value };\n    }\n\n    if (value === \"true\") {\n      return { ok: true, value: true };\n    }\n\n    if (value === \"false\") {\n      return { ok: true, value: false };\n    }\n\n    return { ok: false, message: 'Field \"Published\" must be a boolean.' };\n  }\n  if (fieldName === \"publishedAt\") {\n    return typeof value === \"string\" && Number.isFinite(Date.parse(value))\n      ? { ok: true, value }\n      : { ok: false, message: 'Field \"Published At\" must be a valid date string.' };\n  }\n\n  return {\n    ok: false,\n    message: `Field \"${label}\" is not supported.`,\n  };\n}\n\nfunction validateShape<Value extends object>(\n  input: unknown,\n  mode: \"create\" | \"update\",\n): ValidationResult<Value> {\n  if (!assertRecord(input)) {\n    return {\n      ok: false,\n      errors: toFieldErrors([\n        {\n          field: \"form\",\n          message: \"Input must be an object.\",\n        },\n      ]),\n    };\n  }\n\n  const record = input;\n\n  const result = assertShape<Value>(record, [\n    {\n      name: \"title\",\n      label: \"Title\",\n      required: mode === \"create\" ? true : false,\n      coerce(value) {\n        return validateCreateField(\"title\", \"Title\", value);\n      },\n    },\n    {\n      name: \"views\",\n      label: \"Views\",\n      required: mode === \"create\" ? true : false,\n      coerce(value) {\n        return validateCreateField(\"views\", \"Views\", value);\n      },\n    },\n    {\n      name: \"published\",\n      label: \"Published\",\n      required: mode === \"create\" ? true : false,\n      coerce(value) {\n        return validateCreateField(\"published\", \"Published\", value);\n      },\n    },\n    {\n      name: \"publishedAt\",\n      label: \"Published At\",\n      required: mode === \"create\" ? false : false,\n      coerce(value) {\n        return validateCreateField(\"publishedAt\", \"Published At\", value);\n      },\n    },\n  ]);\n\n  return result.ok\n    ? {\n        ok: true,\n        data: result.data as Value,\n      }\n    : result;\n}\n\nexport function validateCreatePostInput(\n  input: unknown,\n): ValidationResult<CreatePostInput> {\n  return validateShape<CreatePostInput>(input, \"create\");\n}\n\nexport function validateUpdatePostInput(\n  input: unknown,\n): ValidationResult<UpdatePostInput> {\n  return validateShape<UpdatePostInput>(input, \"update\");\n}\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:19:51.742Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:19:51.742Z"
+    },
+    "health-route:health": {
+      "itemName": "health-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "health",
+      "adapter": "bun-http",
+      "files": {
+        "server/routes/health.ts": {
+          "template": "templates/health-route/transport/health.ts.tpl",
+          "surface": "transport",
+          "hash": "5165b856599ae45a25958f06233da511cb2dd36704bfa08e9700af645aa9ccf2",
+          "snapshot": "type RouteMethod = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\";\ntype RouteHandler = (\n  request: Request,\n  params: Record<string, string>,\n) => Promise<Response> | Response;\n\ninterface RouteModule {\n  pattern: string;\n  methods: Partial<Record<RouteMethod, RouteHandler>>;\n}\n\nexport const healthRoute = {\n  pattern: \"/health\",\n  methods: {\n    GET() {\n      return Response.json({\n        ok: true,\n        status: \"healthy\",\n        timestamp: new Date().toISOString(),\n      });\n    },\n  },\n} satisfies RouteModule;\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.421Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.421Z"
+    },
+    "bun-server:server": {
+      "itemName": "bun-server",
+      "itemVersion": "1.0.0",
+      "instanceId": "server",
+      "adapter": "bun-http",
+      "files": {
+        "server/index.ts": {
+          "template": "templates/bun-server/entrypoint/index.ts.tpl",
+          "surface": "entrypoint",
+          "hash": "28cc9245ffb8a63914969131903bb62e85ff5a5f21eb005b55f4eb7bb252339a",
+          "snapshot": "import { healthRoute } from \"./routes/health\";\nimport { postCollectionRoute } from \"./routes/posts/index\";\nimport { postItemRoute } from \"./routes/posts/[id]\";\n\n\ntype RouteMethod = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\";\ntype RouteHandler = (\n  request: Request,\n  params: Record<string, string>,\n) => Promise<Response> | Response;\n\ninterface RouteModule {\n  pattern: string;\n  methods: Partial<Record<RouteMethod, RouteHandler>>;\n}\n\nconst routes: RouteModule[] = [\n  healthRoute,\n  postCollectionRoute,\n  postItemRoute,\n];\n\nfunction normalizePathname(pathname: string): string[] {\n  return pathname.split(\"/\").filter((segment) => segment.length > 0);\n}\n\nfunction matchRoute(\n  pattern: string,\n  pathname: string,\n): Record<string, string> | null {\n  const patternSegments = normalizePathname(pattern);\n  const pathSegments = normalizePathname(pathname);\n\n  if (patternSegments.length !== pathSegments.length) {\n    return null;\n  }\n\n  const params: Record<string, string> = {};\n\n  for (let index = 0; index < patternSegments.length; index += 1) {\n    const patternSegment = patternSegments[index]!;\n    const pathSegment = pathSegments[index]!;\n\n    if (\n      patternSegment.startsWith(\"[\") &&\n      patternSegment.endsWith(\"]\")\n    ) {\n      params[patternSegment.slice(1, -1)] = pathSegment;\n      continue;\n    }\n\n    if (patternSegment !== pathSegment) {\n      return null;\n    }\n  }\n\n  return params;\n}\n\nconst server = Bun.serve({\n  port: Number(Bun.env.PORT ?? \"3000\"),\n  async fetch(request) {\n    const url = new URL(request.url);\n    const method = request.method.toUpperCase() as RouteMethod;\n\n    for (const route of routes) {\n      const params = matchRoute(route.pattern, url.pathname);\n      if (!params) {\n        continue;\n      }\n\n      const handler = route.methods[method];\n      if (!handler) {\n        return new Response(\"Method not allowed\", {\n          status: 405,\n        });\n      }\n\n      return handler(request, params);\n    }\n\n    return Response.json({ error: \"Not found.\" }, { status: 404 });\n  },\n});\n\nconsole.log(`Listening on ${server.url}`);\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.526Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.526Z"
+    },
+    "json-collection-route:posts": {
+      "itemName": "json-collection-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "bun-http",
+      "files": {
+        "server/routes/posts/index.ts": {
+          "template": "templates/json-collection-route/transport/index.ts.tpl",
+          "surface": "transport",
+          "hash": "88744281fa17a58e6e228b1777cdb4b1e05013609448efccd7730911d24da0f3",
+          "snapshot": "import { postService } from \"../../../ucr/posts/domain/runtime\";\nimport { validateCreatePostInput } from \"../../../ucr/posts/contract/validation\";\n\ntype RouteMethod = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\";\ntype RouteHandler = (\n  request: Request,\n  params: Record<string, string>,\n) => Promise<Response> | Response;\n\ninterface RouteModule {\n  pattern: string;\n  methods: Partial<Record<RouteMethod, RouteHandler>>;\n}\n\nasync function readJsonBody(request: Request): Promise<unknown> {\n  try {\n    return await request.json();\n  } catch {\n    return null;\n  }\n}\n\nexport const postCollectionRoute = {\n  pattern: \"/posts\",\n  methods: {\n    async GET() {\n      const items = await postService.listPosts();\n      return Response.json({ items });\n    },\n    async POST(request) {\n      const body = await readJsonBody(request);\n      const validation = validateCreatePostInput(body);\n\n      if (!validation.ok) {\n        return Response.json(\n          { errors: validation.errors },\n          { status: 400 },\n        );\n      }\n\n      const item = await postService.createPost(\n        validation.data,\n      );\n\n      return Response.json({ item }, { status: 201 });\n    },\n  },\n} satisfies RouteModule;\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.630Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.630Z"
+    },
+    "json-item-route:posts": {
+      "itemName": "json-item-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "bun-http",
+      "files": {
+        "server/routes/posts/[id].ts": {
+          "template": "templates/json-item-route/transport/item.ts.tpl",
+          "surface": "transport",
+          "hash": "277c1c4e781582d3e4e4bbb7b9c9d5529776e4e0d2feb022060c09238eed5a42",
+          "snapshot": "import { postService } from \"../../../ucr/posts/domain/runtime\";\nimport { validateUpdatePostInput } from \"../../../ucr/posts/contract/validation\";\n\ntype RouteMethod = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\";\ntype RouteHandler = (\n  request: Request,\n  params: Record<string, string>,\n) => Promise<Response> | Response;\n\ninterface RouteModule {\n  pattern: string;\n  methods: Partial<Record<RouteMethod, RouteHandler>>;\n}\n\nasync function readJsonBody(request: Request): Promise<unknown> {\n  try {\n    return await request.json();\n  } catch {\n    return null;\n  }\n}\n\nexport const postItemRoute = {\n  pattern: \"/posts/[id]\",\n  methods: {\n    async GET(_request, params) {\n      const item = await postService.getPost(params.id);\n\n      return item\n        ? Response.json({ item })\n        : Response.json({ error: \"Not found.\" }, { status: 404 });\n    },\n    async PUT(request, params) {\n      const body = await readJsonBody(request);\n      const validation = validateUpdatePostInput(body);\n\n      if (!validation.ok) {\n        return Response.json(\n          { errors: validation.errors },\n          { status: 400 },\n        );\n      }\n\n      const item = await postService.updatePost(\n        params.id,\n        validation.data,\n      );\n\n      return item\n        ? Response.json({ item })\n        : Response.json({ error: \"Not found.\" }, { status: 404 });\n    },\n    async DELETE(_request, params) {\n      const removed = await postService.removePost(params.id);\n\n      return removed\n        ? Response.json({ ok: true })\n        : Response.json({ error: \"Not found.\" }, { status: 404 });\n    },\n  },\n} satisfies RouteModule;\n",
+          "itemVersion": "1.0.0",
+          "updatedAt": "2026-04-19T10:18:29.734Z"
+        }
+      },
+      "updatedAt": "2026-04-19T10:18:29.734Z"
+    }
+  }
+}

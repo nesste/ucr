@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+.turbo
+coverage
+examples/next-app/.next
+examples/bun-service/dist
+docs/.vitepress/cache
+docs/.vitepress/dist

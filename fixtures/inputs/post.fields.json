@@ -1,0 +1,50 @@
+[
+  {
+    "name": "title",
+    "label": "Title",
+    "tsType": "string",
+    "inputType": "text",
+    "optionalToken": "",
+    "required": true,
+    "emptyValueCode": "\"\"",
+    "sampleValueCode": "\"Example title\"",
+    "updatedValueCode": "\"Updated title\"",
+    "isString": true
+  },
+  {
+    "name": "views",
+    "label": "Views",
+    "tsType": "number",
+    "inputType": "number",
+    "optionalToken": "",
+    "required": true,
+    "emptyValueCode": "0",
+    "sampleValueCode": "42",
+    "updatedValueCode": "99",
+    "isNumber": true
+  },
+  {
+    "name": "published",
+    "label": "Published",
+    "tsType": "boolean",
+    "inputType": "checkbox",
+    "optionalToken": "",
+    "required": true,
+    "emptyValueCode": "false",
+    "sampleValueCode": "true",
+    "updatedValueCode": "false",
+    "isBoolean": true
+  },
+  {
+    "name": "publishedAt",
+    "label": "Published At",
+    "tsType": "string",
+    "inputType": "date",
+    "optionalToken": "?",
+    "required": false,
+    "emptyValueCode": "\"\"",
+    "sampleValueCode": "\"2026-04-19\"",
+    "updatedValueCode": "\"2026-12-31\"",
+    "isDate": true
+  }
+]

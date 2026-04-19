@@ -1,0 +1,21 @@
+{
+  "version": 4,
+  "registry": "../../fixtures/registries/ucr-official/registry.json",
+  "adapter": "bun-http",
+  "packageManager": "bun",
+  "testRunner": "bun",
+  "sourceRoot": ".",
+  "appRoot": null,
+  "runtimeRoot": "ucr/runtime",
+  "utilityRoot": "ucr/utilities",
+  "presetRoot": "ucr/presets",
+  "capabilities": [
+    "adapter:bun-http",
+    "bun",
+    "bun-http",
+    "bun:test",
+    "server",
+    "source-root:.",
+    "transport"
+  ]
+}

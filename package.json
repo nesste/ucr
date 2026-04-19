@@ -1,0 +1,32 @@
+{
+  "name": "universal-code-registry",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Bun-first source registry for audited reusable code blocks.",
+  "packageManager": "bun@1.3.4",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "bun run --workspaces build",
+    "clean": "bun run --workspaces clean",
+    "typecheck": "bun run --workspaces typecheck",
+    "test": "bun test",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "cli:init:bun-service": "bun packages/cli/dist/bin.js init --registry fixtures/registries/ucr-official/registry.json --target examples/bun-service",
+    "cli:init:next-app": "bun packages/cli/dist/bin.js init --registry fixtures/registries/ucr-official/registry.json --target examples/next-app",
+    "cli:list:bun-service": "bun packages/cli/dist/bin.js list --registry fixtures/registries/ucr-official/registry.json --target examples/bun-service",
+    "cli:list:next-app": "bun packages/cli/dist/bin.js list --registry fixtures/registries/ucr-official/registry.json --target examples/next-app"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.4",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "typescript": "^5.9.2",
+    "vitepress": "1.6.4"
+  }
+}

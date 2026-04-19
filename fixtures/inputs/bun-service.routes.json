@@ -1,0 +1,14 @@
+[
+  {
+    "importName": "healthRoute",
+    "importPath": "./routes/health"
+  },
+  {
+    "importName": "postCollectionRoute",
+    "importPath": "./routes/posts/index"
+  },
+  {
+    "importName": "postItemRoute",
+    "importPath": "./routes/posts/[id]"
+  }
+]

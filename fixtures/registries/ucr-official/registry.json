@@ -1,0 +1,809 @@
+{
+  "$schema": "../../../packages/schema/registry.schema.json",
+  "name": "ucr-official",
+  "version": "3.0.0",
+  "items": [
+    {
+      "name": "ts-runtime",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Typed composition runtime for utility-first TypeScript blocks.",
+      "targets": ["shared"],
+      "provides": ["runtime:ts"],
+      "metadata": {
+        "exports": "defineUtility,definePreset,compose"
+      },
+      "outputs": [
+        {
+          "template": "templates/ts-runtime/utility/index.ts.tpl",
+          "target": "index.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "result-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Small result helpers for predictable service and transport flows.",
+      "targets": ["shared"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:result-utility"],
+      "metadata": {
+        "exports": "ok,err,mapResult,mapError,matchResult"
+      },
+      "outputs": [
+        {
+          "template": "templates/result-utility/utility/result-utility.ts.tpl",
+          "target": "result-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "async-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Composable async helpers for retries, sequencing, and timeouts.",
+      "targets": ["shared"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:async-utility"],
+      "metadata": {
+        "exports": "retry,parallel,sequence,withTimeout"
+      },
+      "outputs": [
+        {
+          "template": "templates/async-utility/utility/async-utility.ts.tpl",
+          "target": "async-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "object-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Object helpers for picking, omitting, and merging defined values.",
+      "targets": ["shared"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:object-utility"],
+      "metadata": {
+        "exports": "pick,omit,mergeDefined"
+      },
+      "outputs": [
+        {
+          "template": "templates/object-utility/utility/object-utility.ts.tpl",
+          "target": "object-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "collection-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Collection helpers for grouping, indexing, and sorting records.",
+      "targets": ["shared"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:collection-utility"],
+      "metadata": {
+        "exports": "groupBy,indexBy,sortBy"
+      },
+      "outputs": [
+        {
+          "template": "templates/collection-utility/utility/collection-utility.ts.tpl",
+          "target": "collection-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "validation-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Validation helpers for record checking and field-error shaping.",
+      "targets": ["shared"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:validation-utility"],
+      "metadata": {
+        "exports": "assertRecord,assertShape,toFieldErrors"
+      },
+      "outputs": [
+        {
+          "template": "templates/validation-utility/utility/validation-utility.ts.tpl",
+          "target": "validation-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "variant-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript-ui",
+      "description": "Variant helpers for UI state and appearance selection.",
+      "targets": ["next-app-router"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:variant-utility"],
+      "metadata": {
+        "exports": "createVariants,pickVariant,compoundVariants"
+      },
+      "outputs": [
+        {
+          "template": "templates/variant-utility/utility/variant-utility.ts.tpl",
+          "target": "variant-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "slot-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript-ui",
+      "description": "Slot helpers for predictable UI regions and shared view props.",
+      "targets": ["next-app-router"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:slot-utility"],
+      "metadata": {
+        "exports": "createSlots,mergeSlots,resolveSlots"
+      },
+      "outputs": [
+        {
+          "template": "templates/slot-utility/utility/slot-utility.ts.tpl",
+          "target": "slot-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "state-utility",
+      "kind": "utility",
+      "version": "1.0.0",
+      "category": "typescript-ui",
+      "description": "State helpers for async, form, and event-driven UI flows.",
+      "targets": ["next-app-router"],
+      "requires": ["runtime:ts"],
+      "provides": ["utility:state-utility"],
+      "metadata": {
+        "exports": "createAsyncState,createFormState,reduceEvent"
+      },
+      "outputs": [
+        {
+          "template": "templates/state-utility/utility/state-utility.ts.tpl",
+          "target": "state-utility.ts",
+          "surface": "utility"
+        }
+      ]
+    },
+    {
+      "name": "service-preset",
+      "kind": "preset",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Shared service preset for result, async, and validation helpers.",
+      "targets": ["shared"],
+      "compose": [
+        "result-utility",
+        "async-utility",
+        "validation-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:result-utility",
+        "utility:async-utility",
+        "utility:validation-utility"
+      ],
+      "provides": ["preset:service-preset"],
+      "outputs": [
+        {
+          "template": "templates/service-preset/preset/service-preset.ts.tpl",
+          "target": "service-preset.ts",
+          "surface": "preset"
+        }
+      ]
+    },
+    {
+      "name": "endpoint-preset",
+      "kind": "preset",
+      "version": "1.0.0",
+      "category": "typescript",
+      "description": "Transport preset for endpoint-safe shared helpers.",
+      "targets": ["shared"],
+      "compose": [
+        "service-preset",
+        "object-utility",
+        "collection-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "preset:service-preset",
+        "utility:object-utility",
+        "utility:collection-utility"
+      ],
+      "provides": ["preset:endpoint-preset"],
+      "outputs": [
+        {
+          "template": "templates/endpoint-preset/preset/endpoint-preset.ts.tpl",
+          "target": "endpoint-preset.ts",
+          "surface": "preset"
+        }
+      ]
+    },
+    {
+      "name": "form-preset",
+      "kind": "preset",
+      "version": "1.0.0",
+      "category": "typescript-ui",
+      "description": "UI form preset for validation, object updates, and state changes.",
+      "targets": ["next-app-router"],
+      "compose": [
+        "validation-utility",
+        "object-utility",
+        "state-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:validation-utility",
+        "utility:object-utility",
+        "utility:state-utility"
+      ],
+      "provides": ["preset:form-preset"],
+      "outputs": [
+        {
+          "template": "templates/form-preset/preset/form-preset.ts.tpl",
+          "target": "form-preset.ts",
+          "surface": "preset"
+        }
+      ]
+    },
+    {
+      "name": "admin-page-preset",
+      "kind": "preset",
+      "version": "1.0.0",
+      "category": "typescript-ui",
+      "description": "UI preset for admin layouts, slots, state, and collection rendering.",
+      "targets": ["next-app-router"],
+      "compose": [
+        "variant-utility",
+        "slot-utility",
+        "state-utility",
+        "collection-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:variant-utility",
+        "utility:slot-utility",
+        "utility:state-utility",
+        "utility:collection-utility"
+      ],
+      "provides": ["preset:admin-page-preset"],
+      "outputs": [
+        {
+          "template": "templates/admin-page-preset/preset/admin-page-preset.ts.tpl",
+          "target": "admin-page-preset.ts",
+          "surface": "preset"
+        }
+      ]
+    },
+    {
+      "name": "env-config",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "foundation",
+      "description": "Typed environment helpers for Bun-managed projects.",
+      "targets": ["shared"],
+      "provides": ["env-config"],
+      "outputs": [
+        {
+          "template": "templates/env-config/config/env.ts.tpl",
+          "target": "env.ts",
+          "surface": "config"
+        }
+      ]
+    },
+    {
+      "name": "result-errors",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "foundation",
+      "description": "Small Result helpers for predictable service and transport flows.",
+      "targets": ["shared"],
+      "provides": ["result-errors"],
+      "outputs": [
+        {
+          "template": "templates/result-errors/domain/result.ts.tpl",
+          "target": "result.ts",
+          "surface": "domain"
+        }
+      ]
+    },
+    {
+      "name": "logger",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "foundation",
+      "description": "Simple structured logger wrapper for app-local code.",
+      "targets": ["shared"],
+      "provides": ["logger"],
+      "outputs": [
+        {
+          "template": "templates/logger/config/logger.ts.tpl",
+          "target": "logger.ts",
+          "surface": "config"
+        }
+      ]
+    },
+    {
+      "name": "request-context",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "bun-http",
+      "description": "Small request context helpers for Bun HTTP handlers.",
+      "targets": ["bun-http"],
+      "provides": ["request-context"],
+      "outputs": [
+        {
+          "template": "templates/request-context/config/request-context.ts.tpl",
+          "target": "request-context.ts",
+          "surface": "config"
+        }
+      ]
+    },
+    {
+      "name": "entity-contract",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "entity",
+      "description": "Typed entity model, create/update inputs, and field metadata.",
+      "targets": ["shared"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "description": "Field metadata used to render entity code."
+        }
+      ],
+      "provides": ["entity-contract:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/entity-contract/contract/model.ts.tpl",
+          "target": "model.ts",
+          "surface": "contract"
+        }
+      ]
+    },
+    {
+      "name": "service-layer",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "entity",
+      "description": "Repository contract plus service methods for one entity.",
+      "targets": ["shared"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural method stem, for example posts."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "preset:service-preset"
+      ],
+      "provides": [
+        "repository-contract:{{instanceId}}",
+        "service-layer:{{instanceId}}"
+      ],
+      "outputs": [
+        {
+          "template": "templates/service-layer/domain/repository.ts.tpl",
+          "target": "repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/service-layer/domain/service.ts.tpl",
+          "target": "service.ts",
+          "surface": "domain"
+        }
+      ]
+    },
+    {
+      "name": "memory-repository",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "entity",
+      "description": "In-memory repository plus singleton service runtime for one entity.",
+      "targets": ["shared"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "repository-contract:{{instanceId}}",
+        "service-layer:{{instanceId}}",
+        "preset:endpoint-preset"
+      ],
+      "provides": [
+        "memory-repository:{{instanceId}}",
+        "service-runtime:{{instanceId}}"
+      ],
+      "outputs": [
+        {
+          "template": "templates/memory-repository/domain/memory-repository.ts.tpl",
+          "target": "memory-repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/runtime.ts.tpl",
+          "target": "runtime.ts",
+          "surface": "domain"
+        }
+      ]
+    },
+    {
+      "name": "input-validation",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "entity",
+      "description": "Unknown input validation for create and update entity payloads.",
+      "targets": ["shared"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "description": "Field metadata used to render validation logic."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "utility:validation-utility"
+      ],
+      "provides": ["validation:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/input-validation/contract/validation.ts.tpl",
+          "target": "validation.ts",
+          "surface": "contract"
+        }
+      ]
+    },
+    {
+      "name": "api-client",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "entity",
+      "description": "Small fetch client for one entity collection.",
+      "targets": ["shared"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "utility:async-utility"
+      ],
+      "provides": ["api-client:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/api-client/domain/api-client.ts.tpl",
+          "target": "api-client.ts",
+          "surface": "domain"
+        }
+      ]
+    },
+    {
+      "name": "next-collection-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Next App Router collection handler for one entity.",
+      "targets": ["next-app-router"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}"
+      ],
+      "provides": ["next-collection-route:{{instanceId}}"],
+      "entrypoints": ["{{pluralKebab}}/route.ts"],
+      "outputs": [
+        {
+          "template": "templates/next-collection-route/transport/route.ts.tpl",
+          "target": "{{pluralKebab}}/route.ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "next-item-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Next App Router item handler for one entity.",
+      "targets": ["next-app-router"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}"
+      ],
+      "provides": ["next-item-route:{{instanceId}}"],
+      "entrypoints": ["{{pluralKebab}}/[id]/route.ts"],
+      "outputs": [
+        {
+          "template": "templates/next-item-route/transport/route.ts.tpl",
+          "target": "{{pluralKebab}}/[id]/route.ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Minimal entity table component for admin pages.",
+      "targets": ["next-app-router"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "preset:admin-page-preset"
+      ],
+      "provides": ["data-table:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/data-table/ui/data-table.tsx.tpl",
+          "target": "{{pluralKebab}}/data-table.tsx",
+          "surface": "ui"
+        }
+      ]
+    },
+    {
+      "name": "entity-form",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Minimal create form component for one entity.",
+      "targets": ["next-app-router"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "preset:form-preset"
+      ],
+      "provides": ["entity-form:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/entity-form/ui/entity-form.tsx.tpl",
+          "target": "{{resourceKebab}}/entity-form.tsx",
+          "surface": "ui"
+        }
+      ]
+    },
+    {
+      "name": "admin-page",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "next",
+      "description": "Client-side admin page composed from table, form, and API client blocks.",
+      "targets": ["next-app-router"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "entity-contract:{{instanceId}}",
+        "api-client:{{instanceId}}",
+        "data-table:{{instanceId}}",
+        "entity-form:{{instanceId}}",
+        "preset:admin-page-preset"
+      ],
+      "provides": ["admin-page:{{instanceId}}"],
+      "entrypoints": ["{{pluralKebab}}/page.tsx"],
+      "outputs": [
+        {
+          "template": "templates/admin-page/ui/page.tsx.tpl",
+          "target": "{{pluralKebab}}/page.tsx",
+          "surface": "ui"
+        }
+      ]
+    },
+    {
+      "name": "bun-server",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "bun-http",
+      "description": "Static route registry plus Bun.serve bootstrap.",
+      "targets": ["bun-http"],
+      "inputs": [
+        {
+          "name": "routeModules",
+          "type": "json",
+          "description": "Route import metadata for the server entrypoint."
+        }
+      ],
+      "provides": ["bun-server"],
+      "entrypoints": ["index.ts"],
+      "outputs": [
+        {
+          "template": "templates/bun-server/entrypoint/index.ts.tpl",
+          "target": "index.ts",
+          "surface": "entrypoint"
+        }
+      ]
+    },
+    {
+      "name": "health-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "bun-http",
+      "description": "Static health route for Bun HTTP services.",
+      "targets": ["bun-http"],
+      "provides": ["health-route"],
+      "outputs": [
+        {
+          "template": "templates/health-route/transport/health.ts.tpl",
+          "target": "health.ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "json-collection-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "bun-http",
+      "description": "Bun HTTP collection route for one entity.",
+      "targets": ["bun-http"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}"
+      ],
+      "provides": ["json-collection-route:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/json-collection-route/transport/index.ts.tpl",
+          "target": "{{pluralKebab}}/index.ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "json-item-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "bun-http",
+      "description": "Bun HTTP item route for one entity.",
+      "targets": ["bun-http"],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}"
+      ],
+      "provides": ["json-item-route:{{instanceId}}"],
+      "outputs": [
+        {
+          "template": "templates/json-item-route/transport/item.ts.tpl",
+          "target": "{{pluralKebab}}/[id].ts",
+          "surface": "transport"
+        }
+      ]
+    }
+  ]
+}

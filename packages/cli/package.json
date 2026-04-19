@@ -1,0 +1,22 @@
+{
+  "name": "@ucr/cli",
+  "version": "0.1.0",
+  "description": "CLI for the universal code registry.",
+  "type": "commonjs",
+  "main": "dist/bin.js",
+  "types": "dist/bin.d.ts",
+  "bin": {
+    "ucr": "dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@ucr/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

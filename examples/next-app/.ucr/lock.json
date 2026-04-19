@@ -1,0 +1,623 @@
+{
+  "version": 2,
+  "registry": {
+    "name": "ucr-official",
+    "version": "3.0.0",
+    "source": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json"
+  },
+  "installs": {
+    "ts-runtime:ts-runtime": {
+      "itemKind": "utility",
+      "itemName": "ts-runtime",
+      "itemVersion": "1.0.0",
+      "instanceId": "ts-runtime",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [],
+      "provides": [
+        "runtime:ts"
+      ],
+      "files": [
+        "src/ucr/runtime/index.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:28.179Z"
+    },
+    "result-utility:result-utility": {
+      "itemKind": "utility",
+      "itemName": "result-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "result-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:result-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/result-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:28.281Z"
+    },
+    "async-utility:async-utility": {
+      "itemKind": "utility",
+      "itemName": "async-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "async-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:async-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/async-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:28.387Z"
+    },
+    "object-utility:object-utility": {
+      "itemKind": "utility",
+      "itemName": "object-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "object-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:object-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/object-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:19:11.515Z"
+    },
+    "collection-utility:collection-utility": {
+      "itemKind": "utility",
+      "itemName": "collection-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "collection-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:collection-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/collection-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:28.591Z"
+    },
+    "validation-utility:validation-utility": {
+      "itemKind": "utility",
+      "itemName": "validation-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "validation-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:validation-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/validation-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:19:51.640Z"
+    },
+    "variant-utility:variant-utility": {
+      "itemKind": "utility",
+      "itemName": "variant-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "variant-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:variant-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/variant-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:28.795Z"
+    },
+    "slot-utility:slot-utility": {
+      "itemKind": "utility",
+      "itemName": "slot-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "slot-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:slot-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/slot-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:28.900Z"
+    },
+    "state-utility:state-utility": {
+      "itemKind": "utility",
+      "itemName": "state-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "state-utility",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:state-utility"
+      ],
+      "files": [
+        "src/ucr/utilities/state-utility.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.007Z"
+    },
+    "service-preset:service-preset": {
+      "itemKind": "preset",
+      "itemName": "service-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "service-preset",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [
+        "async-utility",
+        "result-utility",
+        "validation-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:async-utility",
+        "utility:result-utility",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "preset:service-preset"
+      ],
+      "files": [
+        "src/ucr/presets/service-preset.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.107Z"
+    },
+    "endpoint-preset:endpoint-preset": {
+      "itemKind": "preset",
+      "itemName": "endpoint-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "endpoint-preset",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [
+        "async-utility",
+        "collection-utility",
+        "object-utility",
+        "result-utility",
+        "service-preset",
+        "validation-utility"
+      ],
+      "requires": [
+        "preset:service-preset",
+        "runtime:ts",
+        "utility:collection-utility",
+        "utility:object-utility"
+      ],
+      "provides": [
+        "preset:endpoint-preset"
+      ],
+      "files": [
+        "src/ucr/presets/endpoint-preset.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.211Z"
+    },
+    "form-preset:form-preset": {
+      "itemKind": "preset",
+      "itemName": "form-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "form-preset",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [
+        "object-utility",
+        "state-utility",
+        "validation-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:object-utility",
+        "utility:state-utility",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "preset:form-preset"
+      ],
+      "files": [
+        "src/ucr/presets/form-preset.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.317Z"
+    },
+    "admin-page-preset:admin-page-preset": {
+      "itemKind": "preset",
+      "itemName": "admin-page-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "admin-page-preset",
+      "adapter": "next-app-router",
+      "inputs": {},
+      "compose": [
+        "collection-utility",
+        "slot-utility",
+        "state-utility",
+        "variant-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:collection-utility",
+        "utility:slot-utility",
+        "utility:state-utility",
+        "utility:variant-utility"
+      ],
+      "provides": [
+        "preset:admin-page-preset"
+      ],
+      "files": [
+        "src/ucr/presets/admin-page-preset.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.420Z"
+    },
+    "entity-contract:posts": {
+      "itemKind": "block",
+      "itemName": "entity-contract",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "tsType": "string",
+            "inputType": "text",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"Example title\"",
+            "updatedValueCode": "\"Updated title\"",
+            "isString": true
+          },
+          {
+            "name": "views",
+            "label": "Views",
+            "tsType": "number",
+            "inputType": "number",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "0",
+            "sampleValueCode": "42",
+            "updatedValueCode": "99",
+            "isNumber": true
+          },
+          {
+            "name": "published",
+            "label": "Published",
+            "tsType": "boolean",
+            "inputType": "checkbox",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "false",
+            "sampleValueCode": "true",
+            "updatedValueCode": "false",
+            "isBoolean": true
+          },
+          {
+            "name": "publishedAt",
+            "label": "Published At",
+            "tsType": "string",
+            "inputType": "date",
+            "optionalToken": "?",
+            "required": false,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"2026-04-19\"",
+            "updatedValueCode": "\"2026-12-31\"",
+            "isDate": true
+          }
+        ]
+      },
+      "compose": [],
+      "requires": [],
+      "provides": [
+        "entity-contract:posts"
+      ],
+      "files": [
+        "src/ucr/posts/contract/model.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.525Z"
+    },
+    "service-layer:posts": {
+      "itemKind": "block",
+      "itemName": "service-layer",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "preset:service-preset"
+      ],
+      "provides": [
+        "repository-contract:posts",
+        "service-layer:posts"
+      ],
+      "files": [
+        "src/ucr/posts/domain/repository.ts",
+        "src/ucr/posts/domain/service.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.629Z"
+    },
+    "memory-repository:posts": {
+      "itemKind": "block",
+      "itemName": "memory-repository",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "preset:endpoint-preset",
+        "repository-contract:posts",
+        "service-layer:posts"
+      ],
+      "provides": [
+        "memory-repository:posts",
+        "service-runtime:posts"
+      ],
+      "files": [
+        "src/ucr/posts/domain/memory-repository.ts",
+        "src/ucr/posts/domain/runtime.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.734Z"
+    },
+    "input-validation:posts": {
+      "itemKind": "block",
+      "itemName": "input-validation",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "tsType": "string",
+            "inputType": "text",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"Example title\"",
+            "updatedValueCode": "\"Updated title\"",
+            "isString": true
+          },
+          {
+            "name": "views",
+            "label": "Views",
+            "tsType": "number",
+            "inputType": "number",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "0",
+            "sampleValueCode": "42",
+            "updatedValueCode": "99",
+            "isNumber": true
+          },
+          {
+            "name": "published",
+            "label": "Published",
+            "tsType": "boolean",
+            "inputType": "checkbox",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "false",
+            "sampleValueCode": "true",
+            "updatedValueCode": "false",
+            "isBoolean": true
+          },
+          {
+            "name": "publishedAt",
+            "label": "Published At",
+            "tsType": "string",
+            "inputType": "date",
+            "optionalToken": "?",
+            "required": false,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"2026-04-19\"",
+            "updatedValueCode": "\"2026-12-31\"",
+            "isDate": true
+          }
+        ]
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "validation:posts"
+      ],
+      "files": [
+        "src/ucr/posts/contract/validation.ts"
+      ],
+      "updatedAt": "2026-04-19T10:19:51.740Z"
+    },
+    "api-client:posts": {
+      "itemKind": "block",
+      "itemName": "api-client",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "utility:async-utility"
+      ],
+      "provides": [
+        "api-client:posts"
+      ],
+      "files": [
+        "src/ucr/posts/domain/api-client.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:29.938Z"
+    },
+    "next-collection-route:posts": {
+      "itemKind": "block",
+      "itemName": "next-collection-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "service-runtime:posts",
+        "validation:posts"
+      ],
+      "provides": [
+        "next-collection-route:posts"
+      ],
+      "files": [
+        "src/app/api/posts/route.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:30.040Z"
+    },
+    "next-item-route:posts": {
+      "itemKind": "block",
+      "itemName": "next-item-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "service-runtime:posts",
+        "validation:posts"
+      ],
+      "provides": [
+        "next-item-route:posts"
+      ],
+      "files": [
+        "src/app/api/posts/[id]/route.ts"
+      ],
+      "updatedAt": "2026-04-19T10:18:30.139Z"
+    },
+    "data-table:posts": {
+      "itemKind": "block",
+      "itemName": "data-table",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "preset:admin-page-preset"
+      ],
+      "provides": [
+        "data-table:posts"
+      ],
+      "files": [
+        "src/app/posts/data-table.tsx"
+      ],
+      "updatedAt": "2026-04-19T10:18:30.237Z"
+    },
+    "entity-form:posts": {
+      "itemKind": "block",
+      "itemName": "entity-form",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "preset:form-preset"
+      ],
+      "provides": [
+        "entity-form:posts"
+      ],
+      "files": [
+        "src/app/posts/entity-form.tsx"
+      ],
+      "updatedAt": "2026-04-19T10:18:30.337Z"
+    },
+    "admin-page:posts": {
+      "itemKind": "block",
+      "itemName": "admin-page",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "next-app-router",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "api-client:posts",
+        "data-table:posts",
+        "entity-contract:posts",
+        "entity-form:posts",
+        "preset:admin-page-preset"
+      ],
+      "provides": [
+        "admin-page:posts"
+      ],
+      "files": [
+        "src/app/posts/page.tsx"
+      ],
+      "updatedAt": "2026-04-19T10:18:30.439Z"
+    }
+  }
+}

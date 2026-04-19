@@ -1,0 +1,23 @@
+{
+  "version": 4,
+  "registry": "../../fixtures/registries/ucr-official/registry.json",
+  "adapter": "next-app-router",
+  "packageManager": "bun",
+  "testRunner": "bun",
+  "sourceRoot": "src",
+  "appRoot": "src/app",
+  "runtimeRoot": "src/ucr/runtime",
+  "utilityRoot": "src/ucr/utilities",
+  "presetRoot": "src/ucr/presets",
+  "capabilities": [
+    "adapter:next-app-router",
+    "bun",
+    "bun:test",
+    "next",
+    "next-app-router",
+    "react",
+    "source-root:src",
+    "transport",
+    "ui"
+  ]
+}
