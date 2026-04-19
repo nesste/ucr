@@ -15,25 +15,21 @@ const targets = [
     label: "linux-x64",
     bunTarget: "bun-linux-x64",
     filename: "ucr-linux-x64",
-    extraArgs: [] as string[],
   },
   {
     label: "windows-x64",
     bunTarget: "bun-windows-x64",
     filename: "ucr-windows-x64.exe",
-    extraArgs: ["--windows-hide-console"],
   },
   {
     label: "darwin-x64",
     bunTarget: "bun-darwin-x64",
     filename: "ucr-darwin-x64",
-    extraArgs: [] as string[],
   },
   {
     label: "darwin-arm64",
     bunTarget: "bun-darwin-aarch64",
     filename: "ucr-darwin-arm64",
-    extraArgs: [] as string[],
   },
 ];
 
@@ -69,6 +65,10 @@ async function main(): Promise<void> {
 
   for (const target of activeTargets) {
     const outputFile = path.join(binaryRoot, target.filename);
+    const targetSpecificArgs =
+      target.label === "windows-x64" && process.platform === "win32"
+        ? ["--windows-hide-console"]
+        : [];
     const command = [
       "bun",
       "build",
@@ -76,7 +76,7 @@ async function main(): Promise<void> {
       `--target=${target.bunTarget}`,
       `--outfile=${outputFile}`,
       "--env=UCR_OFFICIAL_REGISTRY_URL*",
-      ...target.extraArgs,
+      ...targetSpecificArgs,
       entrypoint,
     ];
     const result = Bun.spawnSync({
