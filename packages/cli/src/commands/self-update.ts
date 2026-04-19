@@ -170,9 +170,12 @@ export function resolveReleaseAsset(
 export function resolveStandaloneBinaryPath(
   execPath: string = process.execPath,
 ): string {
-  const executableName = path.basename(execPath).toLowerCase();
+  const executableNames = [
+    path.posix.basename(execPath).toLowerCase(),
+    path.win32.basename(execPath).toLowerCase(),
+  ];
 
-  if (!executableName.startsWith("ucr")) {
+  if (!executableNames.some((entry) => entry.startsWith("ucr"))) {
     throw new Error(
       "self-update is only available from the installed standalone ucr binary.",
     );
