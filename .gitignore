@@ -7,3 +7,6 @@ examples/next-app/.next
 examples/bun-service/dist
 docs/.vitepress/cache
 docs/.vitepress/dist
+docs/public/registry
+docs/public/install.sh
+docs/public/install.ps1

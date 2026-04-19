@@ -24,11 +24,15 @@ export interface LockedRegistryInstall {
 }
 
 export interface RegistryLock {
-  version: 2;
+  version: 3;
   registry: {
     name: string;
     version: string;
+    transport: "file" | "http" | "https";
     source: string;
+    manifestUrl: string;
+    bundleUrl: string | null;
+    bundleChecksum: string | null;
   };
   installs: Record<string, LockedRegistryInstall>;
 }
@@ -48,11 +52,15 @@ export interface LockedRegistryInstallUpdate {
 
 function createLock(loaded: LoadedRegistry): RegistryLock {
   return {
-    version: 2,
+    version: 3,
     registry: {
       name: loaded.document.name,
       version: loaded.document.version,
-      source: loaded.registryFile,
+      transport: loaded.source.transport,
+      source: loaded.source.source,
+      manifestUrl: loaded.source.manifestUrl,
+      bundleUrl: loaded.source.bundleUrl,
+      bundleChecksum: loaded.source.bundleChecksum,
     },
     installs: {},
   };
@@ -75,7 +83,7 @@ export async function readRegistryLock(targetRoot: string): Promise<RegistryLock
 
     if (
       !isRecord(parsed) ||
-      (parsed.version !== 1 && parsed.version !== 2) ||
+      (parsed.version !== 1 && parsed.version !== 2 && parsed.version !== 3) ||
       !isRecord(parsed.registry) ||
       !isRecord(parsed.installs)
     ) {
@@ -133,11 +141,32 @@ export async function readRegistryLock(targetRoot: string): Promise<RegistryLock
     }
 
     return {
-      version: 2,
+      version: 3,
       registry: {
         name: String((parsed.registry as Record<string, unknown>).name ?? ""),
         version: String((parsed.registry as Record<string, unknown>).version ?? ""),
         source: String((parsed.registry as Record<string, unknown>).source ?? ""),
+        transport:
+          (parsed.registry as Record<string, unknown>).transport === "http" ||
+          (parsed.registry as Record<string, unknown>).transport === "https"
+            ? ((parsed.registry as Record<string, unknown>).transport as
+                | "http"
+                | "https")
+            : "file",
+        manifestUrl: String(
+          (parsed.registry as Record<string, unknown>).manifestUrl ??
+            (parsed.registry as Record<string, unknown>).source ??
+            "",
+        ),
+        bundleUrl:
+          typeof (parsed.registry as Record<string, unknown>).bundleUrl === "string"
+            ? String((parsed.registry as Record<string, unknown>).bundleUrl)
+            : null,
+        bundleChecksum:
+          typeof (parsed.registry as Record<string, unknown>).bundleChecksum ===
+          "string"
+            ? String((parsed.registry as Record<string, unknown>).bundleChecksum)
+            : null,
       },
       installs,
     };
@@ -159,7 +188,11 @@ export async function upsertLockedInstall(
   lock.registry = {
     name: loaded.document.name,
     version: loaded.document.version,
-    source: loaded.registryFile,
+    transport: loaded.source.transport,
+    source: loaded.source.source,
+    manifestUrl: loaded.source.manifestUrl,
+    bundleUrl: loaded.source.bundleUrl,
+    bundleChecksum: loaded.source.bundleChecksum,
   };
 
   const timestamp = new Date().toISOString();

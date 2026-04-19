@@ -9,7 +9,7 @@ Written by `init`.
 Purpose:
 
 - record the detected adapter
-- store the resolved registry reference when provided
+- store the selected registry reference
 - capture the deterministic shared roots for the target project
 - record project capabilities discovered during inspection
 
@@ -18,7 +18,7 @@ Current shape in this repo:
 | Field | Meaning |
 | --- | --- |
 | `version` | Config format version, currently `4`. |
-| `registry` | Optional registry reference, stored relative to the target root when possible. |
+| `registry` | Registry manifest URL or local registry path, stored relative to the target root when possible. |
 | `adapter` | `bun-http` or `next-app-router`. |
 | `packageManager` | Always `bun` in v1. |
 | `testRunner` | Always `bun` in v1. |
@@ -44,8 +44,8 @@ Top-level shape:
 
 | Field | Meaning |
 | --- | --- |
-| `version` | Lock format version, currently `2`. |
-| `registry` | Registry name, version, and source path used for the install. |
+| `version` | Lock format version, currently `3`. |
+| `registry` | Registry name, version, transport, configured source, resolved manifest URL, and bundle metadata used for the install. |
 | `installs` | Map keyed by `itemName:instanceId`. |
 
 Each install record stores:
@@ -76,8 +76,8 @@ Top-level shape:
 
 | Field | Meaning |
 | --- | --- |
-| `version` | State format version, currently `4`. |
-| `registry` | Registry name, version, and source path. |
+| `version` | State format version, currently `5`. |
+| `registry` | Registry name, version, transport, configured source, resolved manifest URL, and bundle metadata. |
 | `installs` | Map keyed by `itemName:instanceId`. |
 
 Each install snapshot stores:
@@ -111,5 +111,5 @@ When `diff` runs, it compares the current local file hash, the tracked hash from
 ## Practical Guidance
 
 - keep `.ucr/*.json` checked in for projects that want explainable upgrades
-- if the config version or state version is rejected, rerun `init` or reinstall with the current UCR
+- if older lock/state versions are present, the current UCR reads them and normalizes them on the next write
 - do not hand-edit these files unless you are deliberately repairing state and understand the consequences

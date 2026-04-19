@@ -1,132 +1,132 @@
 # Universal Code Registry
 
-Universal Code Registry (UCR) is a Bun-first, source-only registry for reusable internal code. It installs audited source files into an existing Bun-managed project, keeps the output paths deterministic, and records enough state to diff and upgrade those installs later.
+Universal Code Registry (UCR) is a source-first code registry for Bun projects. Instead of installing generated packages, UCR installs audited source templates into your app, maps them into deterministic adapter-specific roots, and tracks enough upstream state to support `diff` and `upgrade` later.
 
-UCR does not replace Bun. Bun still owns external packages and `bun.lock`. UCR owns the registry templates, typed install inputs, adapter-aware file placement, and the `.ucr/*.json` files that track what was installed.
+UCR does not replace Bun. Bun still owns external dependencies and `bun.lock`. UCR owns:
 
-Detailed guides and reference material live in the [docs website source](./docs/index.md). Run `bun run docs:dev` to browse it locally.
+- registry manifests and template bundles
+- typed install inputs
+- deterministic install roots
+- `.ucr/config.json`
+- `.ucr/lock.json`
+- `.ucr/state.json`
 
-## What UCR Owns
+Full documentation lives in the docs site source at [docs/index.md](./docs/index.md).
 
-UCR manages three tracked files inside the target project:
+## Install
 
-- `.ucr/config.json`: detected adapter, registry reference, and install roots
-- `.ucr/lock.json`: installed items, resolved inputs, compose dependencies, and owned files
-- `.ucr/state.json`: per-file upstream snapshots used by `diff` and `upgrade`
+Install the standalone binary from GitHub Releases:
 
-It installs three kinds of registry items:
+```bash
+curl -fsSL https://ucr.network/install.sh | sh
+```
 
-- `utility`: reusable TypeScript helpers installed into `ucr/utilities` or `src/ucr/utilities`
-- `preset`: reusable compositions of utilities installed into `ucr/presets` or `src/ucr/presets`
-- `block`: feature scaffolding installed into adapter-owned feature, route, UI, or entrypoint paths
+On Windows PowerShell:
 
-It currently supports two adapters:
+```powershell
+irm https://ucr.network/install.ps1 | iex
+```
+
+The default official registry is:
+
+```text
+https://ucr.network/registry/ucr-official/latest/registry.json
+```
+
+Override it with `--registry <url-or-path>` or `UCR_REGISTRY`.
+
+## Quickstart
+
+Initialize a Bun project against the official registry:
+
+```bash
+ucr init --target .
+ucr list
+ucr show entity-contract
+ucr add entity-contract --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+```
+
+From there:
+
+- `ucr diff entity-contract --instance posts`
+- `ucr upgrade entity-contract --instance posts`
+
+To pin a project to a specific published registry version:
+
+```bash
+ucr init --registry https://ucr.network/registry/ucr-official/v3.0.0/registry.json --target .
+```
+
+## Supported Adapters And Item Kinds
+
+Adapters:
 
 - `bun-http`
 - `next-app-router`
 
-## How It Works
+Registry item kinds:
 
-The normal workflow is:
+- `utility`: reusable shared helpers
+- `preset`: reusable compositions of utilities or other presets
+- `block`: instance-scoped feature code, routes, UI, config, or entrypoints
 
-1. `ucr init` inspects a Bun project and writes `.ucr/config.json`.
-2. `ucr list` shows which registry items are available for that target.
-3. `ucr show <item>` prints inputs, outputs, compose dependencies, and compatibility.
-4. `ucr add <item>` renders source files into deterministic locations and records the install.
-5. `ucr diff <item>` compares the local install with a fresh upstream render.
-6. `ucr upgrade <item>` applies safe upstream updates and reports conflicts when manual review is needed.
+## Registry Modes
 
-Utilities and presets default their instance id to the item name. Blocks require `--instance`.
+UCR supports two registry sources:
 
-## Quickstart
+- remote HTTPS manifests for normal end-user usage
+- local `registry.json` paths for contributors, tests, and custom/private registries
 
-Inspect the checked-in registry and example targets:
+Remote registries are fetched on demand, validated, and hydrated into a local cache before install, diff, or upgrade runs. Local registries are read directly from disk.
 
-```bash
-bun install
-bun run build
+## What UCR Tracks
 
-bun packages/cli/dist/bin.js list --registry fixtures/registries/ucr-official/registry.json --target examples/bun-service
-bun packages/cli/dist/bin.js show service-preset --registry fixtures/registries/ucr-official/registry.json --target examples/bun-service
+Inside each target project:
 
-bun packages/cli/dist/bin.js list --registry fixtures/registries/ucr-official/registry.json --target examples/next-app
-bun packages/cli/dist/bin.js show admin-page --registry fixtures/registries/ucr-official/registry.json --target examples/next-app
-```
-
-Run the example applications:
-
-```bash
-cd examples/bun-service
-bun run start
-```
-
-```bash
-cd examples/next-app
-bun run build
-```
-
-Validate the repo:
-
-```bash
-bun run build
-bun run docs:build
-bun run typecheck
-bun test
-```
-
-## Deterministic Install Roots
-
-UCR maps the same logical registry outputs into adapter-specific roots every time.
-
-For `bun-http` projects:
-
-- runtime: `ucr/runtime`
-- utilities: `ucr/utilities`
-- presets: `ucr/presets`
-- feature code: `ucr/<instance>/...`
-- routes: `server/routes/...`
-- entrypoints: `server/...`
-
-For `next-app-router` projects with a `src/` app layout:
-
-- runtime: `src/ucr/runtime`
-- utilities: `src/ucr/utilities`
-- presets: `src/ucr/presets`
-- feature code: `src/ucr/<instance>/...`
-- routes: `src/app/api/...`
-- UI: `src/app/...`
+- `.ucr/config.json`: adapter, registry reference, and deterministic roots
+- `.ucr/lock.json`: installed items, resolved inputs, owned files, and registry metadata
+- `.ucr/state.json`: tracked upstream snapshots used by `diff` and `upgrade`
 
 ## When To Use UCR
 
 Use UCR when you want:
 
-- reusable internal code to stay source-owned after install
-- adapter-aware scaffolding with predictable output paths
-- typed template inputs instead of executable generators
-- tracked upgrades after local edits exist
+- source-owned reusable internal code
+- adapter-aware scaffolding with predictable paths
+- typed install inputs instead of imperative generators
+- explainable upgrades after local edits
 
 Do not use UCR when you want:
 
-- third-party package resolution or lockfile management
-- registry-driven package installation
-- arbitrary hooks or executable generators
-- automatic patching of user-owned files in v1
+- third-party dependency management
+- package publishing and package resolution
+- arbitrary executable generators or hooks
+- automatic mutation of unrelated user files
 
-## Current v1 Constraints
+## Contributor Flow
 
-- the target project must be Bun-managed
-- supported adapters are limited to `bun-http` and `next-app-router`
-- generated code must come from registry-owned templates
-- legacy registry item formats are rejected
+This repository still contains the source registry, examples, docs site, and release scripts used to publish the product.
+
+Useful contributor commands:
+
+```bash
+bun install
+bun run build
+bun run docs:build
+bun run registry:build
+bun run release:artifacts
+bun test
+```
 
 ## Learn More
 
-The docs site expands on the README with:
+The docs site covers:
 
-- a guided quickstart for both example targets
-- command-by-command CLI reference
-- registry format and adapter path mapping reference
-- upgrade and diff behavior
-- contributor-facing architecture and development notes
+- binary install and remote registry onboarding
+- command reference
+- registry format and distribution metadata
+- `.ucr` file formats
+- adapter path mapping
+- contributor release and publishing flow
 
 Start at [docs/index.md](./docs/index.md).

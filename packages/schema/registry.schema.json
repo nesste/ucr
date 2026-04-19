@@ -17,6 +17,9 @@
       "type": "string",
       "minLength": 1
     },
+    "distribution": {
+      "$ref": "#/$defs/distribution"
+    },
     "items": {
       "type": "array",
       "minItems": 1,
@@ -26,6 +29,24 @@
     }
   },
   "$defs": {
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "bundleUrl", "checksum"],
+      "properties": {
+        "format": {
+          "const": "zip"
+        },
+        "bundleUrl": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checksum": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        }
+      }
+    },
     "input": {
       "type": "object",
       "additionalProperties": false,

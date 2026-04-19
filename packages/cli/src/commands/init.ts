@@ -1,30 +1,38 @@
 import {
   inspectProjectProfile,
   loadRegistryDocument,
+  resolveProjectRegistryPath,
   toProjectRegistryReference,
   writeProjectConfig,
 } from "@ucr/core";
 
 import type { ProjectAdapterId } from "@ucr/core";
 
+import { OFFICIAL_REGISTRY_URL } from "../official-registry";
+
 export interface InitCommandContext {
-  registryPath: string | undefined;
+  registryRef: string | undefined;
   targetRoot: string;
   adapterId: ProjectAdapterId | undefined;
 }
 
 export async function runInitCommand(context: InitCommandContext): Promise<void> {
   const profile = await inspectProjectProfile(context.targetRoot, context.adapterId);
+  const selectedRegistryRef = context.registryRef ?? OFFICIAL_REGISTRY_URL;
+  const resolvedRegistryRef = resolveProjectRegistryPath(
+    process.cwd(),
+    selectedRegistryRef,
+  );
 
-  const registry = context.registryPath
-    ? await loadRegistryDocument(context.registryPath)
+  const registry = context.registryRef
+    ? await loadRegistryDocument(context.registryRef, {
+        baseDir: process.cwd(),
+      })
     : null;
 
   await writeProjectConfig(context.targetRoot, {
     version: 4,
-    ...(context.registryPath
-      ? { registry: toProjectRegistryReference(context.targetRoot, context.registryPath) }
-      : {}),
+    registry: toProjectRegistryReference(context.targetRoot, resolvedRegistryRef),
     adapter: profile.adapterId,
     packageManager: profile.packageManager,
     testRunner: profile.testRunner,
@@ -40,9 +48,7 @@ export async function runInitCommand(context: InitCommandContext): Promise<void>
   if (registry) {
     console.log(`Registry: ${registry.document.name}`);
   } else {
-    console.log(
-      'Registry: (not set — use --registry, set "registry" in .ucr/config.json, set UCR_REGISTRY, or rely on fixture discovery)',
-    );
+    console.log(`Registry: ${selectedRegistryRef}`);
   }
   console.log(`Adapter: ${profile.adapterId}`);
   console.log(`Source Root: ${profile.sourceRoot}`);

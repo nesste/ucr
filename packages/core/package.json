@@ -9,7 +9,8 @@
     "dist"
   ],
   "dependencies": {
-    "@ucr/schema": "workspace:*"
+    "@ucr/schema": "workspace:*",
+    "fflate": "^0.8.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

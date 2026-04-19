@@ -7,7 +7,7 @@ import {
 import { resolveRegistryOptions } from "../context";
 
 export interface CommandContext {
-  registryPath: string | undefined;
+  registryRef: string | undefined;
   targetRoot: string;
   itemName: string;
   instanceId: string;
@@ -17,7 +17,9 @@ export interface CommandContext {
 
 export async function runAddCommand(context: CommandContext): Promise<void> {
   const resolved = await resolveRegistryOptions(context);
-  const registry = await loadRegistryDocument(resolved.registryPath);
+  const registry = await loadRegistryDocument(resolved.registryRef, {
+    baseDir: resolved.registryBaseDir,
+  });
   const plan = await createInstallPlan(
     registry,
     context.itemName,

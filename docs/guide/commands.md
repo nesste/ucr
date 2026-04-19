@@ -1,11 +1,11 @@
 # Commands
 
-The CLI entrypoint is `ucr`, which in this repository is built to `packages/cli/dist/bin.js`.
+The CLI entrypoint is `ucr`. Contributors can also run the checked-in workspace build at `packages/cli/dist/bin.js`.
 
 ## Synopsis
 
 ```bash
-ucr <command> [item] [--registry <path>] [--target <path>] [--instance <id>] [--input key=value] [--input-file key=path] [--force]
+ucr <command> [item] [--registry <ref>] [--target <path>] [--instance <id>] [--input key=value] [--input-file key=path] [--force]
 ```
 
 Available commands:
@@ -21,7 +21,7 @@ Available commands:
 
 | Option | Meaning |
 | --- | --- |
-| `--registry <path>` | Registry JSON file. If omitted, UCR falls back to `.ucr/config.json`, `UCR_REGISTRY`, then fixture discovery. |
+| `--registry <ref>` | Registry manifest URL or local `registry.json` path. If omitted, UCR falls back to `.ucr/config.json`, `UCR_REGISTRY`, then the built-in official registry URL. |
 | `--target <path>` | Target project root. Defaults to the current directory. |
 | `--instance <id>` | Required for blocks. Utilities and presets default to their item name. |
 | `--input <key=value>` | Repeated typed input for templated items. |
@@ -33,7 +33,7 @@ Available commands:
 Creates `.ucr/config.json` by inspecting the target project.
 
 ```bash
-bun packages/cli/dist/bin.js init --registry fixtures/registries/ucr-official/registry.json --target examples/bun-service
+ucr init --target .
 ```
 
 What it does:
@@ -41,7 +41,9 @@ What it does:
 - verifies the target is Bun-managed
 - detects the adapter unless `--adapter` overrides it
 - computes the shared roots for runtime, utilities, and presets
-- stores the registry path as a project-relative reference when one is provided
+- stores the selected registry reference in `.ucr/config.json`
+
+Use `--registry https://.../registry.json` to pin a remote manifest explicitly or `--registry /absolute/path/to/registry.json` for contributor and custom local flows.
 
 Use `--adapter bun-http` or `--adapter next-app-router` only when you need to force detection.
 
@@ -50,7 +52,7 @@ Use `--adapter bun-http` or `--adapter next-app-router` only when you need to fo
 Prints the registry catalog for the resolved adapter.
 
 ```bash
-bun packages/cli/dist/bin.js list --registry fixtures/registries/ucr-official/registry.json --target examples/next-app
+ucr list
 ```
 
 The output includes:
@@ -65,7 +67,7 @@ The output includes:
 Prints one item's metadata, inputs, and output surfaces.
 
 ```bash
-bun packages/cli/dist/bin.js show entity-contract --registry fixtures/registries/ucr-official/registry.json --target examples/bun-service
+ucr show entity-contract
 ```
 
 The output includes:
@@ -81,11 +83,12 @@ The output includes:
 Renders one registry item into source files and records the install in `.ucr/lock.json` and `.ucr/state.json`.
 
 ```bash
-bun packages/cli/dist/bin.js add entity-contract --registry fixtures/registries/ucr-official/registry.json --target /absolute/path/to/project --instance posts --input entity=Post --input plural=posts
+ucr add entity-contract --target /absolute/path/to/project --instance posts --input entity=Post --input plural=posts
 ```
 
 Behavior to expect:
 
+- when the registry is remote, UCR fetches and caches the bundle automatically before rendering
 - reusable items default their instance id
 - blocks require `--instance`
 - missing required capabilities cause the install plan to fail before files are written
@@ -105,7 +108,7 @@ Plan action labels:
 Compares a tracked install with a fresh render from the current registry templates.
 
 ```bash
-bun packages/cli/dist/bin.js diff admin-page --registry fixtures/registries/ucr-official/registry.json --target examples/next-app --instance posts
+ucr diff admin-page --instance posts
 ```
 
 Status labels:
@@ -124,7 +127,7 @@ Use `diff` before `upgrade` when you want to inspect the shape of upcoming chang
 Re-renders a tracked install from the locked inputs and applies safe updates.
 
 ```bash
-bun packages/cli/dist/bin.js upgrade service-layer --registry fixtures/registries/ucr-official/registry.json --target /absolute/path/to/project --instance posts
+ucr upgrade service-layer --instance posts
 ```
 
 Upgrade action labels:
@@ -142,11 +145,11 @@ Without `--force`, any conflict aborts the upgrade after the plan is printed. Wi
 Two commands commonly use implicit instance ids:
 
 ```bash
-bun packages/cli/dist/bin.js diff service-preset --target examples/bun-service
+ucr diff service-preset
 ```
 
 ```bash
-bun packages/cli/dist/bin.js upgrade result-utility --target examples/bun-service
+ucr upgrade result-utility
 ```
 
 Those work because reusable items default the instance id to the item name. Blocks still require `--instance`.

@@ -136,6 +136,10 @@ export function resolveProjectRegistryPath(
   targetRoot: string,
   registryReference: string,
 ): string {
+  if (/^https?:\/\//i.test(registryReference)) {
+    return registryReference;
+  }
+
   if (path.isAbsolute(registryReference)) {
     return registryReference;
   }
@@ -147,6 +151,10 @@ export function toProjectRegistryReference(
   targetRoot: string,
   registryPath: string,
 ): string {
+  if (/^https?:\/\//i.test(registryPath)) {
+    return registryPath;
+  }
+
   const absoluteRegistryPath = path.resolve(registryPath);
   const relativeRegistryPath = path.relative(targetRoot, absoluteRegistryPath);
 

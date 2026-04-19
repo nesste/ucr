@@ -3,13 +3,15 @@ import { itemSupportsAdapter, loadRegistryDocument } from "@ucr/core";
 import { resolveRegistryOptions } from "../context";
 
 export interface ListCommandContext {
-  registryPath: string | undefined;
+  registryRef: string | undefined;
   targetRoot: string;
 }
 
 export async function runListCommand(context: ListCommandContext): Promise<void> {
   const resolved = await resolveRegistryOptions(context);
-  const registry = await loadRegistryDocument(resolved.registryPath);
+  const registry = await loadRegistryDocument(resolved.registryRef, {
+    baseDir: resolved.registryBaseDir,
+  });
 
   console.log(`Registry: ${registry.document.name}`);
   console.log(`Version: ${registry.document.version}`);

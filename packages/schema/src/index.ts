@@ -20,6 +20,7 @@ export type RegistrySurface =
   | "utility"
   | "preset";
 export type RegistryInputType = "string" | "number" | "boolean" | "json";
+export type RegistryDistributionFormat = "zip";
 
 export interface RegistryInputDefinition {
   name: string;
@@ -34,6 +35,12 @@ export interface RegistryOutput {
   surface: RegistrySurface;
   description?: string;
   overwrite?: boolean;
+}
+
+export interface RegistryDistribution {
+  format: RegistryDistributionFormat;
+  bundleUrl: string;
+  checksum: string;
 }
 
 export interface RegistryItem {
@@ -57,6 +64,7 @@ export interface RegistryDocument {
   $schema?: string;
   name: string;
   version: string;
+  distribution?: RegistryDistribution;
   items: RegistryItem[];
 }
 
@@ -91,6 +99,9 @@ const VALID_INPUT_TYPES: Set<RegistryInputType> = new Set([
   "boolean",
   "json",
 ]);
+const VALID_DISTRIBUTION_FORMATS: Set<RegistryDistributionFormat> = new Set([
+  "zip",
+]);
 const LEGACY_ITEM_KEYS = [
   "files",
   "dependencies",
@@ -120,6 +131,54 @@ function isRegistrySurface(value: string): value is RegistrySurface {
 
 function isRegistryInputType(value: string): value is RegistryInputType {
   return VALID_INPUT_TYPES.has(value as RegistryInputType);
+}
+
+function isRegistryDistributionFormat(
+  value: string,
+): value is RegistryDistributionFormat {
+  return VALID_DISTRIBUTION_FORMATS.has(value as RegistryDistributionFormat);
+}
+
+function isSha256Checksum(value: string): boolean {
+  return /^[a-f0-9]{64}$/i.test(value);
+}
+
+function validateDistribution(
+  input: unknown,
+  errors: string[],
+): input is RegistryDistribution {
+  if (input === undefined) {
+    return true;
+  }
+
+  if (!isRecord(input)) {
+    errors.push('Registry document "distribution" must be an object.');
+    return false;
+  }
+
+  if (
+    !isNonEmptyString(input.format) ||
+    !isRegistryDistributionFormat(input.format)
+  ) {
+    errors.push('Registry document "distribution.format" must be "zip".');
+  }
+
+  if (!isNonEmptyString(input.bundleUrl)) {
+    errors.push(
+      'Registry document "distribution.bundleUrl" must be a non-empty string.',
+    );
+  }
+
+  if (
+    !isNonEmptyString(input.checksum) ||
+    !isSha256Checksum(input.checksum)
+  ) {
+    errors.push(
+      'Registry document "distribution.checksum" must be a SHA-256 hex string.',
+    );
+  }
+
+  return errors.length === 0;
 }
 
 function validateStringArray(
@@ -389,6 +448,8 @@ export function validateRegistryDocument(
   if (!isNonEmptyString(input.version)) {
     errors.push('Registry document must include a non-empty "version".');
   }
+
+  validateDistribution(input.distribution, errors);
 
   if (!Array.isArray(input.items) || input.items.length === 0) {
     errors.push('Registry document must include a non-empty "items" array.');

@@ -1,0 +1,31 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  artifacts:
+    runs-on: ubuntu-latest
+    env:
+      UCR_OFFICIAL_REGISTRY_URL: ${{ vars.UCR_OFFICIAL_REGISTRY_URL || 'https://ucr.network/registry/ucr-official/latest/registry.json' }}
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.4
+      - run: bun ci
+      - run: bun run build
+      - run: bun test
+      - run: bun run release:artifacts
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mapfile -t files < <(find dist/release -type f)
+          gh release upload "$RELEASE_TAG" "${files[@]}" --clobber

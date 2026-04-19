@@ -15,7 +15,7 @@ import { runShowCommand } from "./commands/show";
 import { runUpgradeCommand } from "./commands/upgrade";
 
 function printHelp(): void {
-  console.log(`ucr <command> [item] [--registry <path>] [--target <path>] [--instance <id>] [--input key=value] [--input-file key=path] [--force]
+  console.log(`ucr <command> [item] [--registry <ref>] [--target <path>] [--instance <id>] [--input key=value] [--input-file key=path] [--force]
 
 Commands:
   init      Create .ucr/config.json in the target project.
@@ -26,7 +26,7 @@ Commands:
   upgrade   Apply safe upgrades to one installed instance.
 
 Options:
-  --registry <path>             Registry JSON file. Optional: uses this flag, then .ucr/config.json, then UCR_REGISTRY, then walks up for fixtures/registries/ucr-official/registry.json.
+  --registry <ref>              Registry manifest URL or local registry.json path. Optional: uses this flag, then .ucr/config.json, then UCR_REGISTRY, then the built-in official registry URL.
   --target <path>               Target project root. Defaults to the current directory.
   --adapter <id>                Adapter override for \`init\` (\`bun-http\` or \`next-app-router\`).
   --instance <id>               Required for \`block\` items. Utilities and presets default to their item name.
@@ -39,7 +39,7 @@ Options:
 interface ParsedCommandContext {
   command: string;
   itemName: string;
-  registryPath: string | undefined;
+  registryRef: string | undefined;
   targetRoot: string;
   adapterId: ProjectAdapterId | undefined;
   instanceId: string;
@@ -133,9 +133,7 @@ async function createCommandContext(): Promise<ParsedCommandContext> {
   return {
     command,
     itemName,
-    registryPath: parsed.values.registry
-      ? path.resolve(parsed.values.registry)
-      : undefined,
+    registryRef: parsed.values.registry?.trim() || undefined,
     targetRoot: path.resolve(parsed.values.target ?? process.cwd()),
     adapterId: adapterValue,
     instanceId: parsed.values.instance ?? "",
@@ -157,7 +155,7 @@ async function main(): Promise<void> {
   }
 
   const context: CommandContext = {
-    registryPath: parsed.registryPath,
+    registryRef: parsed.registryRef,
     targetRoot: parsed.targetRoot,
     itemName: parsed.itemName,
     instanceId: parsed.instanceId,
@@ -168,14 +166,14 @@ async function main(): Promise<void> {
   switch (parsed.command) {
     case "init":
       await runInitCommand({
-        registryPath: parsed.registryPath,
+        registryRef: parsed.registryRef,
         targetRoot: parsed.targetRoot,
         adapterId: parsed.adapterId,
       });
       break;
     case "list":
       await runListCommand({
-        registryPath: parsed.registryPath,
+        registryRef: parsed.registryRef,
         targetRoot: parsed.targetRoot,
       });
       break;
@@ -184,7 +182,7 @@ async function main(): Promise<void> {
         throw new Error("Missing required item name.");
       }
       await runShowCommand({
-        registryPath: parsed.registryPath,
+        registryRef: parsed.registryRef,
         targetRoot: parsed.targetRoot,
         itemName: parsed.itemName,
       });

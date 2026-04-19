@@ -87,11 +87,35 @@ These files are what make `diff` and `upgrade` explainable instead of opaque.
 
 ## Registry Resolution
 
-When a command needs a registry file, UCR resolves it in this order:
+When a command needs a registry reference, UCR resolves it in this order:
 
-1. `--registry <path>`
+1. `--registry <url-or-path>`
 2. `registry` in `.ucr/config.json`
 3. `UCR_REGISTRY`
-4. upward discovery of `fixtures/registries/ucr-official/registry.json`
+4. the built-in official registry URL
 
-That is why the checked-in examples can often run against the official fixture without repeating the registry path after `init`.
+This means normal end-user projects can run `ucr init` with no explicit registry flag and still end up pinned to the official published manifest URL.
+
+## Remote Registry Cache
+
+When the resolved registry is remote, UCR:
+
+1. downloads the manifest
+2. validates the optional top-level `distribution` block
+3. resolves the bundle URL
+4. downloads the ZIP bundle
+5. verifies the SHA-256 checksum
+6. extracts the bundle into a local cache
+
+The extracted cache mirrors the local registry layout:
+
+- `registry.json`
+- `templates/**`
+
+That lets the install, diff, and upgrade logic reuse the same render pipeline for local and remote registries.
+
+Cache roots are OS-specific:
+
+- Windows: `%LOCALAPPDATA%\\ucr\\registries`
+- macOS: `~/Library/Caches/ucr/registries`
+- Linux: `$XDG_CACHE_HOME/ucr/registries` or `~/.cache/ucr/registries`

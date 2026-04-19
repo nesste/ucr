@@ -28,11 +28,15 @@ export interface InstalledRegistrySnapshot {
 }
 
 export interface RegistryState {
-  version: 4;
+  version: 5;
   registry: {
     name: string;
     version: string;
+    transport: "file" | "http" | "https";
     source: string;
+    manifestUrl: string;
+    bundleUrl: string | null;
+    bundleChecksum: string | null;
   };
   installs: Record<string, InstalledRegistrySnapshot>;
 }
@@ -56,11 +60,15 @@ export interface InstalledSnapshotUpdate {
 
 function createState(loaded: LoadedRegistry): RegistryState {
   return {
-    version: 4,
+    version: 5,
     registry: {
       name: loaded.document.name,
       version: loaded.document.version,
-      source: loaded.registryFile,
+      transport: loaded.source.transport,
+      source: loaded.source.source,
+      manifestUrl: loaded.source.manifestUrl,
+      bundleUrl: loaded.source.bundleUrl,
+      bundleChecksum: loaded.source.bundleChecksum,
     },
     installs: {},
   };
@@ -83,7 +91,7 @@ export async function readRegistryState(targetRoot: string): Promise<RegistrySta
 
     if (
       !isRecord(parsed) ||
-      parsed.version !== 4 ||
+      (parsed.version !== 4 && parsed.version !== 5) ||
       !isRecord(parsed.registry) ||
       !isRecord(parsed.installs)
     ) {
@@ -92,7 +100,36 @@ export async function readRegistryState(targetRoot: string): Promise<RegistrySta
       );
     }
 
-    return parsed as unknown as RegistryState;
+    return {
+      ...(parsed as unknown as Omit<RegistryState, "version" | "registry">),
+      version: 5,
+      registry: {
+        name: String((parsed.registry as Record<string, unknown>).name ?? ""),
+        version: String((parsed.registry as Record<string, unknown>).version ?? ""),
+        transport:
+          (parsed.registry as Record<string, unknown>).transport === "http" ||
+          (parsed.registry as Record<string, unknown>).transport === "https"
+            ? ((parsed.registry as Record<string, unknown>).transport as
+                | "http"
+                | "https")
+            : "file",
+        source: String((parsed.registry as Record<string, unknown>).source ?? ""),
+        manifestUrl: String(
+          (parsed.registry as Record<string, unknown>).manifestUrl ??
+            (parsed.registry as Record<string, unknown>).source ??
+            "",
+        ),
+        bundleUrl:
+          typeof (parsed.registry as Record<string, unknown>).bundleUrl === "string"
+            ? String((parsed.registry as Record<string, unknown>).bundleUrl)
+            : null,
+        bundleChecksum:
+          typeof (parsed.registry as Record<string, unknown>).bundleChecksum ===
+          "string"
+            ? String((parsed.registry as Record<string, unknown>).bundleChecksum)
+            : null,
+      },
+    };
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return null;
@@ -111,7 +148,11 @@ export async function upsertInstalledSnapshot(
   state.registry = {
     name: loaded.document.name,
     version: loaded.document.version,
-    source: loaded.registryFile,
+    transport: loaded.source.transport,
+    source: loaded.source.source,
+    manifestUrl: loaded.source.manifestUrl,
+    bundleUrl: loaded.source.bundleUrl,
+    bundleChecksum: loaded.source.bundleChecksum,
   };
 
   const timestamp = new Date().toISOString();

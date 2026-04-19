@@ -15,11 +15,22 @@ export type JsonValue =
 
 export type ResolvedRegistryInputValue = unknown;
 export type ResolvedRegistryInputs = Record<string, ResolvedRegistryInputValue>;
+export type RegistryTransport = "file" | "http" | "https";
+
+export interface LoadedRegistrySource {
+  transport: RegistryTransport;
+  source: string;
+  manifestUrl: string;
+  bundleUrl: string | null;
+  bundleChecksum: string | null;
+  cacheDir: string | null;
+}
 
 export interface LoadedRegistry {
   document: RegistryDocument;
   registryFile: string;
   rootDir: string;
+  source: LoadedRegistrySource;
 }
 
 export interface RenderedRegistryOutput {

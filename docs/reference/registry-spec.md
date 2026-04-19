@@ -9,6 +9,7 @@ A registry document contains:
 - `name`
 - `version`
 - optional `$schema`
+- optional `distribution`
 - `items[]`
 
 Each item must be uniquely named.
@@ -38,6 +39,18 @@ Preset-only field:
 | Field | Required | Notes |
 | --- | --- | --- |
 | `compose[]` | yes for presets | Names reusable items the preset composes. |
+
+## Distribution Metadata
+
+Remote registries add an optional top-level `distribution` block:
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `format` | yes when present | Currently only `zip`. |
+| `bundleUrl` | yes when present | Absolute URL or relative URL from the manifest location. |
+| `checksum` | yes when present | SHA-256 hex digest of the bundle file. |
+
+Local filesystem registries do not need `distribution`.
 
 ## Input Definitions
 
@@ -113,6 +126,11 @@ The schema package enforces several repo-visible rules:
 {
   "name": "ucr-official",
   "version": "3.0.0",
+  "distribution": {
+    "format": "zip",
+    "bundleUrl": "bundle.zip",
+    "checksum": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  },
   "items": [
     {
       "name": "ts-runtime",
@@ -160,3 +178,4 @@ The schema package enforces several repo-visible rules:
 - registry type definitions and validation live in `packages/schema/src/index.ts`
 - the JSON schema file lives in `packages/schema/registry.schema.json`
 - the official example registry lives in `fixtures/registries/ucr-official/registry.json`
+- published static registry assets are generated into `docs/public/registry/ucr-official`
