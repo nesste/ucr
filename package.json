@@ -9,9 +9,15 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "bun run --workspaces build",
-    "clean": "bun run --workspaces clean",
-    "typecheck": "bun run --workspaces typecheck",
+    "build": "bun run build:packages && bun run build:examples",
+    "build:packages": "bun run --filter @ucr/schema build && bun run --filter @ucr/core build && bun run --filter @ucr/cli build",
+    "build:examples": "bun run --filter @ucr/example-bun-service build && bun run --filter @ucr/example-next-app build",
+    "clean": "bun run clean:packages && bun run clean:examples",
+    "clean:packages": "bun run --filter @ucr/cli clean && bun run --filter @ucr/core clean && bun run --filter @ucr/schema clean",
+    "clean:examples": "bun run --filter @ucr/example-bun-service clean && bun run --filter @ucr/example-next-app clean",
+    "typecheck": "bun run typecheck:packages && bun run typecheck:examples",
+    "typecheck:packages": "bun run build:packages && bun run --filter @ucr/schema typecheck && bun run --filter @ucr/core typecheck && bun run --filter @ucr/cli typecheck",
+    "typecheck:examples": "bun run --filter @ucr/example-bun-service typecheck && bun run --filter @ucr/example-next-app typecheck",
     "test": "bun test",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
