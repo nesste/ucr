@@ -12,6 +12,7 @@ export async function runShowCommand(context: ShowCommandContext): Promise<void>
   const resolved = await resolveRegistryOptions(context);
   const registry = await loadRegistryDocument(resolved.registryRef, {
     baseDir: resolved.registryBaseDir,
+    requestHeaders: resolved.requestHeaders,
   });
   const item = registry.document.items.find((candidate) => candidate.name === context.itemName);
 

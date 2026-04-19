@@ -8,6 +8,7 @@ import {
 
 import type { ProjectAdapterId } from "@ucr/core";
 
+import { resolveRegistryRequestHeaders } from "../context";
 import { OFFICIAL_REGISTRY_URL } from "../official-registry";
 
 export interface InitCommandContext {
@@ -27,6 +28,7 @@ export async function runInitCommand(context: InitCommandContext): Promise<void>
   const registry = context.registryRef
     ? await loadRegistryDocument(context.registryRef, {
         baseDir: process.cwd(),
+        requestHeaders: resolveRegistryRequestHeaders(),
       })
     : null;
 

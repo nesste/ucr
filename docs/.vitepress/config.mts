@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "UCR",
   description:
-    "Universal Code Registry documentation for source-owned Bun code installs.",
+    "Universal Code Registry documentation for Apache-2.0 source-owned installs in Bun-managed projects.",
   cleanUrls: true,
   lastUpdated: true,
   themeConfig: {
@@ -15,6 +15,10 @@ export default defineConfig({
       {
         text: "Guide",
         link: "/guide/quickstart",
+      },
+      {
+        text: "Trust",
+        link: "/reference/trust",
       },
       {
         text: "Reference",
@@ -39,6 +43,10 @@ export default defineConfig({
               link: "/guide/concepts",
             },
             {
+              text: "Private Registries",
+              link: "/guide/private-registries",
+            },
+            {
               text: "Commands",
               link: "/guide/commands",
             },
@@ -60,6 +68,10 @@ export default defineConfig({
             {
               text: "Official Registry",
               link: "/reference/official-registry",
+            },
+            {
+              text: "Trust And Scope",
+              link: "/reference/trust",
             },
             {
               text: "Registry Spec",
@@ -97,7 +109,7 @@ export default defineConfig({
       level: [2, 3],
     },
     footer: {
-      message: "Bun-first source registry documentation kept in-repo.",
+      message: "Apache-2.0 source registry documentation for Bun-managed projects.",
     },
   },
 });

@@ -7,6 +7,7 @@ export async function runDiffCommand(context: CommandContext): Promise<void> {
   const resolved = await resolveRegistryOptions(context);
   const registry = await loadRegistryDocument(resolved.registryRef, {
     baseDir: resolved.registryBaseDir,
+    requestHeaders: resolved.requestHeaders,
   });
   const report = await createDiffReport(
     registry,

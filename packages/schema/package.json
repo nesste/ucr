@@ -1,6 +1,7 @@
 {
   "name": "@ucr/schema",
   "version": "0.0.2",
+  "license": "Apache-2.0",
   "description": "Shared schema and validation for registry documents.",
   "type": "commonjs",
   "main": "dist/index.js",

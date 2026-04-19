@@ -35,6 +35,10 @@ Options:
   --input <key=value>           Repeated typed input for templated items.
   --input-file <key=path>       Repeated input file, useful for JSON values.
   --force                       Apply install or upgrade writes even when conflicts would normally abort.
+
+Environment:
+  UCR_REGISTRY                  Registry manifest URL or local registry.json path override.
+  UCR_REGISTRY_AUTH_HEADER      Optional remote registry auth header in "Header-Name: value" format.
 `);
 }
 

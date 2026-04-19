@@ -7,7 +7,12 @@ import path from "node:path";
 
 import { zipSync } from "fflate";
 
+import { runAddCommand } from "../packages/cli/src/commands/add";
+import { runDiffCommand } from "../packages/cli/src/commands/diff";
 import { runInitCommand } from "../packages/cli/src/commands/init";
+import { runListCommand } from "../packages/cli/src/commands/list";
+import { runShowCommand } from "../packages/cli/src/commands/show";
+import { runUpgradeCommand } from "../packages/cli/src/commands/upgrade";
 import { OFFICIAL_REGISTRY_URL } from "../packages/cli/src/official-registry";
 import { inspectProjectProfile } from "../packages/core/src/adapters";
 import { createDiffReport } from "../packages/core/src/diff";
@@ -278,6 +283,60 @@ async function createPublishedRegistryBundle(): Promise<{
   };
 }
 
+async function listenOnRandomPort(
+  server: ReturnType<typeof createServer>,
+): Promise<number> {
+  await new Promise<void>((resolve) => {
+    server.listen(0, "127.0.0.1", () => resolve());
+  });
+
+  const address = server.address();
+
+  if (!address || typeof address === "string") {
+    throw new Error("Failed to start the registry test server.");
+  }
+
+  return address.port;
+}
+
+async function closeServer(
+  server: ReturnType<typeof createServer>,
+): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    server.close((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve();
+    });
+  });
+}
+
+async function withRegistryAuthHeader<T>(
+  rawValue: string | undefined,
+  action: () => Promise<T>,
+): Promise<T> {
+  const previousValue = process.env.UCR_REGISTRY_AUTH_HEADER;
+
+  if (rawValue === undefined) {
+    delete process.env.UCR_REGISTRY_AUTH_HEADER;
+  } else {
+    process.env.UCR_REGISTRY_AUTH_HEADER = rawValue;
+  }
+
+  try {
+    return await action();
+  } finally {
+    if (previousValue === undefined) {
+      delete process.env.UCR_REGISTRY_AUTH_HEADER;
+    } else {
+      process.env.UCR_REGISTRY_AUTH_HEADER = previousValue;
+    }
+  }
+}
+
 test("project inspection distinguishes bun-http and next-app-router", async () => {
   const bunRoot = await createTempProject();
   const nextRoot = await createTempProject({ next: true });
@@ -440,17 +499,8 @@ test("remote registry loads, caches bundles, and falls back to the newest cached
     response.end("not found");
   });
 
-  await new Promise<void>((resolve) => {
-    server.listen(0, "127.0.0.1", () => resolve());
-  });
-
-  const address = server.address();
-
-  if (!address || typeof address === "string") {
-    throw new Error("Failed to start the registry test server.");
-  }
-
-  const manifestUrl = `http://127.0.0.1:${address.port}/registry.json`;
+  const port = await listenOnRandomPort(server);
+  const manifestUrl = `http://127.0.0.1:${port}/registry.json`;
   const firstLoad = await loadRegistryDocument(manifestUrl);
   expect(firstLoad.source.transport).toBe("http");
   expect(firstLoad.source.bundleChecksum).toBe(published.checksum);
@@ -461,20 +511,289 @@ test("remote registry loads, caches bundles, and falls back to the newest cached
   expect(secondLoad.registryFile).toBe(firstLoad.registryFile);
   expect(requestCounts.bundle).toBe(1);
 
-  await new Promise<void>((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      resolve();
-    });
-  });
+  await closeServer(server);
 
   const cachedLoad = await loadRegistryDocument(manifestUrl);
   expect(cachedLoad.document.name).toBe(firstLoad.document.name);
   expect(cachedLoad.registryFile).toBe(firstLoad.registryFile);
+});
+
+test("remote registry auth header gates manifest fetches and is not written to cache metadata", async () => {
+  const published = await createPublishedRegistryBundle();
+  const requiredHeaderValue = "Bearer secret-token";
+  const requestHeaders = {
+    manifest: [] as Array<string | undefined>,
+    bundle: [] as Array<string | undefined>,
+  };
+  const server = createServer((request, response) => {
+    const authHeader =
+      typeof request.headers.authorization === "string"
+        ? request.headers.authorization
+        : undefined;
+
+    if (request.url === "/registry.json") {
+      requestHeaders.manifest.push(authHeader);
+
+      if (authHeader !== requiredHeaderValue) {
+        response.statusCode = 401;
+        response.end("unauthorized");
+        return;
+      }
+
+      response.setHeader("content-type", "application/json");
+      response.end(`${JSON.stringify(published.manifest, null, 2)}\n`);
+      return;
+    }
+
+    if (request.url === "/bundle.zip") {
+      requestHeaders.bundle.push(authHeader);
+
+      if (authHeader !== requiredHeaderValue) {
+        response.statusCode = 401;
+        response.end("unauthorized");
+        return;
+      }
+
+      response.setHeader("content-type", "application/zip");
+      response.end(Buffer.from(published.bundle));
+      return;
+    }
+
+    response.statusCode = 404;
+    response.end("not found");
+  });
+
+  const port = await listenOnRandomPort(server);
+
+  try {
+    const manifestUrl = `http://127.0.0.1:${port}/registry.json`;
+
+    await expect(loadRegistryDocument(manifestUrl)).rejects.toThrow(
+      "401 Unauthorized",
+    );
+
+    const loaded = await loadRegistryDocument(manifestUrl, {
+      requestHeaders: {
+        Authorization: requiredHeaderValue,
+      },
+    });
+    expect(loaded.source.cacheDir).not.toBeNull();
+    expect(requestHeaders.manifest).toContain(requiredHeaderValue);
+    expect(requestHeaders.bundle).toEqual([requiredHeaderValue]);
+
+    const cacheMetadata = await fs.readFile(
+      path.join(loaded.source.cacheDir!, ".ucr-cache.json"),
+      "utf8",
+    );
+    expect(cacheMetadata).not.toContain(requiredHeaderValue);
+    expect(cacheMetadata).not.toContain("Authorization");
+  } finally {
+    await closeServer(server);
+  }
+});
+
+test("remote registry auth header is not forwarded to cross-origin bundle URLs", async () => {
+  const published = await createPublishedRegistryBundle();
+  const requiredHeaderValue = "Bearer cross-origin-secret";
+  const requestHeaders = {
+    manifest: [] as Array<string | undefined>,
+    bundle: [] as Array<string | undefined>,
+  };
+  const bundleServer = createServer((request, response) => {
+    const authHeader =
+      typeof request.headers.authorization === "string"
+        ? request.headers.authorization
+        : undefined;
+
+    if (request.url === "/bundle.zip") {
+      requestHeaders.bundle.push(authHeader);
+      response.setHeader("content-type", "application/zip");
+      response.end(Buffer.from(published.bundle));
+      return;
+    }
+
+    response.statusCode = 404;
+    response.end("not found");
+  });
+  const bundlePort = await listenOnRandomPort(bundleServer);
+  (published.manifest.distribution as { bundleUrl: string }).bundleUrl =
+    `http://127.0.0.1:${bundlePort}/bundle.zip`;
+
+  const manifestServer = createServer((request, response) => {
+    const authHeader =
+      typeof request.headers.authorization === "string"
+        ? request.headers.authorization
+        : undefined;
+
+    if (request.url === "/registry.json") {
+      requestHeaders.manifest.push(authHeader);
+
+      if (authHeader !== requiredHeaderValue) {
+        response.statusCode = 401;
+        response.end("unauthorized");
+        return;
+      }
+
+      response.setHeader("content-type", "application/json");
+      response.end(`${JSON.stringify(published.manifest, null, 2)}\n`);
+      return;
+    }
+
+    response.statusCode = 404;
+    response.end("not found");
+  });
+  const manifestPort = await listenOnRandomPort(manifestServer);
+
+  try {
+    const manifestUrl = `http://127.0.0.1:${manifestPort}/registry.json`;
+    const loaded = await loadRegistryDocument(manifestUrl, {
+      requestHeaders: {
+        Authorization: requiredHeaderValue,
+      },
+    });
+
+    expect(loaded.source.cacheDir).not.toBeNull();
+    expect(requestHeaders.manifest).toEqual([requiredHeaderValue]);
+    expect(requestHeaders.bundle).toEqual([undefined]);
+  } finally {
+    await closeServer(manifestServer);
+    await closeServer(bundleServer);
+  }
+});
+
+test("commands pass registry auth headers through remote registry loading and never persist them", async () => {
+  const projectRoot = await createTempProject();
+  const published = await createPublishedRegistryBundle();
+  const requiredHeaderValue = "Bearer command-secret";
+  const requestHeaders = {
+    manifest: [] as Array<string | undefined>,
+    bundle: [] as Array<string | undefined>,
+  };
+  const server = createServer((request, response) => {
+    const authHeader =
+      typeof request.headers.authorization === "string"
+        ? request.headers.authorization
+        : undefined;
+
+    if (request.url === "/registry.json") {
+      requestHeaders.manifest.push(authHeader);
+
+      if (authHeader !== requiredHeaderValue) {
+        response.statusCode = 401;
+        response.end("unauthorized");
+        return;
+      }
+
+      response.setHeader("content-type", "application/json");
+      response.end(`${JSON.stringify(published.manifest, null, 2)}\n`);
+      return;
+    }
+
+    if (request.url === "/bundle.zip") {
+      requestHeaders.bundle.push(authHeader);
+
+      if (authHeader !== requiredHeaderValue) {
+        response.statusCode = 401;
+        response.end("unauthorized");
+        return;
+      }
+
+      response.setHeader("content-type", "application/zip");
+      response.end(Buffer.from(published.bundle));
+      return;
+    }
+
+    response.statusCode = 404;
+    response.end("not found");
+  });
+  const port = await listenOnRandomPort(server);
+
+  try {
+    const manifestUrl = `http://127.0.0.1:${port}/registry.json`;
+
+    await withRegistryAuthHeader(
+      `Authorization: ${requiredHeaderValue}`,
+      async () => {
+        await runInitCommand({
+          registryRef: manifestUrl,
+          targetRoot: projectRoot,
+          adapterId: undefined,
+        });
+        await runListCommand({
+          registryRef: undefined,
+          targetRoot: projectRoot,
+        });
+        await runShowCommand({
+          registryRef: undefined,
+          targetRoot: projectRoot,
+          itemName: "ts-runtime",
+        });
+        await runAddCommand({
+          registryRef: undefined,
+          targetRoot: projectRoot,
+          itemName: "ts-runtime",
+          instanceId: "",
+          rawInputs: {},
+          force: true,
+        });
+        await runDiffCommand({
+          registryRef: undefined,
+          targetRoot: projectRoot,
+          itemName: "ts-runtime",
+          instanceId: "",
+          rawInputs: {},
+          force: false,
+        });
+        await runUpgradeCommand({
+          registryRef: undefined,
+          targetRoot: projectRoot,
+          itemName: "ts-runtime",
+          instanceId: "",
+          rawInputs: {},
+          force: false,
+        });
+      },
+    );
+
+    expect(requestHeaders.manifest.length).toBeGreaterThanOrEqual(6);
+    expect(requestHeaders.manifest.every((value) => value === requiredHeaderValue)).toBe(true);
+    expect(requestHeaders.bundle).toEqual([requiredHeaderValue]);
+
+    const projectConfigRaw = await fs.readFile(
+      path.join(projectRoot, ".ucr", "config.json"),
+      "utf8",
+    );
+    const lockRaw = await fs.readFile(
+      path.join(projectRoot, ".ucr", "lock.json"),
+      "utf8",
+    );
+    const stateRaw = await fs.readFile(
+      path.join(projectRoot, ".ucr", "state.json"),
+      "utf8",
+    );
+
+    expect(projectConfigRaw).not.toContain(requiredHeaderValue);
+    expect(lockRaw).not.toContain(requiredHeaderValue);
+    expect(stateRaw).not.toContain(requiredHeaderValue);
+    expect(projectConfigRaw).not.toContain("Authorization");
+    expect(lockRaw).not.toContain("Authorization");
+    expect(stateRaw).not.toContain("Authorization");
+  } finally {
+    await closeServer(server);
+  }
+});
+
+test("malformed registry auth headers fail fast", async () => {
+  const projectRoot = await createTempProject();
+
+  await expect(
+    withRegistryAuthHeader("Authorization", async () => {
+      await runListCommand({
+        registryRef: registryPath,
+        targetRoot: projectRoot,
+      });
+    }),
+  ).rejects.toThrow('UCR_REGISTRY_AUTH_HEADER must use the format "Header-Name: value".');
 });
 
 test("init writes the built-in official registry URL when no registry is provided", async () => {

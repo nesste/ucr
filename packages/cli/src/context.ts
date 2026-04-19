@@ -16,6 +16,44 @@ export interface ResolvedRegistryOptions {
   registryRef: string;
   registryBaseDir: string;
   adapterId: ProjectAdapterId;
+  requestHeaders: Record<string, string> | undefined;
+}
+
+const HEADER_NAME_PATTERN = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+
+export function resolveRegistryRequestHeaders(): Record<string, string> | undefined {
+  const rawHeader = process.env.UCR_REGISTRY_AUTH_HEADER?.trim();
+
+  if (!rawHeader) {
+    return undefined;
+  }
+
+  const separatorIndex = rawHeader.indexOf(":");
+
+  if (separatorIndex <= 0) {
+    throw new Error(
+      'UCR_REGISTRY_AUTH_HEADER must use the format "Header-Name: value".',
+    );
+  }
+
+  const headerName = rawHeader.slice(0, separatorIndex).trim();
+  const headerValue = rawHeader.slice(separatorIndex + 1).trim();
+
+  if (!HEADER_NAME_PATTERN.test(headerName) || headerValue.length === 0) {
+    throw new Error(
+      'UCR_REGISTRY_AUTH_HEADER must use the format "Header-Name: value".',
+    );
+  }
+
+  if (/[\r\n]/.test(headerValue)) {
+    throw new Error(
+      "UCR_REGISTRY_AUTH_HEADER must not contain newline characters.",
+    );
+  }
+
+  return {
+    [headerName]: headerValue,
+  };
 }
 
 export async function resolveRegistryOptions(
@@ -38,10 +76,12 @@ export async function resolveRegistryOptions(
   const adapterId = projectConfig
     ? projectConfig.adapter
     : (await inspectProjectProfile(input.targetRoot)).adapterId;
+  const requestHeaders = resolveRegistryRequestHeaders();
 
   return {
     registryRef,
     registryBaseDir,
     adapterId,
+    requestHeaders,
   };
 }

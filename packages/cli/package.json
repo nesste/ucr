@@ -1,6 +1,7 @@
 {
   "name": "@ucr/cli",
   "version": "0.0.2",
+  "license": "Apache-2.0",
   "description": "CLI for the universal code registry.",
   "type": "commonjs",
   "main": "dist/bin.js",

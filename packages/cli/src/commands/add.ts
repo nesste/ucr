@@ -19,6 +19,7 @@ export async function runAddCommand(context: CommandContext): Promise<void> {
   const resolved = await resolveRegistryOptions(context);
   const registry = await loadRegistryDocument(resolved.registryRef, {
     baseDir: resolved.registryBaseDir,
+    requestHeaders: resolved.requestHeaders,
   });
   const plan = await createInstallPlan(
     registry,

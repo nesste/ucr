@@ -14,7 +14,8 @@ import type {
 } from "./types";
 
 export interface LoadRegistryDocumentOptions {
-  baseDir?: string;
+  baseDir?: string | undefined;
+  requestHeaders?: Record<string, string> | undefined;
 }
 
 interface CachedRegistryMetadata {
@@ -242,8 +243,18 @@ async function readLocalRegistry(
   });
 }
 
-async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url);
+async function fetchText(
+  url: string,
+  requestHeaders?: Record<string, string>,
+): Promise<string> {
+  const response = await fetch(
+    url,
+    requestHeaders
+      ? {
+          headers: requestHeaders,
+        }
+      : undefined,
+  );
 
   if (!response.ok) {
     throw new Error(`Request failed for ${url} (${response.status} ${response.statusText}).`);
@@ -252,8 +263,18 @@ async function fetchText(url: string): Promise<string> {
   return await response.text();
 }
 
-async function fetchBytes(url: string): Promise<Uint8Array> {
-  const response = await fetch(url);
+async function fetchBytes(
+  url: string,
+  requestHeaders?: Record<string, string>,
+): Promise<Uint8Array> {
+  const response = await fetch(
+    url,
+    requestHeaders
+      ? {
+          headers: requestHeaders,
+        }
+      : undefined,
+  );
 
   if (!response.ok) {
     throw new Error(`Request failed for ${url} (${response.status} ${response.statusText}).`);
@@ -262,15 +283,20 @@ async function fetchBytes(url: string): Promise<Uint8Array> {
   return new Uint8Array(await response.arrayBuffer());
 }
 
+function isSameOriginUrl(firstUrl: string, secondUrl: string): boolean {
+  return new URL(firstUrl).origin === new URL(secondUrl).origin;
+}
+
 async function hydrateRemoteRegistry(
   registryReference: string,
+  options?: LoadRegistryDocumentOptions,
 ): Promise<LoadedRegistry> {
   const manifestUrl = registryReference;
   const cacheBase = getRegistryCacheBase(manifestUrl);
   let manifestRaw: string;
 
   try {
-    manifestRaw = await fetchText(manifestUrl);
+    manifestRaw = await fetchText(manifestUrl, options?.requestHeaders);
   } catch (error) {
     const cachedDir = await findNewestCachedRegistry(manifestUrl);
 
@@ -322,7 +348,10 @@ async function hydrateRemoteRegistry(
     }
   }
 
-  const bundleBytes = await fetchBytes(bundleUrl);
+  const bundleRequestHeaders = isSameOriginUrl(bundleUrl, manifestUrl)
+    ? options?.requestHeaders
+    : undefined;
+  const bundleBytes = await fetchBytes(bundleUrl, bundleRequestHeaders);
   const actualChecksum = hashBytes(bundleBytes);
 
   if (actualChecksum !== bundleChecksum) {
@@ -393,7 +422,7 @@ export async function loadRegistryDocument(
   options?: LoadRegistryDocumentOptions,
 ): Promise<LoadedRegistry> {
   if (isHttpUrl(registryReference)) {
-    return await hydrateRemoteRegistry(registryReference);
+    return await hydrateRemoteRegistry(registryReference, options);
   }
 
   return await readLocalRegistry(registryReference, options);

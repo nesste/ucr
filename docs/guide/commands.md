@@ -29,6 +29,15 @@ Available commands:
 | `--input-file <key=path>` | Repeated input file, useful for JSON values. |
 | `--force` | For `add` and `upgrade`, write files even when conflicts would normally abort the operation. |
 
+## Environment Overrides
+
+| Variable | Meaning |
+| --- | --- |
+| `UCR_REGISTRY` | Registry manifest URL or local `registry.json` path override. |
+| `UCR_REGISTRY_AUTH_HEADER` | Optional remote registry auth header in `Header-Name: value` format. |
+
+`UCR_REGISTRY_AUTH_HEADER` is applied to remote manifest requests and to bundle downloads only when the bundle URL is the same origin as the manifest URL.
+
 ## `init`
 
 Creates `.ucr/config.json` by inspecting the target project.
@@ -46,6 +55,8 @@ What it does:
 
 Use `--registry https://.../registry.json` to pin a remote manifest explicitly or `--registry /absolute/path/to/registry.json` for contributor and custom local flows.
 
+For authenticated remote private registries, set `UCR_REGISTRY_AUTH_HEADER` before running `init`.
+
 Use `--adapter bun-http` or `--adapter next-app-router` only when you need to force detection.
 
 ## `list`
@@ -62,6 +73,8 @@ The output includes:
 - kind and version
 - number of outputs, inputs, and composed items
 - compatibility for the detected target adapter
+
+If the resolved registry is a remote private manifest, `list` uses `UCR_REGISTRY_AUTH_HEADER` when that variable is set.
 
 ## `show <item>`
 
@@ -140,6 +153,8 @@ Upgrade action labels:
 - `conflict`: local and upstream edits overlap, so manual review is required
 
 Without `--force`, any conflict aborts the upgrade after the plan is printed. With `--force`, conflict files are overwritten with the freshly rendered upstream content.
+
+For local and authenticated remote private registry examples, see [Private Registries](/guide/private-registries).
 
 ## `self-update [version]`
 

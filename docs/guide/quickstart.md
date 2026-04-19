@@ -2,6 +2,16 @@
 
 This page covers both normal end-user usage and the contributor-only local fixture flow used inside this repository.
 
+## Current Scope
+
+UCR currently supports:
+
+- Bun-managed target projects
+- `bun-http` and `next-app-router`
+- local registries and remote HTTPS registries
+
+Broader package manager support and additional adapters are not implemented yet.
+
 ## Prerequisites
 
 - a Bun-managed target project
@@ -91,6 +101,20 @@ ucr list --registry /absolute/path/to/registry.json
 
 You can also persist the registry reference in `.ucr/config.json` via `init`, or override it per-shell with `UCR_REGISTRY`.
 
+For authenticated remote private registries, set `UCR_REGISTRY_AUTH_HEADER` first:
+
+```bash
+export UCR_REGISTRY_AUTH_HEADER="Authorization: Bearer $UCR_TOKEN"
+ucr list --registry https://registry.example.com/ucr/registry.json
+```
+
+```powershell
+$env:UCR_REGISTRY_AUTH_HEADER = "Authorization: Bearer $env:UCR_TOKEN"
+ucr list --registry https://registry.example.com/ucr/registry.json
+```
+
+See [Private Registries](/guide/private-registries) for the exact auth format, same-origin bundle behavior, and what UCR does not persist.
+
 ## Contributor Flow In This Repository
 
 Contributors still work from the source registry and examples checked into this repo.
@@ -128,7 +152,9 @@ This repository keeps the examples because they demonstrate:
 
 ## What To Read Next
 
+- [Private Registries](/guide/private-registries) for local and authenticated remote registry setup
 - [Concepts](/guide/concepts) for instance ids, capabilities, cache behavior, and state files
 - [Commands](/guide/commands) for all flags and examples
+- [Trust And Scope](/reference/trust) for license, privacy, pricing, and compatibility facts
 - [Official Registry](/reference/official-registry) for the concrete `ucr-official` item catalog
 - [Examples](/guide/examples) for the checked-in Bun and Next compositions
