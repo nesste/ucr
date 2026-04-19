@@ -1,8 +1,12 @@
-name: release
+name: release-assets
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing numeric release tag to rebuild and upload assets for
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ inputs.release_tag }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.4
@@ -25,7 +29,7 @@ jobs:
       - name: Upload release assets
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           mapfile -t files < <(find dist/release -type f)
           gh release upload "$RELEASE_TAG" "${files[@]}" --clobber

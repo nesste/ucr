@@ -34,8 +34,15 @@ jobs:
           EXPECTED_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           current_head="$(git rev-parse HEAD)"
+          current_subject="$(git log -1 --pretty=%s)"
+          current_author="$(git log -1 --pretty=%an)"
+          current_parent="$(git rev-parse HEAD^ 2>/dev/null || true)"
 
-          if [ "$current_head" != "$EXPECTED_HEAD_SHA" ]; then
+          if [ "$current_head" != "$EXPECTED_HEAD_SHA" ] && ! {
+            [ "$current_parent" = "$EXPECTED_HEAD_SHA" ] &&
+            [ "$current_author" = "github-actions[bot]" ] &&
+            echo "$current_subject" | grep -Eq '^chore\(release\): [0-9]+\.[0-9]+\.[0-9]+$'
+          }; then
             echo "stale=true" >> "$GITHUB_OUTPUT"
             echo "Current main head is $current_head, workflow was triggered for $EXPECTED_HEAD_SHA."
             exit 0
@@ -76,7 +83,7 @@ jobs:
           echo "version=$next_version" >> "$GITHUB_OUTPUT"
 
       - name: Check whether the GitHub release already exists
-        if: steps.plan.outputs.action == 'release'
+        if: steps.head.outputs.stale != 'true'
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -111,7 +118,7 @@ jobs:
           git push origin HEAD:main
 
       - name: Create tag and GitHub release
-        if: steps.plan.outputs.action == 'release' && steps.release.outputs.exists != 'true'
+        if: steps.head.outputs.stale != 'true' && steps.release.outputs.exists != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.plan.outputs.version }}
@@ -120,3 +127,22 @@ jobs:
             --target "$(git rev-parse HEAD)" \
             --title "$RELEASE_TAG" \
             --generate-notes
+
+      - name: Install workspace dependencies
+        if: steps.head.outputs.stale != 'true'
+        run: bun ci
+
+      - name: Build release artifacts
+        if: steps.head.outputs.stale != 'true'
+        env:
+          UCR_OFFICIAL_REGISTRY_URL: ${{ vars.UCR_OFFICIAL_REGISTRY_URL || 'https://ucr.network/registry/ucr-official/latest/registry.json' }}
+        run: bun run release:artifacts
+
+      - name: Upload release assets
+        if: steps.head.outputs.stale != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.plan.outputs.version }}
+        run: |
+          mapfile -t files < <(find dist/release -type f)
+          gh release upload "$RELEASE_TAG" "${files[@]}" --clobber
