@@ -27,8 +27,6 @@ features:
     details: "UCR keeps install metadata and upstream snapshots in `.ucr/` so diff and upgrade can explain what changed."
 ---
 
-> The root `README.md` is the short project entry point. This site is the detailed guide for installing the standalone CLI, using the official registry, and contributing to the source registry and release flow.
-
 ## What UCR Does
 
 UCR reads one registry manifest, resolves typed inputs, renders source-owned templates, and writes files into an existing Bun-managed project. It keeps Bun responsible for external dependencies and lockfiles while UCR owns:

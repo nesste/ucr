@@ -5,6 +5,52 @@ $InstallDir = if ($env:UCR_INSTALL_DIR) { $env:UCR_INSTALL_DIR } else { Join-Pat
 $RequestedVersion = if ($args.Length -gt 0) { $args[0] } else { "latest" }
 $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
 
+function Normalize-PathEntry {
+  param(
+    [string] $Value
+  )
+
+  if ([string]::IsNullOrWhiteSpace($Value)) {
+    return ""
+  }
+
+  return $Value.Trim().TrimEnd("\").ToLowerInvariant()
+}
+
+function Test-PathContainsEntry {
+  param(
+    [string] $PathValue,
+    [string] $Candidate
+  )
+
+  $NormalizedCandidate = Normalize-PathEntry $Candidate
+
+  if ($NormalizedCandidate -eq "") {
+    return $false
+  }
+
+  foreach ($Entry in ($PathValue -split ";")) {
+    if ((Normalize-PathEntry $Entry) -eq $NormalizedCandidate) {
+      return $true
+    }
+  }
+
+  return $false
+}
+
+function Add-PathEntry {
+  param(
+    [string] $PathValue,
+    [string] $Candidate
+  )
+
+  if ([string]::IsNullOrWhiteSpace($PathValue)) {
+    return $Candidate
+  }
+
+  return "$PathValue;$Candidate"
+}
+
 switch ($Architecture) {
   ([System.Runtime.InteropServices.Architecture]::X64) { $Asset = "ucr-windows-x64.exe" }
   default {
@@ -27,11 +73,30 @@ Write-Host "Downloading $DownloadUrl"
 Invoke-WebRequest -Uri $DownloadUrl -OutFile $TempFile
 Move-Item -Force $TempFile (Join-Path $InstallDir "ucr.exe")
 
-$PathEntries = ($env:PATH -split ";") | Where-Object { $_ -ne "" }
+$UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+$CurrentSessionUpdated = $false
+$UserPathUpdated = $false
 
-if ($PathEntries -contains $InstallDir) {
-  Write-Host "ucr installed to $(Join-Path $InstallDir 'ucr.exe')"
-} else {
-  Write-Host "ucr installed to $(Join-Path $InstallDir 'ucr.exe')"
-  Write-Host "Add $InstallDir to PATH to run 'ucr' directly."
+if (-not (Test-PathContainsEntry $env:PATH $InstallDir)) {
+  $env:PATH = Add-PathEntry $env:PATH $InstallDir
+  $CurrentSessionUpdated = $true
+}
+
+if (-not (Test-PathContainsEntry $UserPath $InstallDir)) {
+  [Environment]::SetEnvironmentVariable(
+    "Path",
+    (Add-PathEntry $UserPath $InstallDir),
+    "User"
+  )
+  $UserPathUpdated = $true
+}
+
+Write-Host "ucr installed to $(Join-Path $InstallDir 'ucr.exe')"
+
+if ($CurrentSessionUpdated) {
+  Write-Host "Updated PATH for this PowerShell session."
+}
+
+if ($UserPathUpdated) {
+  Write-Host "Updated the user PATH for future terminals."
 }

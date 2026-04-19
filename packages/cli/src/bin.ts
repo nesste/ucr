@@ -11,11 +11,12 @@ import { runAddCommand } from "./commands/add";
 import { runDiffCommand } from "./commands/diff";
 import { runInitCommand } from "./commands/init";
 import { runListCommand } from "./commands/list";
+import { runSelfUpdateCommand } from "./commands/self-update";
 import { runShowCommand } from "./commands/show";
 import { runUpgradeCommand } from "./commands/upgrade";
 
 function printHelp(): void {
-  console.log(`ucr <command> [item] [--registry <ref>] [--target <path>] [--instance <id>] [--input key=value] [--input-file key=path] [--force]
+  console.log(`ucr <command> [item-or-version] [--registry <ref>] [--target <path>] [--instance <id>] [--input key=value] [--input-file key=path] [--force]
 
 Commands:
   init      Create .ucr/config.json in the target project.
@@ -24,6 +25,7 @@ Commands:
   add       Install one registry item from source-only templates.
   diff      Compare one installed instance against the rendered upstream source.
   upgrade   Apply safe upgrades to one installed instance.
+  self-update  Download and replace the installed standalone CLI binary.
 
 Options:
   --registry <ref>              Registry manifest URL or local registry.json path. Optional: uses this flag, then .ucr/config.json, then UCR_REGISTRY, then the built-in official registry URL.
@@ -39,6 +41,7 @@ Options:
 interface ParsedCommandContext {
   command: string;
   itemName: string;
+  requestedVersion: string | undefined;
   registryRef: string | undefined;
   targetRoot: string;
   adapterId: ProjectAdapterId | undefined;
@@ -133,6 +136,7 @@ async function createCommandContext(): Promise<ParsedCommandContext> {
   return {
     command,
     itemName,
+    requestedVersion: itemName.trim() || undefined,
     registryRef: parsed.values.registry?.trim() || undefined,
     targetRoot: path.resolve(parsed.values.target ?? process.cwd()),
     adapterId: adapterValue,
@@ -204,6 +208,11 @@ async function main(): Promise<void> {
         throw new Error("Missing required item name.");
       }
       await runUpgradeCommand(context);
+      break;
+    case "self-update":
+      await runSelfUpdateCommand({
+        requestedVersion: parsed.requestedVersion,
+      });
       break;
     default:
       throw new Error(`Unknown command "${parsed.command}".`);

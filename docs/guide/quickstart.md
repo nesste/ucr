@@ -13,10 +13,20 @@ Install the binary from GitHub Releases:
 curl -fsSL https://ucr.network/install.sh | sh
 ```
 
+The Unix installer writes PATH configuration for future shells automatically.
+Because `curl | sh` runs in a child shell, open a new terminal before invoking
+`ucr` in that flow.
+
 On Windows PowerShell:
 
 ```powershell
 irm https://ucr.network/install.ps1 | iex
+```
+
+To update an existing standalone installation later:
+
+```bash
+ucr self-update
 ```
 
 ## Standard End-User Flow

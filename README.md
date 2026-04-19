@@ -21,6 +21,9 @@ Install the standalone binary from GitHub Releases:
 curl -fsSL https://ucr.network/install.sh | sh
 ```
 
+The Unix installer configures PATH for future shells automatically. If you use
+`curl | sh`, open a new shell before running `ucr`.
+
 On Windows PowerShell:
 
 ```powershell
@@ -50,6 +53,7 @@ From there:
 
 - `ucr diff entity-contract --instance posts`
 - `ucr upgrade entity-contract --instance posts`
+- `ucr self-update`
 
 To pin a project to a specific published registry version:
 

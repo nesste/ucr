@@ -16,6 +16,7 @@ Available commands:
 - `add`
 - `diff`
 - `upgrade`
+- `self-update`
 
 ## Shared Options
 
@@ -139,6 +140,26 @@ Upgrade action labels:
 - `conflict`: local and upstream edits overlap, so manual review is required
 
 Without `--force`, any conflict aborts the upgrade after the plan is printed. With `--force`, conflict files are overwritten with the freshly rendered upstream content.
+
+## `self-update [version]`
+
+Downloads the matching standalone binary from GitHub Releases, verifies the published SHA-256 file, and replaces the current executable.
+
+```bash
+ucr self-update
+```
+
+Pin to a specific release tag when needed:
+
+```bash
+ucr self-update v0.3.0
+```
+
+Notes:
+
+- `self-update` only works when `ucr` is running from the installed standalone binary
+- on Windows, the replacement is queued and completes just after the current command exits
+- on macOS and Linux, the binary is replaced immediately
 
 ## Notes On Instance IDs
 
