@@ -1,6 +1,6 @@
 {
   "name": "universal-code-registry",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": true,
   "license": "Apache-2.0",
   "description": "Bun-first source registry for audited reusable code blocks.",
