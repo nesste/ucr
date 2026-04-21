@@ -17,6 +17,10 @@ export default defineConfig({
         link: "/guide/quickstart",
       },
       {
+        text: "GitHub",
+        link: "https://github.com/nesste/ucr",
+      },
+      {
         text: "Trust",
         link: "/reference/trust",
       },
