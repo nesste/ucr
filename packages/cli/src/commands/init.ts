@@ -33,7 +33,7 @@ export async function runInitCommand(context: InitCommandContext): Promise<void>
     : null;
 
   await writeProjectConfig(context.targetRoot, {
-    version: 4,
+    version: 5,
     registry: toProjectRegistryReference(context.targetRoot, resolvedRegistryRef),
     adapter: profile.adapterId,
     packageManager: profile.packageManager,

@@ -24,7 +24,7 @@ Shared item fields:
 | `kind` | yes | `block`, `utility`, or `preset`. |
 | `version` | yes | Item version string. |
 | `category` | yes | Freeform category label. |
-| `targets` | yes | One or more of `shared`, `bun-http`, `next-app-router`. |
+| `targets` | yes | One or more of `shared`, `bun-http`, `node-http`, `next-app-router`. |
 | `outputs[]` | yes | At least one output is required. |
 | `description` | no | Human-readable description. |
 | `inputs[]` | no | Typed input definitions. |
@@ -93,6 +93,7 @@ Supported targets:
 
 - `shared`
 - `bun-http`
+- `node-http`
 - `next-app-router`
 
 `shared` means the item can be installed into either adapter, subject to whether the adapter supports each output surface.

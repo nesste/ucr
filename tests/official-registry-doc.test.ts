@@ -21,6 +21,11 @@ const exampleLockFiles = [
     lockPath: path.resolve(import.meta.dir, "../examples/bun-service/.ucr/lock.json"),
   },
   {
+    exampleId: "node-service",
+    adapter: "node-http" as const,
+    lockPath: path.resolve(import.meta.dir, "../examples/node-service/.ucr/lock.json"),
+  },
+  {
     exampleId: "next-app",
     adapter: "next-app-router" as const,
     lockPath: path.resolve(import.meta.dir, "../examples/next-app/.ucr/lock.json"),
@@ -110,7 +115,13 @@ test("official registry docs generator renders all item headings and representat
     "ucr add bun-server --target . --instance server --input-file routeModules=./route-modules.json",
   );
   expect(output).toContain(
+    "ucr add node-server --target . --instance server --input-file routeModules=./route-modules.json",
+  );
+  expect(output).toContain(
     "- `bun-service` (bun-http, instance `server`): `server/index.ts`",
+  );
+  expect(output).toContain(
+    "- `node-service` (node-http, instance `server`): `server/index.ts`",
   );
   expect(output).toContain(
     "- `next-app` (next-app-router, instance `posts`): `src/app/posts/[id]/page.tsx`",

@@ -34,11 +34,12 @@ UCR does not publish public production case studies today.
 
 Current product scope is:
 
-- Bun-managed target projects only
-- adapter support for `bun-http` and `next-app-router`
+- Bun-managed non-Next projects with `bun-http`
+- npm- and pnpm-managed non-Next projects with `node-http`
+- Bun-, npm-, and pnpm-managed Next projects with `next-app-router`
 - registry usage through remote HTTPS manifests or local `registry.json` paths
 
-Broader package manager support and additional adapters are not implemented yet.
+Yarn support and additional adapters are not implemented yet.
 
 ## Private Registries
 

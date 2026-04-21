@@ -9,8 +9,8 @@ UCR supports private registries in two ways today:
 
 Current private registry behavior is intentionally narrow:
 
-- target projects still must be Bun-managed
-- adapter support is still limited to `bun-http` and `next-app-router`
+- target projects must still be managed by Bun, npm, or pnpm
+- adapter support is currently limited to `bun-http`, `node-http`, and `next-app-router`
 - UCR accepts one auth header through `UCR_REGISTRY_AUTH_HEADER`
 - UCR does not persist credentials into `.ucr/config.json`, `.ucr/lock.json`, `.ucr/state.json`, or cache metadata
 
@@ -70,7 +70,7 @@ UCR does not currently support:
 
 - multiple registry auth headers
 - persistent credential storage in project config
-- non-Bun-managed target projects
-- adapters beyond `bun-http` and `next-app-router`
+- Yarn-managed target projects
+- adapters beyond `bun-http`, `node-http`, and `next-app-router`
 
 For command syntax details, see [Commands](/guide/commands). For current product scope and trust statements, see [Trust And Scope](/reference/trust).

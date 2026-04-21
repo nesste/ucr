@@ -1,0 +1,19 @@
+{
+  "name": "@ucr/example-node-service",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "start": "node dist/server/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test",
+    "registry:init": "bun ../../packages/cli/dist/bin.js init --registry ../../fixtures/registries/ucr-official/registry.json --target .",
+    "registry:list": "bun ../../packages/cli/dist/bin.js list --target .",
+    "registry:show": "bun ../../packages/cli/dist/bin.js show node-server --target ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.2"
+  }
+}

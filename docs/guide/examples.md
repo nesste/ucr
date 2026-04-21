@@ -1,6 +1,6 @@
 # Examples
 
-The repository contains two checked-in targets that show UCR installs in their fully rendered form. They are the best place to inspect path mapping, composition, and tracked state without setting up a new project first.
+The repository contains three checked-in targets that show UCR installs in their fully rendered form. They are the best place to inspect path mapping, composition, and tracked state without setting up a new project first.
 
 ## `examples/bun-service`
 
@@ -100,6 +100,57 @@ bun packages/cli/dist/bin.js diff admin-page --registry fixtures/registries/ucr-
 
 ```bash
 cd examples/next-app
+bun run build
+```
+
+## `examples/node-service`
+
+This target is an npm-managed Node HTTP service that demonstrates server-oriented installs without Bun-specific runtime assumptions.
+
+Key directories:
+
+- `examples/node-service/ucr/runtime`
+- `examples/node-service/ucr/utilities`
+- `examples/node-service/ucr/presets`
+- `examples/node-service/ucr/posts/...`
+- `examples/node-service/server/routes/...`
+- `examples/node-service/server/index.ts`
+- `examples/node-service/.ucr/*.json`
+
+Checked-in composition:
+
+- runtime: `ts-runtime`
+- shared utilities: `result-utility`, `async-utility`, `object-utility`, `collection-utility`, `validation-utility`
+- presets: `service-preset`, `endpoint-preset`
+- blocks: `entity-contract`, `service-layer`, `memory-repository`, `input-validation`, `node-health-route`, `node-collection-route`, `node-item-route`, `node-server`
+
+Cross-reference these installs with [Official Registry](/reference/official-registry) when you want to see the manifest metadata, canonical install recipe, and example-owned file list for each item.
+
+Recommended browsing flow for Node projects:
+
+- foundations first: `node-health-route`, `node-server`, and optional `env-config`
+- API flow second: either the `node-crud-resource` starter or the granular entity and route chain
+- UI is not applicable for the Node adapter
+
+What this example proves:
+
+- shared code lands under `ucr/...`
+- transport outputs land under `server/routes/...`
+- entrypoint outputs land under `server/...`
+- npm-managed projects still keep enough `.ucr` state for `diff` and `upgrade`
+
+Suggested commands:
+
+```bash
+bun packages/cli/dist/bin.js list --registry fixtures/registries/ucr-official/registry.json --target examples/node-service
+```
+
+```bash
+bun packages/cli/dist/bin.js diff node-collection-route --registry fixtures/registries/ucr-official/registry.json --target examples/node-service --instance posts
+```
+
+```bash
+cd examples/node-service
 bun run build
 ```
 

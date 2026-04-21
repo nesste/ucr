@@ -8,7 +8,11 @@ export const REGISTRY_SCHEMA_FILE = path.resolve(
 );
 
 export type RegistryItemKind = "block" | "utility" | "preset";
-export type RegistryTarget = "shared" | "next-app-router" | "bun-http";
+export type RegistryTarget =
+  | "shared"
+  | "next-app-router"
+  | "bun-http"
+  | "node-http";
 export type RegistrySurface =
   | "contract"
   | "domain"
@@ -81,6 +85,7 @@ const VALID_TARGETS: Set<RegistryTarget> = new Set([
   "shared",
   "next-app-router",
   "bun-http",
+  "node-http",
 ]);
 const VALID_SURFACES: Set<RegistrySurface> = new Set([
   "contract",

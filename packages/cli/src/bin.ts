@@ -30,7 +30,7 @@ Commands:
 Options:
   --registry <ref>              Registry manifest URL or local registry.json path. Optional: uses this flag, then .ucr/config.json, then UCR_REGISTRY, then the built-in official registry URL.
   --target <path>               Target project root. Defaults to the current directory.
-  --adapter <id>                Adapter override for \`init\` (\`bun-http\` or \`next-app-router\`).
+  --adapter <id>                Adapter override for \`init\` (\`bun-http\`, \`node-http\`, or \`next-app-router\`).
   --instance <id>               Required for \`block\` items. Utilities and presets default to their item name.
   --input <key=value>           Repeated typed input for templated items.
   --input-file <key=path>       Repeated input file, useful for JSON values.
@@ -132,9 +132,12 @@ async function createCommandContext(): Promise<ParsedCommandContext> {
   if (
     adapterValue !== undefined &&
     adapterValue !== "bun-http" &&
+    adapterValue !== "node-http" &&
     adapterValue !== "next-app-router"
   ) {
-    throw new Error('Adapter must be "bun-http" or "next-app-router".');
+    throw new Error(
+      'Adapter must be "bun-http", "node-http", or "next-app-router".',
+    );
   }
 
   return {

@@ -112,7 +112,7 @@ export const OFFICIAL_REGISTRY_DOC_OVERLAY: Record<
   }),
   "env-config": defineEntry("env-config", {
     useWhen:
-      "Start here for project foundations when Bun-managed shared code should read environment variables through a typed local wrapper.",
+      "Start here for project foundations when shared code should read environment variables through a typed local wrapper.",
     sampleInstanceId: "env",
     exampleNote: NO_EXAMPLE_FOUNDATION_NOTE,
   }),
@@ -203,6 +203,21 @@ export const OFFICIAL_REGISTRY_DOC_OVERLAY: Record<
       "Start here for Bun project foundations when you want a lightweight health endpoint without any entity-specific inputs.",
     sampleInstanceId: "health",
   }),
+  "node-server": defineEntry("node-server", {
+    useWhen:
+      "Start here for Node project foundations when you want to stitch route modules into a built-in node:http entrypoint.",
+    sampleInstanceId: "server",
+    sampleInputFiles: {
+      routeModules: "./route-modules.json",
+    },
+    recipeNote:
+      "Provide `routeModules` as a JSON array of `{ importName, importPath }` entries that match the route files you want the entrypoint to register.",
+  }),
+  "node-health-route": defineEntry("node-health-route", {
+    useWhen:
+      "Start here for Node project foundations when you want a lightweight health endpoint without any entity-specific inputs.",
+    sampleInstanceId: "health",
+  }),
   "json-collection-route": withEntityInputs(
     "json-collection-route",
     "Use it in the granular Bun entity/API flow to expose collection handlers for one resource.",
@@ -211,12 +226,30 @@ export const OFFICIAL_REGISTRY_DOC_OVERLAY: Record<
     "json-item-route",
     "Use it in the granular Bun entity/API flow to expose item-by-id handlers for one resource.",
   ),
+  "node-collection-route": withEntityInputs(
+    "node-collection-route",
+    "Use it in the granular Node entity/API flow to expose collection handlers for one resource.",
+  ),
+  "node-item-route": withEntityInputs(
+    "node-item-route",
+    "Use it in the granular Node entity/API flow to expose item-by-id handlers for one resource.",
+  ),
   "bun-crud-resource": withEntityFieldInputs(
     "bun-crud-resource",
     "Use it as the fastest Bun HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.",
     {
       recipeNote:
         "Supply the same entity naming values across the related resource code so the generated contract, service, validation, and Bun routes stay aligned.\n\n" +
+        STARTER_ALTERNATIVE_NOTE,
+      exampleNote: NO_EXAMPLE_STARTER_NOTE,
+    },
+  ),
+  "node-crud-resource": withEntityFieldInputs(
+    "node-crud-resource",
+    "Use it as the fastest Node HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.",
+    {
+      recipeNote:
+        "Supply the same entity naming values across the related resource code so the generated contract, service, validation, Node routes, and node:http entrypoint stay aligned.\n\n" +
         STARTER_ALTERNATIVE_NOTE,
       exampleNote: NO_EXAMPLE_STARTER_NOTE,
     },

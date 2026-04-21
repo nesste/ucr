@@ -6,15 +6,16 @@ This page covers both normal end-user usage and the contributor-only local fixtu
 
 UCR currently supports:
 
-- Bun-managed target projects
-- `bun-http` and `next-app-router`
+- Bun-managed non-Next projects with `bun-http`
+- npm- and pnpm-managed non-Next projects with `node-http`
+- Bun-, npm-, and pnpm-managed Next projects with `next-app-router`
 - local registries and remote HTTPS registries
 
-Broader package manager support and additional adapters are not implemented yet.
+Yarn and additional adapters are still out of scope.
 
 ## Prerequisites
 
-- a Bun-managed target project
+- a managed target project using Bun, npm, or pnpm
 - the `ucr` standalone binary on your `PATH`
 
 Install the binary from GitHub Releases:
@@ -41,7 +42,7 @@ ucr self-update
 
 ## Standard End-User Flow
 
-Initialize the current Bun project against the built-in official registry:
+Initialize the current project against the built-in official registry:
 
 ```bash
 ucr init --target .
@@ -84,6 +85,20 @@ On Next projects, add admin/detail UI after the API flow is in place:
 ```bash
 ucr add admin-page --instance posts --input entity=Post --input plural=posts
 ucr add entity-detail-page --instance posts --input entity=Post --input plural=posts
+```
+
+Fastest starter path for a Node HTTP resource:
+
+```bash
+ucr add node-crud-resource --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+ucr add node-server --instance server --input-file routeModules=./route-modules.json
+```
+
+Fastest starter path for a Bun HTTP resource:
+
+```bash
+ucr add bun-crud-resource --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+ucr add bun-server --instance server --input-file routeModules=./route-modules.json
 ```
 
 Compare local state with upstream:
@@ -163,9 +178,16 @@ Inspect the Next example:
 bun packages/cli/dist/bin.js show admin-page --registry fixtures/registries/ucr-official/registry.json --target examples/next-app
 ```
 
+Inspect the Node HTTP example:
+
+```bash
+bun packages/cli/dist/bin.js show node-server --registry fixtures/registries/ucr-official/registry.json --target examples/node-service
+```
+
 This repository keeps the examples because they demonstrate:
 
 - `bun-http` outputs under `ucr/...`, `server/routes/...`, and `server/...`
+- `node-http` outputs under `ucr/...`, `server/routes/...`, and `server/...`
 - `next-app-router` outputs under `src/ucr/...`, `src/app/api/...`, and `src/app/...`
 - the exact item catalog that becomes the official published registry
 
@@ -176,4 +198,4 @@ This repository keeps the examples because they demonstrate:
 - [Commands](/guide/commands) for all flags and examples
 - [Trust And Scope](/reference/trust) for license, privacy, pricing, and compatibility facts
 - [Official Registry](/reference/official-registry) for the concrete `ucr-official` item catalog
-- [Examples](/guide/examples) for the checked-in Bun and Next compositions
+- [Examples](/guide/examples) for the checked-in Bun, Node, and Next compositions

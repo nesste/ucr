@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "registry": "../../fixtures/registries/ucr-official/registry.json",
   "adapter": "bun-http",
   "packageManager": "bun",
@@ -14,6 +14,7 @@
     "bun",
     "bun-http",
     "bun:test",
+    "package-manager:bun",
     "server",
     "source-root:.",
     "transport"

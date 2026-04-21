@@ -1,0 +1,470 @@
+{
+  "version": 3,
+  "registry": {
+    "name": "ucr-official",
+    "version": "3.0.0",
+    "transport": "file",
+    "source": "../../fixtures/registries/ucr-official/registry.json",
+    "manifestUrl": "D:\\Work\\personal\\ucr\\fixtures\\registries\\ucr-official\\registry.json",
+    "bundleUrl": null,
+    "bundleChecksum": null
+  },
+  "installs": {
+    "ts-runtime:ts-runtime": {
+      "itemKind": "utility",
+      "itemName": "ts-runtime",
+      "itemVersion": "1.0.0",
+      "instanceId": "ts-runtime",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [],
+      "provides": [
+        "runtime:ts"
+      ],
+      "files": [
+        "ucr/runtime/index.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:28.669Z"
+    },
+    "result-utility:result-utility": {
+      "itemKind": "utility",
+      "itemName": "result-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "result-utility",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:result-utility"
+      ],
+      "files": [
+        "ucr/utilities/result-utility.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:28.814Z"
+    },
+    "async-utility:async-utility": {
+      "itemKind": "utility",
+      "itemName": "async-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "async-utility",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:async-utility"
+      ],
+      "files": [
+        "ucr/utilities/async-utility.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:28.949Z"
+    },
+    "object-utility:object-utility": {
+      "itemKind": "utility",
+      "itemName": "object-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "object-utility",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:object-utility"
+      ],
+      "files": [
+        "ucr/utilities/object-utility.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.084Z"
+    },
+    "collection-utility:collection-utility": {
+      "itemKind": "utility",
+      "itemName": "collection-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "collection-utility",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:collection-utility"
+      ],
+      "files": [
+        "ucr/utilities/collection-utility.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.220Z"
+    },
+    "validation-utility:validation-utility": {
+      "itemKind": "utility",
+      "itemName": "validation-utility",
+      "itemVersion": "1.0.0",
+      "instanceId": "validation-utility",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [
+        "runtime:ts"
+      ],
+      "provides": [
+        "utility:validation-utility"
+      ],
+      "files": [
+        "ucr/utilities/validation-utility.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.353Z"
+    },
+    "service-preset:service-preset": {
+      "itemKind": "preset",
+      "itemName": "service-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "service-preset",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [
+        "async-utility",
+        "result-utility",
+        "validation-utility"
+      ],
+      "requires": [
+        "runtime:ts",
+        "utility:async-utility",
+        "utility:result-utility",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "preset:service-preset"
+      ],
+      "files": [
+        "ucr/presets/service-preset.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.491Z"
+    },
+    "endpoint-preset:endpoint-preset": {
+      "itemKind": "preset",
+      "itemName": "endpoint-preset",
+      "itemVersion": "1.0.0",
+      "instanceId": "endpoint-preset",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [
+        "async-utility",
+        "collection-utility",
+        "object-utility",
+        "result-utility",
+        "service-preset",
+        "validation-utility"
+      ],
+      "requires": [
+        "preset:service-preset",
+        "runtime:ts",
+        "utility:collection-utility",
+        "utility:object-utility"
+      ],
+      "provides": [
+        "preset:endpoint-preset"
+      ],
+      "files": [
+        "ucr/presets/endpoint-preset.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.623Z"
+    },
+    "entity-contract:posts": {
+      "itemKind": "block",
+      "itemName": "entity-contract",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "node-http",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "tsType": "string",
+            "inputType": "text",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"Example title\"",
+            "updatedValueCode": "\"Updated title\"",
+            "isString": true
+          },
+          {
+            "name": "views",
+            "label": "Views",
+            "tsType": "number",
+            "inputType": "number",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "0",
+            "sampleValueCode": "42",
+            "updatedValueCode": "99",
+            "isNumber": true
+          },
+          {
+            "name": "published",
+            "label": "Published",
+            "tsType": "boolean",
+            "inputType": "checkbox",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "false",
+            "sampleValueCode": "true",
+            "updatedValueCode": "false",
+            "isBoolean": true
+          },
+          {
+            "name": "publishedAt",
+            "label": "Published At",
+            "tsType": "string",
+            "inputType": "date",
+            "optionalToken": "?",
+            "required": false,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"2026-04-19\"",
+            "updatedValueCode": "\"2026-12-31\"",
+            "isDate": true
+          }
+        ]
+      },
+      "compose": [],
+      "requires": [],
+      "provides": [
+        "entity-contract:posts"
+      ],
+      "files": [
+        "ucr/posts/contract/model.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.749Z"
+    },
+    "service-layer:posts": {
+      "itemKind": "block",
+      "itemName": "service-layer",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "node-http",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "preset:service-preset"
+      ],
+      "provides": [
+        "repository-contract:posts",
+        "service-layer:posts"
+      ],
+      "files": [
+        "ucr/posts/domain/repository.ts",
+        "ucr/posts/domain/service.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:29.876Z"
+    },
+    "memory-repository:posts": {
+      "itemKind": "block",
+      "itemName": "memory-repository",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "node-http",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "preset:endpoint-preset",
+        "repository-contract:posts",
+        "service-layer:posts"
+      ],
+      "provides": [
+        "memory-repository:posts",
+        "service-runtime:posts"
+      ],
+      "files": [
+        "ucr/posts/domain/memory-repository.ts",
+        "ucr/posts/domain/runtime.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:30.009Z"
+    },
+    "input-validation:posts": {
+      "itemKind": "block",
+      "itemName": "input-validation",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "node-http",
+      "inputs": {
+        "entity": "Post",
+        "fields": [
+          {
+            "name": "title",
+            "label": "Title",
+            "tsType": "string",
+            "inputType": "text",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"Example title\"",
+            "updatedValueCode": "\"Updated title\"",
+            "isString": true
+          },
+          {
+            "name": "views",
+            "label": "Views",
+            "tsType": "number",
+            "inputType": "number",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "0",
+            "sampleValueCode": "42",
+            "updatedValueCode": "99",
+            "isNumber": true
+          },
+          {
+            "name": "published",
+            "label": "Published",
+            "tsType": "boolean",
+            "inputType": "checkbox",
+            "optionalToken": "",
+            "required": true,
+            "emptyValueCode": "false",
+            "sampleValueCode": "true",
+            "updatedValueCode": "false",
+            "isBoolean": true
+          },
+          {
+            "name": "publishedAt",
+            "label": "Published At",
+            "tsType": "string",
+            "inputType": "date",
+            "optionalToken": "?",
+            "required": false,
+            "emptyValueCode": "\"\"",
+            "sampleValueCode": "\"2026-04-19\"",
+            "updatedValueCode": "\"2026-12-31\"",
+            "isDate": true
+          }
+        ]
+      },
+      "compose": [],
+      "requires": [
+        "entity-contract:posts",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "validation:posts"
+      ],
+      "files": [
+        "ucr/posts/contract/validation.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:30.145Z"
+    },
+    "node-health-route:health": {
+      "itemKind": "block",
+      "itemName": "node-health-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "health",
+      "adapter": "node-http",
+      "inputs": {},
+      "compose": [],
+      "requires": [],
+      "provides": [
+        "node-health-route"
+      ],
+      "files": [
+        "server/routes/health.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:30.275Z"
+    },
+    "node-collection-route:posts": {
+      "itemKind": "block",
+      "itemName": "node-collection-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "node-http",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "service-runtime:posts",
+        "validation:posts"
+      ],
+      "provides": [
+        "node-collection-route:posts"
+      ],
+      "files": [
+        "server/routes/posts/index.ts"
+      ],
+      "updatedAt": "2026-04-21T13:45:30.405Z"
+    },
+    "node-item-route:posts": {
+      "itemKind": "block",
+      "itemName": "node-item-route",
+      "itemVersion": "1.0.0",
+      "instanceId": "posts",
+      "adapter": "node-http",
+      "inputs": {
+        "entity": "Post",
+        "plural": "posts"
+      },
+      "compose": [],
+      "requires": [
+        "service-runtime:posts",
+        "validation:posts"
+      ],
+      "provides": [
+        "node-item-route:posts"
+      ],
+      "files": [
+        "server/routes/posts/[id].ts"
+      ],
+      "updatedAt": "2026-04-21T13:49:30.886Z"
+    },
+    "node-server:server": {
+      "itemKind": "block",
+      "itemName": "node-server",
+      "itemVersion": "1.0.0",
+      "instanceId": "server",
+      "adapter": "node-http",
+      "inputs": {
+        "routeModules": [
+          {
+            "importName": "healthRoute",
+            "importPath": "./routes/health"
+          },
+          {
+            "importName": "postCollectionRoute",
+            "importPath": "./routes/posts/index"
+          },
+          {
+            "importName": "postItemRoute",
+            "importPath": "./routes/posts/[id]"
+          }
+        ]
+      },
+      "compose": [],
+      "requires": [],
+      "provides": [
+        "node-server"
+      ],
+      "files": [
+        "server/index.ts"
+      ],
+      "updatedAt": "2026-04-21T13:49:31.022Z"
+    }
+  }
+}

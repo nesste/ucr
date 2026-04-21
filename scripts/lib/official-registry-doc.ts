@@ -53,7 +53,12 @@ const ALLOWED_OVERLAY_KEYS = new Set([
 ]);
 
 const KIND_ORDER: RegistryItemKind[] = ["utility", "preset", "block"];
-const TARGET_ORDER: RegistryTarget[] = ["shared", "next-app-router", "bun-http"];
+const TARGET_ORDER: RegistryTarget[] = [
+  "shared",
+  "next-app-router",
+  "bun-http",
+  "node-http",
+];
 const KIND_LABELS: Record<RegistryItemKind, string> = {
   utility: "Utilities",
   preset: "Presets",
@@ -554,7 +559,7 @@ export function generateOfficialRegistryDoc(
     "",
     `This page documents the shipped \`${options.registry.name}\` catalog from \`fixtures/registries/ucr-official/registry.json\`. It complements \`ucr list\` and \`ucr show\` with concrete guidance on what each utility, preset, and block is for.`,
     "",
-    "Use `<ucr-root>` below as shorthand for the adapter-managed shared UCR root. In the checked-in examples that is `ucr` for Bun HTTP and `src/ucr` for the Next app.",
+    "Use `<ucr-root>` below as shorthand for the adapter-managed shared UCR root. In the checked-in examples that is `ucr` for Bun HTTP and Node HTTP, and `src/ucr` for the Next app.",
     "",
     "Blocks always require an explicit `--instance`, even when their generated files land at fixed logical paths.",
     "",

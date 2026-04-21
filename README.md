@@ -1,6 +1,6 @@
 # Universal Code Registry
 
-Universal Code Registry (UCR) is an Apache-2.0 source-first code registry for Bun-managed projects. Instead of installing generated packages, UCR installs audited source templates into your app, maps them into deterministic adapter-specific roots, and tracks enough upstream state to support `diff` and `upgrade` later.
+Universal Code Registry (UCR) is an Apache-2.0 source-first code registry for Bun-, npm-, and pnpm-managed projects. Instead of installing generated packages, UCR installs audited source templates into your app, maps them into deterministic adapter-specific roots, and tracks enough upstream state to support `diff` and `upgrade` later.
 
 ## Trust Snapshot
 
@@ -9,7 +9,7 @@ Universal Code Registry (UCR) is an Apache-2.0 source-first code registry for Bu
 - Pricing: the OSS tooling is usable without a paid plan; no hosted or commercial pricing is published today
 - Benchmarks: no public benchmarks are published yet
 - Production case studies: no public production case studies are published yet
-- Compatibility today: Bun-managed projects with `bun-http` and `next-app-router`
+- Compatibility today: Bun-managed non-Next projects with `bun-http`, npm- and pnpm-managed non-Next projects with `node-http`, and Bun-, npm-, and pnpm-managed Next projects with `next-app-router`
 - Private registries: supported with local `registry.json` paths and authenticated remote registries via `UCR_REGISTRY_AUTH_HEADER`
 
 UCR does not replace Bun. Bun still owns external dependencies and `bun.lock`. UCR owns:
@@ -52,7 +52,7 @@ To authenticate a remote private registry, set `UCR_REGISTRY_AUTH_HEADER` to one
 
 ## Quickstart
 
-Initialize a Bun project against the official registry:
+Initialize a managed project against the official registry:
 
 ```bash
 ucr init --target .
@@ -78,13 +78,14 @@ ucr init --registry https://ucr.network/registry/ucr-official/v3.0.0/registry.js
 Adapters:
 
 - `bun-http`
+- `node-http`
 - `next-app-router`
 
 Current limitations:
 
-- target projects must be Bun-managed
-- adapter support is limited to `bun-http` and `next-app-router`
-- broader package manager and adapter support is not implemented yet
+- first-class package manager support is limited to Bun, npm, and pnpm
+- adapter support is limited to `bun-http`, `node-http`, and `next-app-router`
+- Yarn and additional adapters are not implemented yet
 
 Registry item kinds:
 

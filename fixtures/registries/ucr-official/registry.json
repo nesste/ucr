@@ -458,7 +458,7 @@
       "kind": "block",
       "version": "1.0.0",
       "category": "foundation",
-      "description": "Typed environment helpers for Bun-managed projects.",
+      "description": "Typed environment helpers for managed projects.",
       "targets": [
         "shared"
       ],
@@ -1299,6 +1299,263 @@
           "template": "templates/json-item-route/transport/item.ts.tpl",
           "target": "{{pluralKebab}}/[id].ts",
           "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "node-server",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "node-http",
+      "description": "Static route registry plus node:http bootstrap.",
+      "targets": [
+        "node-http"
+      ],
+      "inputs": [
+        {
+          "name": "routeModules",
+          "type": "json",
+          "description": "Route import metadata for the server entrypoint."
+        }
+      ],
+      "provides": [
+        "node-server"
+      ],
+      "tags": [
+        "foundation",
+        "starter",
+        "node"
+      ],
+      "entrypoints": [
+        "index.ts"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "045"
+      },
+      "outputs": [
+        {
+          "template": "templates/node-server/entrypoint/index.ts.tpl",
+          "target": "index.ts",
+          "surface": "entrypoint"
+        }
+      ]
+    },
+    {
+      "name": "node-health-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "node-http",
+      "description": "Static health route for Node HTTP services.",
+      "targets": [
+        "node-http"
+      ],
+      "provides": [
+        "node-health-route"
+      ],
+      "tags": [
+        "foundation",
+        "starter",
+        "node"
+      ],
+      "metadata": {
+        "catalogSection": "foundation",
+        "catalogOrder": "035"
+      },
+      "outputs": [
+        {
+          "template": "templates/node-health-route/transport/health.ts.tpl",
+          "target": "health.ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "node-collection-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "node-http",
+      "description": "Node HTTP collection route for one entity.",
+      "targets": [
+        "node-http"
+      ],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}"
+      ],
+      "provides": [
+        "node-collection-route:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "node"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "080"
+      },
+      "outputs": [
+        {
+          "template": "templates/node-collection-route/transport/index.ts.tpl",
+          "target": "{{pluralKebab}}/index.ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "node-item-route",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "node-http",
+      "description": "Node HTTP item route for one entity.",
+      "targets": [
+        "node-http"
+      ],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        }
+      ],
+      "requires": [
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}"
+      ],
+      "provides": [
+        "node-item-route:{{instanceId}}"
+      ],
+      "tags": [
+        "crud",
+        "api",
+        "node"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "090"
+      },
+      "outputs": [
+        {
+          "template": "templates/node-item-route/transport/item.ts.tpl",
+          "target": "{{pluralKebab}}/[id].ts",
+          "surface": "transport"
+        }
+      ]
+    },
+    {
+      "name": "node-crud-resource",
+      "kind": "block",
+      "version": "1.0.0",
+      "category": "node-http",
+      "description": "Starter CRUD resource for Node HTTP services.",
+      "targets": [
+        "node-http"
+      ],
+      "inputs": [
+        {
+          "name": "entity",
+          "type": "string",
+          "description": "Entity name, for example Post."
+        },
+        {
+          "name": "plural",
+          "type": "string",
+          "description": "Plural route segment, for example posts."
+        },
+        {
+          "name": "fields",
+          "type": "json",
+          "description": "Field metadata used to render entity code."
+        }
+      ],
+      "requires": [
+        "preset:service-preset",
+        "preset:endpoint-preset",
+        "utility:validation-utility"
+      ],
+      "provides": [
+        "entity-contract:{{instanceId}}",
+        "repository-contract:{{instanceId}}",
+        "service-layer:{{instanceId}}",
+        "memory-repository:{{instanceId}}",
+        "service-runtime:{{instanceId}}",
+        "validation:{{instanceId}}",
+        "node-collection-route:{{instanceId}}",
+        "node-item-route:{{instanceId}}"
+      ],
+      "tags": [
+        "starter",
+        "crud",
+        "api",
+        "node"
+      ],
+      "metadata": {
+        "catalogSection": "entity-api",
+        "catalogOrder": "105"
+      },
+      "outputs": [
+        {
+          "template": "templates/entity-contract/contract/model.ts.tpl",
+          "target": "model.ts",
+          "surface": "contract"
+        },
+        {
+          "template": "templates/service-layer/domain/repository.ts.tpl",
+          "target": "repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/service-layer/domain/service.ts.tpl",
+          "target": "service.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/memory-repository.ts.tpl",
+          "target": "memory-repository.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/memory-repository/domain/runtime.ts.tpl",
+          "target": "runtime.ts",
+          "surface": "domain"
+        },
+        {
+          "template": "templates/input-validation/contract/validation.ts.tpl",
+          "target": "validation.ts",
+          "surface": "contract"
+        },
+        {
+          "template": "templates/node-collection-route/transport/index.ts.tpl",
+          "target": "{{pluralKebab}}/index.ts",
+          "surface": "transport"
+        },
+        {
+          "template": "templates/node-item-route/transport/item.ts.tpl",
+          "target": "{{pluralKebab}}/[id].ts",
+          "surface": "transport"
+        },
+        {
+          "template": "templates/node-crud-resource/entrypoint/index.ts.tpl",
+          "target": "index.ts",
+          "surface": "entrypoint"
         }
       ]
     },

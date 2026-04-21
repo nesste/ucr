@@ -112,6 +112,8 @@ export async function readRegistryLock(targetRoot: string): Promise<RegistryLock
         adapter:
           rawInstall.adapter === "next-app-router"
             ? "next-app-router"
+            : rawInstall.adapter === "node-http"
+              ? "node-http"
             : "bun-http",
         inputs:
           (rawInstall.inputs as ResolvedRegistryInputs | undefined) ?? {},

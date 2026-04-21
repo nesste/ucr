@@ -31,8 +31,60 @@ const fieldsPath = path.resolve(
   "../fixtures/inputs/post.fields.json",
 );
 
-async function createTempProject(options?: { next?: boolean }): Promise<string> {
+type TempProjectManager = "bun" | "npm" | "pnpm";
+
+async function writeManagerMarker(
+  root: string,
+  manager: TempProjectManager,
+): Promise<void> {
+  if (manager === "bun") {
+    await fs.writeFile(path.join(root, "bun.lock"), "", "utf8");
+    return;
+  }
+
+  if (manager === "npm") {
+    await fs.writeFile(
+      path.join(root, "package-lock.json"),
+      `${JSON.stringify(
+        {
+          name: "tmp-project",
+          version: "0.0.1",
+          lockfileVersion: 3,
+          requires: true,
+          packages: {
+            "": {
+              name: "tmp-project",
+              version: "0.0.1",
+            },
+          },
+        },
+        null,
+        2,
+      )}\n`,
+      "utf8",
+    );
+    return;
+  }
+
+  await fs.writeFile(
+    path.join(root, "pnpm-lock.yaml"),
+    "lockfileVersion: '9.0'\n",
+    "utf8",
+  );
+}
+
+async function createTempProject(options?: {
+  next?: boolean;
+  manager?: TempProjectManager;
+}): Promise<string> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "ucr-"));
+  const manager = options?.manager ?? "bun";
+  const packageManager =
+    manager === "bun"
+      ? "bun@1.3.4"
+      : manager === "npm"
+        ? "npm@10.9.0"
+        : "pnpm@9.15.0";
   await fs.writeFile(
     path.join(root, "package.json"),
     `${JSON.stringify(
@@ -40,20 +92,21 @@ async function createTempProject(options?: { next?: boolean }): Promise<string> 
         ? {
             name: "tmp-next",
             private: true,
-            packageManager: "bun@1.3.4",
+            packageManager,
             dependencies: {
               next: "16.2.4",
             },
           }
         : {
-            name: "tmp-bun",
+            name: `tmp-${manager}`,
             private: true,
-            packageManager: "bun@1.3.4",
+            packageManager,
           },
       null,
       2,
     )}\n`,
   );
+  await writeManagerMarker(root, manager);
 
   if (options?.next) {
     await fs.mkdir(path.join(root, "src", "app"), { recursive: true });
@@ -369,18 +422,100 @@ async function captureConsoleLogs(action: () => Promise<void>): Promise<string> 
   return lines.join("\n");
 }
 
-test("project inspection distinguishes bun-http and next-app-router", async () => {
+test("project inspection detects Bun, npm, and pnpm project matrices", async () => {
   const bunRoot = await createTempProject();
-  const nextRoot = await createTempProject({ next: true });
+  const bunNextRoot = await createTempProject({ next: true });
+  const npmRoot = await createTempProject({ manager: "npm" });
+  const npmNextRoot = await createTempProject({
+    next: true,
+    manager: "npm",
+  });
+  const pnpmRoot = await createTempProject({ manager: "pnpm" });
+  const pnpmNextRoot = await createTempProject({
+    next: true,
+    manager: "pnpm",
+  });
 
   await expect(inspectProjectProfile(bunRoot)).resolves.toMatchObject({
     adapterId: "bun-http",
     packageManager: "bun",
     testRunner: "bun",
   });
-  await expect(inspectProjectProfile(nextRoot)).resolves.toMatchObject({
+  await expect(inspectProjectProfile(bunNextRoot)).resolves.toMatchObject({
     adapterId: "next-app-router",
+    packageManager: "bun",
+    testRunner: "bun",
     appRoot: "src/app",
+  });
+  await expect(inspectProjectProfile(npmRoot)).resolves.toMatchObject({
+    adapterId: "node-http",
+    packageManager: "npm",
+    testRunner: "unknown",
+  });
+  await expect(inspectProjectProfile(npmNextRoot)).resolves.toMatchObject({
+    adapterId: "next-app-router",
+    packageManager: "npm",
+    testRunner: "unknown",
+    appRoot: "src/app",
+  });
+  await expect(inspectProjectProfile(pnpmRoot)).resolves.toMatchObject({
+    adapterId: "node-http",
+    packageManager: "pnpm",
+    testRunner: "unknown",
+  });
+  await expect(inspectProjectProfile(pnpmNextRoot)).resolves.toMatchObject({
+    adapterId: "next-app-router",
+    packageManager: "pnpm",
+    testRunner: "unknown",
+    appRoot: "src/app",
+  });
+});
+
+test("adapter overrides reject incompatible runtime and framework combinations", async () => {
+  const npmRoot = await createTempProject({ manager: "npm" });
+  const bunNextRoot = await createTempProject({ next: true });
+
+  await expect(inspectProjectProfile(npmRoot, "bun-http")).rejects.toThrow(
+    'Adapter "bun-http" requires a Bun-managed non-Next project.',
+  );
+  await expect(inspectProjectProfile(bunNextRoot, "node-http")).rejects.toThrow(
+    'Adapter "node-http" is not available for Next.js projects.',
+  );
+});
+
+test("project config reads v4 and normalizes to v5", async () => {
+  const projectRoot = await createTempProject();
+  const configDir = path.join(projectRoot, ".ucr");
+  const configFile = path.join(configDir, "config.json");
+
+  await fs.mkdir(configDir, { recursive: true });
+  await fs.writeFile(
+    configFile,
+    `${JSON.stringify(
+      {
+        version: 4,
+        registry: registryPath,
+        adapter: "bun-http",
+        packageManager: "bun",
+        testRunner: "bun",
+        sourceRoot: ".",
+        appRoot: null,
+        runtimeRoot: "ucr/runtime",
+        utilityRoot: "ucr/utilities",
+        presetRoot: "ucr/presets",
+        capabilities: ["adapter:bun-http", "bun", "bun:test"],
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+
+  await expect(readProjectConfig(projectRoot)).resolves.toMatchObject({
+    version: 5,
+    adapter: "bun-http",
+    packageManager: "bun",
+    testRunner: "bun",
   });
 });
 
@@ -500,7 +635,7 @@ test("list groups the official catalog by workflow and keeps incompatible items 
   expect(output).toContain("Admin UI");
   expect(output).toContain("Building Blocks");
   expect(output).toContain("Incompatible");
-  expect(output).toContain("Typed environment helpers for Bun-managed projects.");
+  expect(output).toContain("Typed environment helpers for managed projects.");
   expect(output).toContain("tags=foundation, starter, shared");
   expect(output.indexOf("Project Foundations")).toBeLessThan(
     output.indexOf("Entity/API Flows"),
@@ -535,7 +670,7 @@ test("list falls back to flat ordering for registries without catalog metadata",
   expect(output.indexOf("utility-b")).toBeLessThan(output.indexOf("broken-preset"));
 });
 
-test("starter CRUD blocks render the full Bun and Next resource chains", async () => {
+test("starter CRUD blocks render the full Bun, Node, and Next resource chains", async () => {
   const registry = await loadRegistryDocument(registryPath);
   const fields = await fs.readFile(fieldsPath, "utf8");
 
@@ -560,6 +695,39 @@ test("starter CRUD blocks render the full Bun and Next resource chains", async (
   expect(bunLock?.installs["bun-crud-resource:posts"]?.files).toContain(
     "ucr/posts/domain/service.ts",
   );
+
+  const nodeRoot = await createTempProject({ manager: "npm" });
+  await installSharedTypeScriptBase(registry, nodeRoot);
+  await installItem(registry, nodeRoot, "node-crud-resource", {
+    instanceId: "posts",
+    rawInputs: {
+      entity: "Post",
+      plural: "posts",
+      fields,
+    },
+  });
+
+  const nodeLock = await readRegistryLock(nodeRoot);
+  expect(nodeLock?.installs["node-crud-resource:posts"]?.provides).toContain(
+    "node-item-route:posts",
+  );
+  expect(nodeLock?.installs["node-crud-resource:posts"]?.files).toContain(
+    "server/routes/posts/index.ts",
+  );
+  expect(nodeLock?.installs["node-crud-resource:posts"]?.files).toContain(
+    "server/index.ts",
+  );
+  expect(nodeLock?.installs["node-crud-resource:posts"]?.files).toContain(
+    "ucr/posts/domain/service.ts",
+  );
+
+  const nodeEntrypoint = await fs.readFile(
+    path.join(nodeRoot, "server", "index.ts"),
+    "utf8",
+  );
+  expect(nodeEntrypoint).toContain('from "node:http"');
+  expect(nodeEntrypoint).toContain("createServer");
+  expect(nodeEntrypoint).toContain('import { postCollectionRoute }');
 
   const nextRoot = await createTempProject({ next: true });
   await installSharedTypeScriptBase(registry, nextRoot);

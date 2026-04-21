@@ -135,7 +135,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "enum": ["shared", "next-app-router", "bun-http"]
+            "enum": ["shared", "next-app-router", "bun-http", "node-http"]
           },
           "uniqueItems": true
         },

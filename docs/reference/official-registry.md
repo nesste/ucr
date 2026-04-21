@@ -4,7 +4,7 @@
 
 This page documents the shipped `ucr-official` catalog from `fixtures/registries/ucr-official/registry.json`. It complements `ucr list` and `ucr show` with concrete guidance on what each utility, preset, and block is for.
 
-Use `<ucr-root>` below as shorthand for the adapter-managed shared UCR root. In the checked-in examples that is `ucr` for Bun HTTP and `src/ucr` for the Next app.
+Use `<ucr-root>` below as shorthand for the adapter-managed shared UCR root. In the checked-in examples that is `ucr` for Bun HTTP and Node HTTP, and `src/ucr` for the Next app.
 
 Blocks always require an explicit `--instance`, even when their generated files land at fixed logical paths.
 
@@ -14,10 +14,12 @@ Use this section as the default browsing path in `ucr list`: foundations first, 
 
 ### Project Foundations
 
-- `env-config`: Start here for project foundations when Bun-managed shared code should read environment variables through a typed local wrapper.
+- `env-config`: Start here for project foundations when shared code should read environment variables through a typed local wrapper.
 - `logger`: Start here for project foundations when app-local code needs a tiny structured logger wrapper without pulling in a framework-specific logging layer.
 - `health-route`: Start here for Bun project foundations when you want a lightweight health endpoint without any entity-specific inputs.
+- `node-health-route`: Start here for Node project foundations when you want a lightweight health endpoint without any entity-specific inputs.
 - `bun-server`: Start here for Bun project foundations when you want to stitch route modules into a Bun.serve entrypoint.
+- `node-server`: Start here for Node project foundations when you want to stitch route modules into a built-in node:http entrypoint.
 - `request-context`: Use this more advanced Bun foundation when handlers should share request-scoped metadata or helper accessors.
 
 ### Entity/API Flows
@@ -30,8 +32,11 @@ Use this section as the default browsing path in `ucr list`: foundations first, 
 - `json-collection-route`: Use it in the granular Bun entity/API flow to expose collection handlers for one resource.
 - `json-item-route`: Use it in the granular Bun entity/API flow to expose item-by-id handlers for one resource.
 - `next-collection-route`: Use it in the granular Next entity/API flow when you want the collection API route for one resource.
+- `node-collection-route`: Use it in the granular Node entity/API flow to expose collection handlers for one resource.
 - `next-item-route`: Use it in the granular Next entity/API flow when you want the item-by-id API route for one resource.
+- `node-item-route`: Use it in the granular Node entity/API flow to expose item-by-id handlers for one resource.
 - `bun-crud-resource`: Use it as the fastest Bun HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.
+- `node-crud-resource`: Use it as the fastest Node HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.
 - `next-crud-resource`: Use it as the fastest Next App Router starter for one CRUD resource after the shared and UI building blocks are already installed.
 
 ### Admin UI
@@ -60,7 +65,7 @@ Use this section as the default browsing path in `ucr list`: foundations first, 
 
 ## Summary
 
-The published `ucr-official` manifest currently contains **34** installable items.
+The published `ucr-official` manifest currently contains **39** installable items.
 
 **By kind**
 
@@ -68,7 +73,7 @@ The published `ucr-official` manifest currently contains **34** installable item
 | --- | --- |
 | `utility` | 9 |
 | `preset` | 4 |
-| `block` | 21 |
+| `block` | 26 |
 
 **By category**
 
@@ -82,6 +87,7 @@ The published `ucr-official` manifest currently contains **34** installable item
 | `block` | `entity` | 5 |
 | `block` | `foundation` | 3 |
 | `block` | `next` | 7 |
+| `block` | `node-http` | 5 |
 
 **By target**
 
@@ -90,6 +96,7 @@ The published `ucr-official` manifest currently contains **34** installable item
 | `shared` | 16 |
 | `next-app-router` | 12 |
 | `bun-http` | 6 |
+| `node-http` | 5 |
 
 ## Utilities
 
@@ -128,6 +135,7 @@ ucr add async-utility --target .
 
 - `bun-service` (bun-http, instance `async-utility`): `ucr/utilities/async-utility.ts`
 - `next-app` (next-app-router, instance `async-utility`): `src/ucr/utilities/async-utility.ts`
+- `node-service` (node-http, instance `async-utility`): `ucr/utilities/async-utility.ts`
 
 ### `collection-utility`
 
@@ -164,6 +172,7 @@ ucr add collection-utility --target .
 
 - `bun-service` (bun-http, instance `collection-utility`): `ucr/utilities/collection-utility.ts`
 - `next-app` (next-app-router, instance `collection-utility`): `src/ucr/utilities/collection-utility.ts`
+- `node-service` (node-http, instance `collection-utility`): `ucr/utilities/collection-utility.ts`
 
 ### `object-utility`
 
@@ -200,6 +209,7 @@ ucr add object-utility --target .
 
 - `bun-service` (bun-http, instance `object-utility`): `ucr/utilities/object-utility.ts`
 - `next-app` (next-app-router, instance `object-utility`): `src/ucr/utilities/object-utility.ts`
+- `node-service` (node-http, instance `object-utility`): `ucr/utilities/object-utility.ts`
 
 ### `result-utility`
 
@@ -236,6 +246,7 @@ ucr add result-utility --target .
 
 - `bun-service` (bun-http, instance `result-utility`): `ucr/utilities/result-utility.ts`
 - `next-app` (next-app-router, instance `result-utility`): `src/ucr/utilities/result-utility.ts`
+- `node-service` (node-http, instance `result-utility`): `ucr/utilities/result-utility.ts`
 
 ### `ts-runtime`
 
@@ -272,6 +283,7 @@ ucr add ts-runtime --target .
 
 - `bun-service` (bun-http, instance `ts-runtime`): `ucr/runtime/index.ts`
 - `next-app` (next-app-router, instance `ts-runtime`): `src/ucr/runtime/index.ts`
+- `node-service` (node-http, instance `ts-runtime`): `ucr/runtime/index.ts`
 
 ### `validation-utility`
 
@@ -308,6 +320,7 @@ ucr add validation-utility --target .
 
 - `bun-service` (bun-http, instance `validation-utility`): `ucr/utilities/validation-utility.ts`
 - `next-app` (next-app-router, instance `validation-utility`): `src/ucr/utilities/validation-utility.ts`
+- `node-service` (node-http, instance `validation-utility`): `ucr/utilities/validation-utility.ts`
 
 ### `slot-utility`
 
@@ -451,6 +464,7 @@ ucr add endpoint-preset --target .
 
 - `bun-service` (bun-http, instance `endpoint-preset`): `ucr/presets/endpoint-preset.ts`
 - `next-app` (next-app-router, instance `endpoint-preset`): `src/ucr/presets/endpoint-preset.ts`
+- `node-service` (node-http, instance `endpoint-preset`): `ucr/presets/endpoint-preset.ts`
 
 ### `service-preset`
 
@@ -487,6 +501,7 @@ ucr add service-preset --target .
 
 - `bun-service` (bun-http, instance `service-preset`): `ucr/presets/service-preset.ts`
 - `next-app` (next-app-router, instance `service-preset`): `src/ucr/presets/service-preset.ts`
+- `node-service` (node-http, instance `service-preset`): `ucr/presets/service-preset.ts`
 
 ### `admin-page-preset`
 
@@ -859,6 +874,7 @@ Supply the same entity naming values across the related entity blocks so the gen
 
 - `bun-service` (bun-http, instance `posts`): `ucr/posts/contract/model.ts`
 - `next-app` (next-app-router, instance `posts`): `src/ucr/posts/contract/model.ts`
+- `node-service` (node-http, instance `posts`): `ucr/posts/contract/model.ts`
 
 ### `input-validation`
 
@@ -898,6 +914,7 @@ Point `fields` at the same JSON file you used for `entity-contract` so the gener
 
 - `bun-service` (bun-http, instance `posts`): `ucr/posts/contract/validation.ts`
 - `next-app` (next-app-router, instance `posts`): `src/ucr/posts/contract/validation.ts`
+- `node-service` (node-http, instance `posts`): `ucr/posts/contract/validation.ts`
 
 ### `memory-repository`
 
@@ -936,6 +953,7 @@ ucr add memory-repository --target . --instance posts --input entity=Post --inpu
 
 - `bun-service` (bun-http, instance `posts`): `ucr/posts/domain/memory-repository.ts`, `ucr/posts/domain/runtime.ts`
 - `next-app` (next-app-router, instance `posts`): `src/ucr/posts/domain/memory-repository.ts`, `src/ucr/posts/domain/runtime.ts`
+- `node-service` (node-http, instance `posts`): `ucr/posts/domain/memory-repository.ts`, `ucr/posts/domain/runtime.ts`
 
 ### `service-layer`
 
@@ -974,12 +992,13 @@ ucr add service-layer --target . --instance posts --input entity=Post --input pl
 
 - `bun-service` (bun-http, instance `posts`): `ucr/posts/domain/repository.ts`, `ucr/posts/domain/service.ts`
 - `next-app` (next-app-router, instance `posts`): `src/ucr/posts/domain/repository.ts`, `src/ucr/posts/domain/service.ts`
+- `node-service` (node-http, instance `posts`): `ucr/posts/domain/repository.ts`, `ucr/posts/domain/service.ts`
 
 ### `env-config`
 
-Typed environment helpers for Bun-managed projects.
+Typed environment helpers for managed projects.
 
-**When to use it:** Start here for project foundations when Bun-managed shared code should read environment variables through a typed local wrapper.
+**When to use it:** Start here for project foundations when shared code should read environment variables through a typed local wrapper.
 
 - Kind: `block`
 - Category: `foundation`
@@ -1345,3 +1364,195 @@ ucr add next-item-route --target . --instance posts --input entity=Post --input 
 **Checked-in examples**
 
 - `next-app` (next-app-router, instance `posts`): `src/app/api/posts/[id]/route.ts`
+
+### `node-collection-route`
+
+Node HTTP collection route for one entity.
+
+**When to use it:** Use it in the granular Node entity/API flow to expose collection handlers for one resource.
+
+- Kind: `block`
+- Category: `node-http`
+- Targets: `node-http`
+- Tags: `crud`, `api`, `node`
+- Requires: `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`
+- Provides: `node-collection-route:{{instanceId}}`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `entity` | `string` | yes | Entity name, for example Post. |
+| `plural` | `string` | yes | Plural route segment, for example posts. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `transport` | `{{pluralKebab}}/index.ts` | `templates/node-collection-route/transport/index.ts.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add node-collection-route --target . --instance posts --input entity=Post --input plural=posts
+```
+
+**Checked-in examples**
+
+- `node-service` (node-http, instance `posts`): `server/routes/posts/index.ts`
+
+### `node-crud-resource`
+
+Starter CRUD resource for Node HTTP services.
+
+**When to use it:** Use it as the fastest Node HTTP starter for one CRUD resource after the shared TypeScript building blocks are already installed.
+
+- Kind: `block`
+- Category: `node-http`
+- Targets: `node-http`
+- Tags: `starter`, `crud`, `api`, `node`
+- Requires: `preset:service-preset`, `preset:endpoint-preset`, `utility:validation-utility`
+- Provides: `entity-contract:{{instanceId}}`, `repository-contract:{{instanceId}}`, `service-layer:{{instanceId}}`, `memory-repository:{{instanceId}}`, `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`, `node-collection-route:{{instanceId}}`, `node-item-route:{{instanceId}}`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `entity` | `string` | yes | Entity name, for example Post. |
+| `plural` | `string` | yes | Plural route segment, for example posts. |
+| `fields` | `json` | yes | Field metadata used to render entity code. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `contract` | `model.ts` | `templates/entity-contract/contract/model.ts.tpl` |
+| `domain` | `repository.ts` | `templates/service-layer/domain/repository.ts.tpl` |
+| `domain` | `service.ts` | `templates/service-layer/domain/service.ts.tpl` |
+| `domain` | `memory-repository.ts` | `templates/memory-repository/domain/memory-repository.ts.tpl` |
+| `domain` | `runtime.ts` | `templates/memory-repository/domain/runtime.ts.tpl` |
+| `contract` | `validation.ts` | `templates/input-validation/contract/validation.ts.tpl` |
+| `transport` | `{{pluralKebab}}/index.ts` | `templates/node-collection-route/transport/index.ts.tpl` |
+| `transport` | `{{pluralKebab}}/[id].ts` | `templates/node-item-route/transport/item.ts.tpl` |
+| `entrypoint` | `index.ts` | `templates/node-crud-resource/entrypoint/index.ts.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add node-crud-resource --target . --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+```
+
+Supply the same entity naming values across the related resource code so the generated contract, service, validation, Node routes, and node:http entrypoint stay aligned.
+
+This starter block is an alternative entry point. Do not mix it with the equivalent granular installs for the same `--instance`.
+
+**Checked-in examples**
+
+No checked-in example install yet. The checked-in apps stay focused on the granular composition chain, but this starter block is still part of the published official registry.
+
+### `node-health-route`
+
+Static health route for Node HTTP services.
+
+**When to use it:** Start here for Node project foundations when you want a lightweight health endpoint without any entity-specific inputs.
+
+- Kind: `block`
+- Category: `node-http`
+- Targets: `node-http`
+- Tags: `foundation`, `starter`, `node`
+- Requires: -
+- Provides: `node-health-route`
+
+**Inputs**
+
+This item does not declare typed inputs.
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `transport` | `health.ts` | `templates/node-health-route/transport/health.ts.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add node-health-route --target . --instance health
+```
+
+**Checked-in examples**
+
+- `node-service` (node-http, instance `health`): `server/routes/health.ts`
+
+### `node-item-route`
+
+Node HTTP item route for one entity.
+
+**When to use it:** Use it in the granular Node entity/API flow to expose item-by-id handlers for one resource.
+
+- Kind: `block`
+- Category: `node-http`
+- Targets: `node-http`
+- Tags: `crud`, `api`, `node`
+- Requires: `service-runtime:{{instanceId}}`, `validation:{{instanceId}}`
+- Provides: `node-item-route:{{instanceId}}`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `entity` | `string` | yes | Entity name, for example Post. |
+| `plural` | `string` | yes | Plural route segment, for example posts. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `transport` | `{{pluralKebab}}/[id].ts` | `templates/node-item-route/transport/item.ts.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add node-item-route --target . --instance posts --input entity=Post --input plural=posts
+```
+
+**Checked-in examples**
+
+- `node-service` (node-http, instance `posts`): `server/routes/posts/[id].ts`
+
+### `node-server`
+
+Static route registry plus node:http bootstrap.
+
+**When to use it:** Start here for Node project foundations when you want to stitch route modules into a built-in node:http entrypoint.
+
+- Kind: `block`
+- Category: `node-http`
+- Targets: `node-http`
+- Tags: `foundation`, `starter`, `node`
+- Requires: -
+- Provides: `node-server`
+- Entrypoints: `index.ts`
+
+**Inputs**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `routeModules` | `json` | yes | Route import metadata for the server entrypoint. |
+
+**Outputs**
+
+| Surface | Logical target | Template |
+| --- | --- | --- |
+| `entrypoint` | `index.ts` | `templates/node-server/entrypoint/index.ts.tpl` |
+
+**Usage recipe**
+
+```bash
+ucr add node-server --target . --instance server --input-file routeModules=./route-modules.json
+```
+
+Provide `routeModules` as a JSON array of `{ importName, importPath }` entries that match the route files you want the entrypoint to register.
+
+**Checked-in examples**
+
+- `node-service` (node-http, instance `server`): `server/index.ts`

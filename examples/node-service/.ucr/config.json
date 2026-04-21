@@ -1,0 +1,22 @@
+{
+  "version": 5,
+  "registry": "../../fixtures/registries/ucr-official/registry.json",
+  "adapter": "node-http",
+  "packageManager": "npm",
+  "testRunner": "unknown",
+  "sourceRoot": ".",
+  "appRoot": null,
+  "runtimeRoot": "ucr/runtime",
+  "utilityRoot": "ucr/utilities",
+  "presetRoot": "ucr/presets",
+  "capabilities": [
+    "adapter:node-http",
+    "node",
+    "node-http",
+    "package-manager:npm",
+    "server",
+    "source-root:.",
+    "test-runner:unknown",
+    "transport"
+  ]
+}

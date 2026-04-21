@@ -12,7 +12,7 @@ import {
 interface ExampleLockInstallRecord {
   itemName: string;
   instanceId: string;
-  adapter: "shared" | "next-app-router" | "bun-http";
+  adapter: "shared" | "next-app-router" | "bun-http" | "node-http";
   files: string[];
 }
 
@@ -59,7 +59,8 @@ function parseExampleLock(raw: unknown, exampleId: string): ExampleLockFile {
       typeof instanceId !== "string" ||
       (adapter !== "shared" &&
         adapter !== "next-app-router" &&
-        adapter !== "bun-http") ||
+        adapter !== "bun-http" &&
+        adapter !== "node-http") ||
       !Array.isArray(files) ||
       files.some((file) => typeof file !== "string")
     ) {

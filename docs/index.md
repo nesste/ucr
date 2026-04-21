@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "UCR"
   text: "Install like a package. Keep the source."
-  tagline: "UCR pulls audited source templates into Bun and Next projects, keeps them in your repo, and makes upgrades diffable."
+  tagline: "UCR pulls audited source templates into Bun, Node, and Next projects, keeps them in your repo, and makes upgrades diffable."
   actions:
     - theme: brand
       text: Run the 2-minute quickstart
@@ -27,7 +27,7 @@ features:
 
 ## A More Honest Install Model
 
-Today, UCR supports Bun-managed projects for `bun-http` and `next-app-router`.
+Today, UCR supports Bun-managed projects for `bun-http`, npm- and pnpm-managed projects for `node-http`, and Bun-, npm-, and pnpm-managed Next projects for `next-app-router`.
 
 You usually have to choose between:
 
@@ -101,6 +101,7 @@ ucr upgrade entity-contract --instance posts
 
 - [`examples/next-app`](/guide/examples) shows source installs under `src/ucr/...`, API routes under `src/app/api/...`, UI outputs under `src/app/...`, and real `.ucr` tracking files.
 - [`examples/bun-service`](/guide/examples) shows the same model for `bun-http`, with source under `ucr/...` and routes under `server/routes/...`.
+- [`examples/node-service`](/guide/examples) shows the Node HTTP flow with source under `ucr/...`, routes under `server/routes/...`, a checked `server/index.ts` entrypoint, and npm-managed `.ucr` state.
 - The official registry and the checked examples describe the same install paths, so the flow is public and inspectable instead of implied.
 
 ## Who This Is For
@@ -110,7 +111,7 @@ UCR is for you if:
 - you want source ownership after install
 - you build reusable app blocks, routes, or UI slices
 - you want safer upgrades for installed code
-- you use Bun with `bun-http` or `next-app-router`
+- you use Bun, npm, or pnpm with `bun-http`, `node-http`, or `next-app-router`
 
 UCR is not for you if:
 
@@ -120,10 +121,11 @@ UCR is not for you if:
 
 ## How It Works
 
-1. Install the standalone CLI and run `ucr init` in a Bun-managed project.
-2. Browse the registry, pick a block, and install it into the adapter-specific app paths UCR detects.
-3. Commit the resulting source like any other application code.
-4. Run `diff` or `upgrade` later when the upstream template changes.
+1. Install the standalone CLI and run `ucr init` in a managed Bun, npm, or pnpm project.
+2. Let UCR detect `bun-http`, `node-http`, or `next-app-router` from the target project shape.
+3. Browse the registry, pick a block, and install it into the adapter-specific app paths UCR detects.
+4. Commit the resulting source like any other application code.
+5. Run `diff` or `upgrade` later when the upstream template changes.
 
 The system details still matter, but they are lower on the stack:
 
@@ -136,6 +138,6 @@ The system details still matter, but they are lower on the stack:
 
 - [Quickstart](/guide/quickstart) to install the CLI and run the first flow
 - [Official Registry](/reference/official-registry) to browse the shipped blocks, presets, and utilities
-- [Examples](/guide/examples) to inspect the checked-in Bun and Next targets
+- [Examples](/guide/examples) to inspect the checked-in Bun, Node, and Next targets
 - [Upgrades](/guide/upgrades) to see how `diff` and `upgrade` work after local edits
 - [Trust And Scope](/reference/trust) for license, telemetry, pricing, and compatibility statements

@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "UCR",
   description:
-    "Installable source for Bun-managed Bun HTTP and Next App Router projects, with tracked diffs and upgrades.",
+    "Installable source for Bun, Node, and Next projects, with tracked diffs and upgrades.",
   cleanUrls: true,
   lastUpdated: true,
   themeConfig: {
@@ -113,7 +113,7 @@ export default defineConfig({
       level: [2, 3],
     },
     footer: {
-      message: "Apache-2.0 source registry documentation for Bun-managed projects.",
+      message: "Apache-2.0 source registry documentation for Bun-, npm-, and pnpm-managed projects.",
     },
   },
 });

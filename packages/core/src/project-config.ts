@@ -6,7 +6,7 @@ import type { ProjectAdapterId, ProjectProfile } from "./adapters";
 export const PROJECT_CONFIG_PATH = path.join(".ucr", "config.json");
 
 export interface ProjectConfig {
-  version: 4;
+  version: 5;
   registry?: string;
   adapter: ProjectAdapterId;
   packageManager: ProjectProfile["packageManager"];
@@ -48,7 +48,7 @@ export async function readProjectConfig(
       throw new Error("Project config must be a JSON object.");
     }
 
-    if (parsed.version !== 3 && parsed.version !== 4) {
+    if (parsed.version !== 3 && parsed.version !== 4 && parsed.version !== 5) {
       throw new Error(
         "Unsupported .ucr/config.json version. Delete it and run `ucr init` again.",
       );
@@ -63,18 +63,30 @@ export async function readProjectConfig(
       throw new Error('Project config "registry" must be a non-empty string when set.');
     }
 
-    if (parsed.adapter !== "next-app-router" && parsed.adapter !== "bun-http") {
+    if (
+      parsed.adapter !== "next-app-router" &&
+      parsed.adapter !== "bun-http" &&
+      parsed.adapter !== "node-http"
+    ) {
       throw new Error(
         'Project config must include a supported "adapter" value.',
       );
     }
 
-    if (parsed.packageManager !== "bun") {
-      throw new Error('Project config must include "packageManager": "bun".');
+    if (
+      parsed.packageManager !== "bun" &&
+      parsed.packageManager !== "npm" &&
+      parsed.packageManager !== "pnpm"
+    ) {
+      throw new Error(
+        'Project config must include "packageManager": "bun", "npm", or "pnpm".',
+      );
     }
 
-    if (parsed.testRunner !== "bun") {
-      throw new Error('Project config must include "testRunner": "bun".');
+    if (parsed.testRunner !== "bun" && parsed.testRunner !== "unknown") {
+      throw new Error(
+        'Project config must include "testRunner": "bun" or "unknown".',
+      );
     }
 
     if (!isNonEmptyString(parsed.sourceRoot)) {
@@ -109,7 +121,7 @@ export async function readProjectConfig(
 
     return {
       ...(parsed as unknown as Omit<ProjectConfig, "version" | "runtimeRoot" | "utilityRoot" | "presetRoot">),
-      version: 4,
+      version: 5,
       runtimeRoot,
       utilityRoot,
       presetRoot,

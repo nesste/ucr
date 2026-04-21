@@ -5,7 +5,9 @@ import type { RegistryItem, RegistryOutput, RegistrySurface, RegistryTarget } fr
 
 import { normalizeStatePath } from "./file-system";
 
-export type ProjectAdapterId = "next-app-router" | "bun-http";
+export type ProjectAdapterId = "next-app-router" | "bun-http" | "node-http";
+export type ProjectPackageManager = "bun" | "npm" | "pnpm";
+export type ProjectTestRunner = "bun" | "unknown";
 
 export interface ProjectProfile {
   adapterId: ProjectAdapterId;
@@ -16,8 +18,8 @@ export interface ProjectProfile {
   runtimeRoot: string;
   utilityRoot: string;
   presetRoot: string;
-  packageManager: "bun";
-  testRunner: "bun";
+  packageManager: ProjectPackageManager;
+  testRunner: ProjectTestRunner;
   capabilities: string[];
 }
 
@@ -97,18 +99,52 @@ async function resolveNextAppRoot(targetRoot: string, sourceRoot: string): Promi
     : normalizeStatePath(path.join(sourceRoot, "app"));
 }
 
-async function isBunManagedProject(
+async function detectProjectPackageManager(
   targetRoot: string,
   manifest: PackageManifest | null,
-): Promise<boolean> {
+) : Promise<ProjectPackageManager> {
   const packageManager = manifest?.packageManager?.trim().toLowerCase() ?? "";
   if (packageManager.startsWith("bun@")) {
-    return true;
+    return "bun";
   }
 
-  return (
+  if (packageManager.startsWith("npm@")) {
+    return "npm";
+  }
+
+  if (packageManager.startsWith("pnpm@")) {
+    return "pnpm";
+  }
+
+  const detectedManagers: ProjectPackageManager[] = [];
+
+  if (
     (await pathExists(path.resolve(targetRoot, "bun.lock"))) ||
     (await pathExists(path.resolve(targetRoot, "bun.lockb")))
+  ) {
+    detectedManagers.push("bun");
+  }
+
+  if (await pathExists(path.resolve(targetRoot, "package-lock.json"))) {
+    detectedManagers.push("npm");
+  }
+
+  if (await pathExists(path.resolve(targetRoot, "pnpm-lock.yaml"))) {
+    detectedManagers.push("pnpm");
+  }
+
+  if (detectedManagers.length === 1) {
+    return detectedManagers[0]!;
+  }
+
+  if (detectedManagers.length > 1) {
+    throw new Error(
+      "UCR could not determine the project package manager because multiple lockfiles are present. Set packageManager in package.json or keep only one supported lockfile.",
+    );
+  }
+
+  throw new Error(
+    "UCR requires a managed project. Set packageManager to bun, npm, or pnpm, or add a supported lockfile before running `ucr init`.",
   );
 }
 
@@ -116,13 +152,26 @@ function createCapabilities(
   adapterId: ProjectAdapterId,
   manifest: PackageManifest | null,
   sourceRoot: string,
+  packageManager: ProjectPackageManager,
+  testRunner: ProjectTestRunner,
 ): string[] {
   const capabilities = new Set<string>([
-    "bun",
-    "bun:test",
     `adapter:${adapterId}`,
+    `package-manager:${packageManager}`,
     `source-root:${sourceRoot}`,
   ]);
+
+  if (packageManager === "bun") {
+    capabilities.add("bun");
+  } else {
+    capabilities.add("node");
+  }
+
+  if (testRunner === "bun") {
+    capabilities.add("bun:test");
+  } else {
+    capabilities.add("test-runner:unknown");
+  }
 
   const allDependencies = {
     ...(manifest?.dependencies ?? {}),
@@ -143,6 +192,12 @@ function createCapabilities(
 
   if (adapterId === "bun-http") {
     capabilities.add("bun-http");
+    capabilities.add("transport");
+    capabilities.add("server");
+  }
+
+  if (adapterId === "node-http") {
+    capabilities.add("node-http");
     capabilities.add("transport");
     capabilities.add("server");
   }
@@ -256,9 +311,59 @@ const bunHttpAdapter: ProjectAdapter = {
   },
 };
 
+const nodeHttpAdapter: ProjectAdapter = {
+  id: "node-http",
+  label: "node-http",
+  supportsSurface(surface): boolean {
+    return surface !== "ui";
+  },
+  async buildContext(input): Promise<BuiltAdapterContext> {
+    const featureRoot =
+      input.profile.sourceRoot === "."
+        ? normalizeStatePath(path.join("ucr", input.instanceId))
+        : normalizeStatePath(
+            path.join(input.profile.sourceRoot, "ucr", input.instanceId),
+          );
+
+    return {
+      ...input.profile,
+      id: "node-http",
+      label: "node-http",
+      featureRoot,
+      apiBasePath: `/${input.resourceSegment}`,
+    };
+  },
+  mapTargetPath(item, output, logicalTarget, context): string {
+    if (output.surface === "transport") {
+      return normalizeStatePath(path.join(context.routeRoot, logicalTarget));
+    }
+
+    if (output.surface === "entrypoint") {
+      return normalizeStatePath(
+        path.join(context.entrypointRoot, logicalTarget),
+      );
+    }
+
+    if (output.surface === "utility") {
+      const targetRoot =
+        item.name === "ts-runtime" ? context.runtimeRoot : context.utilityRoot;
+      return normalizeStatePath(path.join(targetRoot, logicalTarget));
+    }
+
+    if (output.surface === "preset") {
+      return normalizeStatePath(path.join(context.presetRoot, logicalTarget));
+    }
+
+    return normalizeStatePath(
+      path.join(context.featureRoot, output.surface, logicalTarget),
+    );
+  },
+};
+
 const ADAPTERS: Record<ProjectAdapterId, ProjectAdapter> = {
   "next-app-router": nextAppRouterAdapter,
   "bun-http": bunHttpAdapter,
+  "node-http": nodeHttpAdapter,
 };
 
 export function getProjectAdapter(adapterId: ProjectAdapterId): ProjectAdapter {
@@ -277,12 +382,9 @@ export async function inspectProjectProfile(
   preferredAdapterId?: ProjectAdapterId,
 ): Promise<ProjectProfile> {
   const manifest = await readPackageManifest(targetRoot);
-
-  if (!(await isBunManagedProject(targetRoot, manifest))) {
-    throw new Error(
-      "UCR v1 requires a Bun-managed project. Add bun.lock or set packageManager to bun before running `ucr init`.",
-    );
-  }
+  const packageManager = await detectProjectPackageManager(targetRoot, manifest);
+  const testRunner: ProjectTestRunner =
+    packageManager === "bun" ? "bun" : "unknown";
 
   const sourceRoot = await resolveSourceRoot(targetRoot);
   const dependencyMap = {
@@ -293,11 +395,41 @@ export async function inspectProjectProfile(
 
   if (preferredAdapterId === "next-app-router" && !isNextProject) {
     throw new Error(
-      'Adapter "next-app-router" requires a Bun-managed Next.js project.',
+      'Adapter "next-app-router" requires a Next.js project.',
     );
   }
 
-  const adapterId = preferredAdapterId ?? (isNextProject ? "next-app-router" : "bun-http");
+  if (preferredAdapterId === "bun-http" && packageManager !== "bun") {
+    throw new Error(
+      'Adapter "bun-http" requires a Bun-managed non-Next project.',
+    );
+  }
+
+  if (preferredAdapterId === "bun-http" && isNextProject) {
+    throw new Error(
+      'Adapter "bun-http" is not available for Next.js projects.',
+    );
+  }
+
+  if (preferredAdapterId === "node-http" && isNextProject) {
+    throw new Error(
+      'Adapter "node-http" is not available for Next.js projects.',
+    );
+  }
+
+  if (preferredAdapterId === "node-http" && packageManager === "bun") {
+    throw new Error(
+      'Adapter "node-http" requires an npm- or pnpm-managed non-Next project.',
+    );
+  }
+
+  const adapterId =
+    preferredAdapterId ??
+    (isNextProject
+      ? "next-app-router"
+      : packageManager === "bun"
+        ? "bun-http"
+        : "node-http");
   const appRoot =
     adapterId === "next-app-router"
       ? await resolveNextAppRoot(targetRoot, sourceRoot)
@@ -331,9 +463,15 @@ export async function inspectProjectProfile(
     runtimeRoot,
     utilityRoot,
     presetRoot,
-    packageManager: "bun",
-    testRunner: "bun",
-    capabilities: createCapabilities(adapterId, manifest, sourceRoot),
+    packageManager,
+    testRunner,
+    capabilities: createCapabilities(
+      adapterId,
+      manifest,
+      sourceRoot,
+      packageManager,
+      testRunner,
+    ),
   };
 }
 

@@ -17,17 +17,17 @@ Current shape in this repo:
 
 | Field | Meaning |
 | --- | --- |
-| `version` | Config format version, currently `4`. |
+| `version` | Config format version, currently `5`. |
 | `registry` | Registry manifest URL or local registry path, stored relative to the target root when possible. |
-| `adapter` | `bun-http` or `next-app-router`. |
-| `packageManager` | Always `bun` in v1. |
-| `testRunner` | Always `bun` in v1. |
+| `adapter` | `bun-http`, `node-http`, or `next-app-router`. |
+| `packageManager` | `bun`, `npm`, or `pnpm`. |
+| `testRunner` | `bun` or `unknown`. |
 | `sourceRoot` | `.` or `src` depending on project layout. |
 | `appRoot` | App directory for Next targets, otherwise `null`. |
 | `runtimeRoot` | Deterministic runtime install root. |
 | `utilityRoot` | Deterministic utility install root. |
 | `presetRoot` | Deterministic preset install root. |
-| `capabilities` | Detected project capabilities such as `bun`, `transport`, `ui`, or `next-app-router`. |
+| `capabilities` | Detected project capabilities such as `bun`, `node`, `transport`, `ui`, or `next-app-router`. |
 
 ## `.ucr/lock.json`
 
@@ -61,6 +61,8 @@ Each install record stores:
 - `provides`
 - `files`
 - `updatedAt`
+
+The lock format stays at version `3`; the widened adapter support only changes the allowed `adapter` values inside install records.
 
 ## `.ucr/state.json`
 
@@ -111,5 +113,5 @@ When `diff` runs, it compares the current local file hash, the tracked hash from
 ## Practical Guidance
 
 - keep `.ucr/*.json` checked in for projects that want explainable upgrades
-- if older lock/state versions are present, the current UCR reads them and normalizes them on the next write
+- if older config or lock/state versions are present, the current UCR reads them and normalizes them on the next write
 - do not hand-edit these files unless you are deliberately repairing state and understand the consequences
