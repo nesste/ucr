@@ -33,9 +33,17 @@
         "typescript": "^5.9.2",
       },
     },
+    "examples/node-service": {
+      "name": "@ucr/example-node-service",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@types/node": "^24.0.0",
+        "typescript": "^5.9.2",
+      },
+    },
     "packages/cli": {
       "name": "@ucr/cli",
-      "version": "0.0.1",
+      "version": "0.0.5",
       "bin": {
         "ucr": "dist/bin.js",
       },
@@ -45,7 +53,7 @@
     },
     "packages/core": {
       "name": "@ucr/core",
-      "version": "0.0.1",
+      "version": "0.0.5",
       "dependencies": {
         "@ucr/schema": "workspace:*",
         "fflate": "^0.8.2",
@@ -53,7 +61,7 @@
     },
     "packages/schema": {
       "name": "@ucr/schema",
-      "version": "0.0.1",
+      "version": "0.0.5",
     },
   },
   "packages": {
@@ -328,6 +336,8 @@
     "@ucr/example-bun-service": ["@ucr/example-bun-service@workspace:examples/bun-service"],
 
     "@ucr/example-next-app": ["@ucr/example-next-app@workspace:examples/next-app"],
+
+    "@ucr/example-node-service": ["@ucr/example-node-service@workspace:examples/node-service"],
 
     "@ucr/schema": ["@ucr/schema@workspace:packages/schema"],
 
