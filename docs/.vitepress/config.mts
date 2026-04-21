@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "UCR",
   description:
-    "Universal Code Registry documentation for Apache-2.0 source-owned installs in Bun-managed projects.",
+    "Installable source for Bun-managed Bun HTTP and Next App Router projects, with tracked diffs and upgrades.",
   cleanUrls: true,
   lastUpdated: true,
   themeConfig: {

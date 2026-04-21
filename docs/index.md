@@ -3,116 +3,139 @@ layout: home
 
 hero:
   name: "UCR"
-  text: "Apache-2.0 CLI + Source-Owned Registry"
-  tagline: "Install a binary, point it at a remote or local registry, and pull audited source templates into Bun-managed projects with tracked diff and upgrade behavior."
+  text: "Install like a package. Keep the source."
+  tagline: "UCR pulls audited source templates into Bun and Next projects, keeps them in your repo, and makes upgrades diffable."
   actions:
     - theme: brand
-      text: Get Started
+      text: Run the 2-minute quickstart
       link: /guide/quickstart
     - theme: alt
-      text: Private Registries
-      link: /guide/private-registries
+      text: Browse the official registry
+      link: /reference/official-registry
     - theme: alt
-      text: Trust And Scope
-      link: /reference/trust
+      text: See how UCR works
+      link: /#show-me
 
 features:
-  - title: "Remote registry by default"
-    details: "Normal usage points at the published HTTPS registry. UCR fetches the manifest, verifies the bundle checksum, and hydrates a local cache automatically."
-  - title: "Private registry support"
-    details: "UCR supports local private manifests and authenticated remote registries through one environment-provided auth header."
-  - title: "Source over packages"
-    details: "Registry bundles contain templates, not generated package artifacts. The installed result stays in your repository as normal source files."
-  - title: "Apache-2.0, no telemetry"
-    details: "The codebase is Apache-2.0 licensed, and the CLI does not emit product telemetry or analytics."
-  - title: "Deterministic paths"
-    details: "The same logical outputs always land in the same adapter-specific roots for Bun HTTP and Next App Router targets."
-  - title: "Tracked upgrades"
-    details: "UCR keeps install metadata and upstream snapshots in `.ucr/` so diff and upgrade can explain what changed."
+  - title: "Package dependency"
+    details: "Fast to install, but the code you rely on lives outside your repo and upgrades are someone else's release cycle."
+  - title: "Copied code"
+    details: "You own the files, but future changes turn into manual diffing and one-off cleanup."
+  - title: "UCR's third option"
+    details: "Installable source that lands in your repo, stays readable, and keeps enough upstream state for diff and upgrade later."
 ---
 
-## What UCR Does
+## A More Honest Install Model
 
-UCR reads one registry manifest, resolves typed inputs, renders source-owned templates, and writes files into an existing Bun-managed project. It keeps Bun responsible for external dependencies and lockfiles while UCR owns:
+Today, UCR supports Bun-managed projects for `bun-http` and `next-app-router`.
 
-- registry manifests, bundles, and item metadata
-- adapter-aware path mapping
-- install records in `.ucr/lock.json`
-- tracked upstream snapshots in `.ucr/state.json`
-- detected project profile data in `.ucr/config.json`
+You usually have to choose between:
 
-## Trust Snapshot
+- package dependency you do not fully control
+- copied code you cannot upgrade cleanly
 
-- License: Apache-2.0
-- Telemetry: none beyond explicit user-invoked registry and release download requests
-- Pricing: the OSS tooling is usable without a paid plan; no hosted or commercial pricing is published today
-- Benchmarks: no public benchmarks are published yet
-- Production case studies: no public production case studies are published yet
-- Compatibility today: Bun-managed projects with `bun-http` and `next-app-router`
-- Private registries: local manifests or authenticated remote registries with `UCR_REGISTRY_AUTH_HEADER`
+UCR gives you a third option:
 
-## Install Model
+- installable source
+- owned in your repo
+- tracked for diff and upgrade
 
-The intended user flow is:
+## What You Get
 
-1. install the standalone `ucr` binary from GitHub Releases
-2. run `ucr init` with the built-in official registry URL or an explicit `--registry`
-3. use `list`, `show`, `add`, `diff`, and `upgrade` against the published registry
+- source-owned installs, not opaque package internals
+- real files in deterministic app paths
+- tracked upstream snapshots for `diff` and `upgrade`
+- a shipped official registry plus checked-in example projects you can inspect
 
-The built-in official registry URL is:
+## Show Me {#show-me}
 
-```text
-https://ucr.network/registry/ucr-official/latest/registry.json
+The checked `examples/next-app` app includes a real `posts` resource installed with granular UCR blocks.
+
+Representative install commands from that flow:
+
+```bash
+ucr add entity-contract --target . --instance posts --input entity=Post --input plural=posts --input-file fields=./post.fields.json
+ucr add next-collection-route --target . --instance posts --input entity=Post --input plural=posts
+ucr add admin-page --target . --instance posts --input entity=Post --input plural=posts
 ```
 
-Local path registries still exist for contributors, tests, and custom/private usage. Remote private registries can authenticate with `UCR_REGISTRY_AUTH_HEADER`.
+Those installs land as normal source files inside the app:
 
-## Mental Model
+```text
+src/ucr/posts/contract/model.ts
+src/app/api/posts/route.ts
+src/app/posts/page.tsx
+```
 
-The normal workflow is:
+UCR also keeps the install tracked inside the project:
 
-1. `init` inspects a Bun project and writes `.ucr/config.json`.
-2. `list` shows which registry items are available for the target adapter.
-3. `show` prints one item's inputs, outputs, capabilities, and compatibility.
-4. `add` fetches or reuses the registry bundle, renders source files, and records the install.
-5. `diff` compares the local install with a fresh upstream render from the current registry snapshot.
-6. `upgrade` applies safe upstream changes and leaves overlapping edits for manual review.
+```text
+.ucr/lock.json   # installed items, inputs, and owned files
+.ucr/state.json  # upstream snapshots used for diff and upgrade
+```
 
-Utilities and presets default their instance id to the item name. Blocks require an explicit `--instance`.
+In the checked example, `.ucr/lock.json` records the exact files owned by the `posts` installs, including:
 
-See [Official Registry](/reference/official-registry) for the shipped catalog of utilities, presets, and blocks, including what each one provides and the canonical install recipe.
+```json
+{
+  "entity-contract:posts": {
+    "files": ["src/ucr/posts/contract/model.ts"]
+  },
+  "next-collection-route:posts": {
+    "files": ["src/app/api/posts/route.ts"]
+  },
+  "admin-page:posts": {
+    "files": ["src/app/posts/page.tsx"]
+  }
+}
+```
 
-## Registry Sources
+That is the point of UCR: the code is yours now, and later you can still ask what changed upstream.
 
-UCR resolves the registry reference in this order:
+```bash
+ucr diff entity-contract --instance posts
+ucr upgrade entity-contract --instance posts
+```
 
-1. `--registry <url-or-path>`
-2. `registry` in `.ucr/config.json`
-3. `UCR_REGISTRY`
-4. the built-in official registry URL
+## Proof You Can Inspect
 
-When the resolved reference is remote, UCR validates the manifest, downloads the declared bundle, verifies the SHA-256 checksum, and extracts it into a local OS cache before rendering any files.
+- [`examples/next-app`](/guide/examples) shows source installs under `src/ucr/...`, API routes under `src/app/api/...`, UI outputs under `src/app/...`, and real `.ucr` tracking files.
+- [`examples/bun-service`](/guide/examples) shows the same model for `bun-http`, with source under `ucr/...` and routes under `server/routes/...`.
+- The official registry and the checked examples describe the same install paths, so the flow is public and inspectable instead of implied.
 
-If `UCR_REGISTRY_AUTH_HEADER` is set, UCR sends that header to the remote manifest request and forwards it to bundle downloads only when the bundle URL is the same origin as the manifest URL.
+## Who This Is For
 
-## Adapters At A Glance
+UCR is for you if:
 
-UCR currently targets two project shapes:
+- you want source ownership after install
+- you build reusable app blocks, routes, or UI slices
+- you want safer upgrades for installed code
+- you use Bun with `bun-http` or `next-app-router`
 
-- `bun-http`: source roots under `ucr/`, routes under `server/routes`, entrypoints under `server`
-- `next-app-router`: shared code under `src/ucr` or `ucr`, API routes under `app/api` or `src/app/api`, UI outputs under `app` or `src/app`
+UCR is not for you if:
 
-Broader project compatibility and additional adapters are not implemented yet.
+- you want broad framework support today
+- you prefer package-only distribution
+- you do not want generated or source-installed code checked into your repo
 
-See [Adapters](/reference/adapters) for the full mapping rules.
+## How It Works
+
+1. Install the standalone CLI and run `ucr init` in a Bun-managed project.
+2. Browse the registry, pick a block, and install it into the adapter-specific app paths UCR detects.
+3. Commit the resulting source like any other application code.
+4. Run `diff` or `upgrade` later when the upstream template changes.
+
+The system details still matter, but they are lower on the stack:
+
+- registry manifests and bundles determine what can be installed
+- adapter-aware path mapping decides where files land
+- `.ucr/config.json`, `.ucr/lock.json`, and `.ucr/state.json` explain how the install is tracked
+- authenticated private registries work through `UCR_REGISTRY_AUTH_HEADER`
 
 ## Read Next
 
-- [Quickstart](/guide/quickstart) for standalone install, official registry usage, and contributor local-path usage
-- [Private Registries](/guide/private-registries) for local and authenticated remote registry setup
-- [Concepts](/guide/concepts) for the item model, registry cache, inputs, capabilities, and state files
-- [Commands](/guide/commands) for the CLI surface
-- [Trust And Scope](/reference/trust) for licensing, privacy, pricing, and compatibility statements
-- [Official Registry](/reference/official-registry) for the concrete `ucr-official` catalog and usage recipes
-- [Examples](/guide/examples) for the checked-in Bun and Next targets
-- [Architecture](/internals/architecture) for the contributor-facing package layout
+- [Quickstart](/guide/quickstart) to install the CLI and run the first flow
+- [Official Registry](/reference/official-registry) to browse the shipped blocks, presets, and utilities
+- [Examples](/guide/examples) to inspect the checked-in Bun and Next targets
+- [Upgrades](/guide/upgrades) to see how `diff` and `upgrade` work after local edits
+- [Trust And Scope](/reference/trust) for license, telemetry, pricing, and compatibility statements
