@@ -1,6 +1,6 @@
 {
   "name": "universal-code-registry",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": true,
   "license": "Apache-2.0",
   "description": "Source-owned registry for audited reusable code blocks across Bun, Node, and Next projects.",
