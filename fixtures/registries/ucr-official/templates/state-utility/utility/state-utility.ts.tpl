@@ -8,7 +8,7 @@ export function createAsyncState<Value>(initial: Value) {
   };
 }
 
-export function createFormState<Value extends Record<string, unknown>>(
+export function createFormState<Value extends object>(
   initial: Value,
 ) {
   return {
@@ -18,7 +18,7 @@ export function createFormState<Value extends Record<string, unknown>>(
   };
 }
 
-export function reduceEvent<Value extends Record<string, unknown>>(
+export function reduceEvent<Value extends object>(
   state: Value,
   patch: Partial<Value>,
 ): Value {

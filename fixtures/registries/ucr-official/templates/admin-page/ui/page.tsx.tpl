@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 
 import {
   compoundVariants,
@@ -122,19 +122,19 @@ export default function {{pluralPascal}}Page() {
   );
 
   return (
-    <main style={pickVariant(layoutVariants, { density: "relaxed" }) as CSSProperties}>
-      <section style={slots.card as CSSProperties}>
+    <main style={pickVariant(layoutVariants, { density: "relaxed" })}>
+      <section style={slots.card}>
         <h1>{{pluralTitle}}</h1>
-        <p style={slots.muted as CSSProperties}>
+        <p style={slots.muted}>
           UCR-managed admin screen for {{pluralTitle}} built from utility-first TypeScript blocks.
         </p>
-        <p style={badgeStyle as CSSProperties}>
+        <p style={badgeStyle}>
           Status: {state.status}
         </p>
         {state.error ? <p>{state.error}</p> : null}
       </section>
 
-      <section style={slots.card as CSSProperties}>
+      <section style={slots.card}>
         <h2>Create {{entityTitle}}</h2>
         <{{entityPascal}}Form
           onSubmit={async (input) => {
@@ -144,7 +144,7 @@ export default function {{pluralPascal}}Page() {
         />
       </section>
 
-      <section style={slots.card as CSSProperties}>
+      <section style={slots.card}>
         <h2>Current {{pluralTitle}}</h2>
         <{{entityPascal}}Table
           items={state.data}

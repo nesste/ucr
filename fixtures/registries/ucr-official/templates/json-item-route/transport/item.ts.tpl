@@ -24,7 +24,11 @@ export const {{entityCamel}}ItemRoute = {
   pattern: "/{{pluralKebab}}/[id]",
   methods: {
     async GET(_request, params) {
-      const item = await {{entityCamel}}Service.get{{entityPascal}}(params.id);
+      const id = params.id;
+      if (!id) {
+        return Response.json({ error: "Missing id." }, { status: 400 });
+      }
+      const item = await {{entityCamel}}Service.get{{entityPascal}}(id);
 
       return item
         ? Response.json({ item })
@@ -41,8 +45,12 @@ export const {{entityCamel}}ItemRoute = {
         );
       }
 
+      const id = params.id;
+      if (!id) {
+        return Response.json({ error: "Missing id." }, { status: 400 });
+      }
       const item = await {{entityCamel}}Service.update{{entityPascal}}(
-        params.id,
+        id,
         validation.data,
       );
 
@@ -51,7 +59,11 @@ export const {{entityCamel}}ItemRoute = {
         : Response.json({ error: "Not found." }, { status: 404 });
     },
     async DELETE(_request, params) {
-      const removed = await {{entityCamel}}Service.remove{{entityPascal}}(params.id);
+      const id = params.id;
+      if (!id) {
+        return Response.json({ error: "Missing id." }, { status: 400 });
+      }
+      const removed = await {{entityCamel}}Service.remove{{entityPascal}}(id);
 
       return removed
         ? Response.json({ ok: true })

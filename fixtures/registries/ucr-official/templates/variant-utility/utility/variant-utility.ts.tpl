@@ -1,6 +1,7 @@
 import { defineUtility } from "{{runtimeDirImport}}";
+import type { CSSProperties } from "react";
 
-export type StyleObject = Record<string, string | number>;
+export type StyleObject = CSSProperties;
 
 export interface VariantConfig<
   Variants extends Record<string, Record<string, StyleObject>>,

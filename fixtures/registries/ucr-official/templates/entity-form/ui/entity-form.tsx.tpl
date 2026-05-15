@@ -25,13 +25,30 @@ export interface {{entityPascal}}FormProps {
   submitLabel?: string;
 }
 
+type FormValues = Partial<Record<keyof Create{{entityPascal}}Input, unknown>>;
+
 function createInitialValues(
-  initialValues?: Partial<Create{{entityPascal}}Input>,
-): Record<string, unknown> {
+  initialValues?: Partial<FormValues>,
+): FormValues {
   return mergeDefined(
-    createEmpty{{entityPascal}}Input() as unknown as Record<string, unknown>,
-    (initialValues ?? {}) as Record<string, unknown>,
+    { ...createEmpty{{entityPascal}}Input() },
+    initialValues ?? {},
   );
+}
+
+function toCreate{{entityPascal}}Input(values: FormValues): Create{{entityPascal}}Input {
+  return values as Create{{entityPascal}}Input;
+}
+
+function withFieldValue(
+  values: FormValues,
+  field: keyof Create{{entityPascal}}Input,
+  value: unknown,
+): FormValues {
+  const patch: Partial<FormValues> = {};
+  patch[field] = value;
+
+  return mergeDefined(values, patch);
 }
 
 export function {{entityPascal}}Form({
@@ -57,12 +74,10 @@ export function {{entityPascal}}Form({
     );
 
     try {
-      await onSubmit(formState.values as unknown as Create{{entityPascal}}Input);
+      await onSubmit(toCreate{{entityPascal}}Input(formState.values));
       setFormState(createFormState(
         initialValues
-          ? createInitialValues(
-              formState.values as unknown as Partial<Create{{entityPascal}}Input>,
-            )
+          ? createInitialValues(formState.values)
           : createInitialValues(),
       ));
     } catch (error) {
@@ -97,9 +112,11 @@ export function {{entityPascal}}Form({
                 onChange={(event) => {
                   setFormState((current) =>
                     reduceEvent(current, {
-                      values: mergeDefined(current.values, {
-                        [field.name]: event.target.checked,
-                      } as Record<string, unknown>),
+                      values: withFieldValue(
+                        current.values,
+                        field.name,
+                        event.target.checked,
+                      ),
                       error: null,
                     }),
                   );
@@ -111,9 +128,11 @@ export function {{entityPascal}}Form({
                 onChange={(event) => {
                   setFormState((current) =>
                     reduceEvent(current, {
-                      values: mergeDefined(current.values, {
-                        [field.name]: event.target.value,
-                      } as Record<string, unknown>),
+                      values: withFieldValue(
+                        current.values,
+                        field.name,
+                        event.target.value,
+                      ),
                       error: null,
                     }),
                   );

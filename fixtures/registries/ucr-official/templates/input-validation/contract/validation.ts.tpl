@@ -12,50 +12,77 @@ export type ValidationResult<T> =
   | { ok: true; data: T }
   | { ok: false; errors: Record<string, string> };
 
-function validateCreateField(
-  fieldName: string,
-  label: string,
-  value: unknown,
-): { ok: true; value: unknown } | { ok: false; message: string } {
-{{#each fields}}  if (fieldName === "{{nameCamel}}") {
-{{#if isString}}    return typeof value === "string"
-      ? { ok: true, value }
-      : { ok: false, message: 'Field "{{label}}" must be a string.' };
-{{/if}}{{#if isNumber}}    if (typeof value === "number" && Number.isFinite(value)) {
-      return { ok: true, value };
-    }
+type FieldValidation =
+  | { ok: true; value: unknown }
+  | { ok: false; message: string };
 
-    if (
-      typeof value === "string" &&
-      value.trim().length > 0 &&
-      Number.isFinite(Number(value))
-    ) {
-      return { ok: true, value: Number(value) };
-    }
-
-    return { ok: false, message: 'Field "{{label}}" must be a number.' };
-{{/if}}{{#if isBoolean}}    if (typeof value === "boolean") {
-      return { ok: true, value };
-    }
-
-    if (value === "true") {
-      return { ok: true, value: true };
-    }
-
-    if (value === "false") {
-      return { ok: true, value: false };
-    }
-
-    return { ok: false, message: 'Field "{{label}}" must be a boolean.' };
-{{/if}}{{#if isDate}}    return typeof value === "string" && Number.isFinite(Date.parse(value))
-      ? { ok: true, value }
-      : { ok: false, message: 'Field "{{label}}" must be a valid date string.' };
-{{/if}}  }
-{{/each}}
+function invalidField(label: string, expectedType: string): FieldValidation {
   return {
     ok: false,
-    message: `Field "${label}" is not supported.`,
+    message: `Field "${label}" must be ${expectedType}.`,
   };
+}
+
+function validateStringField(label: string, value: unknown): FieldValidation {
+  return typeof value === "string"
+    ? { ok: true, value }
+    : invalidField(label, "a string");
+}
+
+function validateNumberField(label: string, value: unknown): FieldValidation {
+  if (typeof value === "number") {
+    return Number.isFinite(value)
+      ? { ok: true, value }
+      : invalidField(label, "a number");
+  }
+
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return invalidField(label, "a number");
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed)
+    ? { ok: true, value: parsed }
+    : invalidField(label, "a number");
+}
+
+function validateBooleanField(label: string, value: unknown): FieldValidation {
+  if (typeof value === "boolean") {
+    return { ok: true, value };
+  }
+
+  if (value === "true") {
+    return { ok: true, value: true };
+  }
+
+  if (value === "false") {
+    return { ok: true, value: false };
+  }
+
+  return invalidField(label, "a boolean");
+}
+
+function validateDateField(label: string, value: unknown): FieldValidation {
+  return typeof value === "string" && Number.isFinite(Date.parse(value))
+    ? { ok: true, value }
+    : invalidField(label, "a valid date string");
+}
+
+function validateField(
+  label: string,
+  inputType: string,
+  value: unknown,
+): FieldValidation {
+  switch (inputType) {
+    case "checkbox":
+      return validateBooleanField(label, value);
+    case "date":
+      return validateDateField(label, value);
+    case "number":
+      return validateNumberField(label, value);
+    default:
+      return validateStringField(label, value);
+  }
 }
 
 function validateShape<Value extends object>(
@@ -80,9 +107,9 @@ function validateShape<Value extends object>(
 {{#each fields}}    {
       name: "{{nameCamel}}",
       label: "{{label}}",
-      required: mode === "create" ? {{required}} : false,
+      required: mode === "create",
       coerce(value) {
-        return validateCreateField("{{nameCamel}}", "{{label}}", value);
+        return validateField("{{label}}", "{{inputType}}", value);
       },
     },
 {{/each}}  ]);

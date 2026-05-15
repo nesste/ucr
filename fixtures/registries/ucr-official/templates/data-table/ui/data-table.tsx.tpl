@@ -38,7 +38,7 @@ const slots = {
     padding: "0.75rem 0.5rem",
     borderBottom: "1px solid #eef1f5",
   },
-};
+} satisfies Record<string, CSSProperties>;
 
 const removeButtonStyle = compoundVariants(
   {
@@ -70,42 +70,38 @@ export function {{entityPascal}}Table({
   const orderedItems = sortBy(items, (item) => item.createdAt);
 
   return (
-    <table style={pickVariant(tableVariants, { density: "compact" }) as CSSProperties}>
+    <table style={pickVariant(tableVariants, { density: "compact" })}>
       <thead>
         <tr>
-          <th style={slots.headerCell as CSSProperties}>ID</th>
+          <th style={slots.headerCell}>ID</th>
           { {{entityCamel}}FieldDefinitions.map((field) => (
-            <th key={field.name} style={slots.headerCell as CSSProperties}>
+            <th key={field.name} style={slots.headerCell}>
               {field.label}
             </th>
           )) }
-          <th style={slots.headerCell as CSSProperties}>Actions</th>
+          <th style={slots.headerCell}>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {orderedItems.map((item) => {
-          const record = item as unknown as Record<string, unknown>;
-
-          return (
-            <tr key={item.id}>
-              <td style={slots.bodyCell as CSSProperties}>{item.id}</td>
-              { {{entityCamel}}FieldDefinitions.map((field) => (
-                <td key={field.name} style={slots.bodyCell as CSSProperties}>
-                  {formatValue(record[field.name])}
-                </td>
-              )) }
-              <td style={slots.bodyCell as CSSProperties}>
-                <button
-                  type="button"
-                  style={removeButtonStyle as CSSProperties}
-                  onClick={() => onRemove?.(item.id)}
-                >
-                  Remove
-                </button>
+        {orderedItems.map((item) => (
+          <tr key={item.id}>
+            <td style={slots.bodyCell}>{item.id}</td>
+            { {{entityCamel}}FieldDefinitions.map((field) => (
+              <td key={field.name} style={slots.bodyCell}>
+                {formatValue(item[field.name])}
               </td>
-            </tr>
-          );
-        })}
+            )) }
+            <td style={slots.bodyCell}>
+              <button
+                type="button"
+                style={removeButtonStyle}
+                onClick={() => onRemove?.(item.id)}
+              >
+                Remove
+              </button>
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );

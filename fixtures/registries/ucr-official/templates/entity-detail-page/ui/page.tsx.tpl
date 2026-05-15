@@ -149,6 +149,8 @@ export default function {{entityPascal}}DetailPage() {
     }
   }
 
+  const currentItem = state.item;
+
   return (
     <main style={layoutStyle}>
       <section style={cardStyle}>
@@ -171,9 +173,9 @@ export default function {{entityPascal}}DetailPage() {
             {state.isDeleting ? "Deleting..." : "Delete {{entityTitle}}"}
           </button>
         </div>
-        {state.item ? (
+        {currentItem ? (
           <p style={metaStyle}>
-            ID: {state.item.id} · Created: {state.item.createdAt} · Updated: {state.item.updatedAt}
+            ID: {currentItem.id} · Created: {currentItem.createdAt} · Updated: {currentItem.updatedAt}
           </p>
         ) : null}
         {state.error ? <p>{state.error}</p> : null}
@@ -184,11 +186,11 @@ export default function {{entityPascal}}DetailPage() {
         <h2>Edit {{entityTitle}}</h2>
         {state.isLoading ? (
           <p>Loading {{entityTitle}}...</p>
-        ) : state.item ? (
+        ) : currentItem ? (
           <{{entityPascal}}Form
-            initialValues={state.item as unknown as Partial<Create{{entityPascal}}Input>}
+            initialValues={currentItem}
             onSubmit={async (input) => {
-              const item = await update{{entityPascal}}(state.item!.id, input);
+              const item = await update{{entityPascal}}(currentItem.id, input);
               setState((current) => ({
                 ...current,
                 item,

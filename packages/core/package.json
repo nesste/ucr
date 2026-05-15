@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "@ucr/schema": "workspace:*",
-    "fflate": "^0.8.2"
+    "fflate": "0.8.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

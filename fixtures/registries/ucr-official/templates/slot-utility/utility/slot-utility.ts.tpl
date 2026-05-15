@@ -1,6 +1,7 @@
 import { defineUtility } from "{{runtimeDirImport}}";
+import type { CSSProperties } from "react";
 
-type SlotShape = Record<string, Record<string, string | number>>;
+type SlotShape = Record<string, CSSProperties>;
 
 export function createSlots<Slots extends SlotShape>(slots: Slots): Slots {
   return slots;

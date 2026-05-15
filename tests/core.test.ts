@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { zipSync } from "fflate";
+import * as ts from "typescript";
 
 import { runAddCommand } from "../packages/cli/src/commands/add";
 import { runDiffCommand } from "../packages/cli/src/commands/diff";
@@ -14,13 +15,17 @@ import { runListCommand } from "../packages/cli/src/commands/list";
 import { runShowCommand } from "../packages/cli/src/commands/show";
 import { runUpgradeCommand } from "../packages/cli/src/commands/upgrade";
 import { OFFICIAL_REGISTRY_URL } from "../packages/cli/src/official-registry";
-import { inspectProjectProfile } from "../packages/core/src/adapters";
+import {
+  inspectProjectProfile,
+  type ProjectAdapterId,
+} from "../packages/core/src/adapters";
 import { createDiffReport } from "../packages/core/src/diff";
 import { applyInstallPlan, createInstallPlan } from "../packages/core/src/install";
 import { readRegistryLock } from "../packages/core/src/lock";
 import { loadRegistryDocument } from "../packages/core/src/parser";
 import { readProjectConfig } from "../packages/core/src/project-config";
 import { readRegistryState } from "../packages/core/src/state";
+import type { InstallPlan } from "../packages/core/src/types";
 
 const registryPath = path.resolve(
   import.meta.dir,
@@ -168,6 +173,284 @@ async function installNextUiBase(
     "admin-page-preset",
   ]) {
     await installItem(registry, targetRoot, itemName);
+  }
+}
+
+type LoadedTestRegistry = Awaited<ReturnType<typeof loadRegistryDocument>>;
+type TemplateValidationProjectKind = "bun" | "node" | "next";
+
+const sharedTypeScriptTemplateItems = [
+  "ts-runtime",
+  "result-utility",
+  "async-utility",
+  "object-utility",
+  "collection-utility",
+  "validation-utility",
+  "service-preset",
+  "endpoint-preset",
+] as const;
+
+const nextUiTemplateItems = [
+  "variant-utility",
+  "slot-utility",
+  "state-utility",
+  "form-preset",
+  "admin-page-preset",
+] as const;
+
+const entityInputs = {
+  entity: "Post",
+  plural: "posts",
+} as const;
+
+const templateValidationAdapterIds: Record<
+  TemplateValidationProjectKind,
+  ProjectAdapterId
+> = {
+  bun: "bun-http",
+  node: "node-http",
+  next: "next-app-router",
+};
+
+const routeModules = JSON.stringify([
+  {
+    importName: "healthRoute",
+    importPath: "./routes/health",
+  },
+  {
+    importName: "postCollectionRoute",
+    importPath: "./routes/posts/index",
+  },
+  {
+    importName: "postItemRoute",
+    importPath: "./routes/posts/[id]",
+  },
+]);
+
+function templateValidationParent(kind: TemplateValidationProjectKind): string {
+  const exampleDir =
+    kind === "next"
+      ? "next-app"
+      : kind === "node"
+        ? "node-service"
+        : "bun-service";
+
+  return path.resolve(import.meta.dir, "../examples", exampleDir);
+}
+
+async function createTemplateValidationProject(
+  kind: TemplateValidationProjectKind,
+): Promise<string> {
+  const root = await fs.mkdtemp(
+    path.join(templateValidationParent(kind), ".ucr-template-validation-"),
+  );
+  const manager: TempProjectManager = kind === "node" ? "npm" : "bun";
+  const packageManager = manager === "npm" ? "npm@10.9.0" : "bun@1.3.4";
+  const manifest =
+    kind === "next"
+      ? {
+          name: "ucr-template-validation-next",
+          private: true,
+          packageManager,
+          dependencies: {
+            next: "16.2.4",
+            react: "19.2.4",
+            "react-dom": "19.2.4",
+          },
+        }
+      : {
+          name: `ucr-template-validation-${kind}`,
+          private: true,
+          packageManager,
+        };
+
+  await fs.writeFile(
+    path.join(root, "package.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    "utf8",
+  );
+  await writeManagerMarker(root, manager);
+
+  if (kind === "next") {
+    await fs.mkdir(path.join(root, "src", "app"), { recursive: true });
+    await fs.writeFile(
+      path.join(root, "next-env.d.ts"),
+      '/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n\n',
+      "utf8",
+    );
+  }
+
+  return root;
+}
+
+async function removeTemplateValidationProject(root: string): Promise<void> {
+  if (!path.basename(root).startsWith(".ucr-template-validation-")) {
+    throw new Error(`Refusing to remove unexpected validation path: ${root}`);
+  }
+
+  await fs.rm(root, { recursive: true, force: true });
+}
+
+async function installTemplateValidationItem(
+  registry: LoadedTestRegistry,
+  targetRoot: string,
+  coveredTemplates: Set<string>,
+  itemName: string,
+  options?: {
+    instanceId?: string;
+    rawInputs?: Record<string, string>;
+  },
+): Promise<InstallPlan> {
+  const plan = await installItem(registry, targetRoot, itemName, options);
+
+  for (const operation of plan.operations) {
+    coveredTemplates.add(operation.template);
+  }
+
+  return plan;
+}
+
+async function installTemplateValidationBase(
+  registry: LoadedTestRegistry,
+  targetRoot: string,
+  coveredTemplates: Set<string>,
+): Promise<void> {
+  for (const itemName of sharedTypeScriptTemplateItems) {
+    await installTemplateValidationItem(
+      registry,
+      targetRoot,
+      coveredTemplates,
+      itemName,
+    );
+  }
+}
+
+async function installTemplateValidationNextUiBase(
+  registry: LoadedTestRegistry,
+  targetRoot: string,
+  coveredTemplates: Set<string>,
+): Promise<void> {
+  for (const itemName of nextUiTemplateItems) {
+    await installTemplateValidationItem(
+      registry,
+      targetRoot,
+      coveredTemplates,
+      itemName,
+    );
+  }
+}
+
+async function collectTypeScriptFiles(root: string): Promise<string[]> {
+  const files: string[] = [];
+
+  async function visit(current: string): Promise<void> {
+    const entries = await fs.readdir(current, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (
+        entry.name === "node_modules" ||
+        entry.name === ".next" ||
+        entry.name === "dist"
+      ) {
+        continue;
+      }
+
+      const entryPath = path.join(current, entry.name);
+
+      if (entry.isDirectory()) {
+        await visit(entryPath);
+        continue;
+      }
+
+      if (
+        entry.isFile() &&
+        (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))
+      ) {
+        files.push(entryPath);
+      }
+    }
+  }
+
+  await visit(root);
+  return files.sort();
+}
+
+function templateValidationCompilerOptions(
+  kind: TemplateValidationProjectKind,
+): ts.CompilerOptions {
+  const common: ts.CompilerOptions = {
+    target: ts.ScriptTarget.ES2022,
+    strict: true,
+    noImplicitOverride: true,
+    noUncheckedIndexedAccess: true,
+    exactOptionalPropertyTypes: true,
+    esModuleInterop: true,
+    resolveJsonModule: true,
+    skipLibCheck: true,
+    forceConsistentCasingInFileNames: true,
+    noEmit: true,
+    lib: ["lib.es2022.d.ts", "lib.dom.d.ts", "lib.dom.iterable.d.ts"],
+  };
+
+  if (kind === "next") {
+    return {
+      ...common,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      jsx: ts.JsxEmit.Preserve,
+      allowJs: true,
+      isolatedModules: true,
+      types: ["node", "react", "react-dom"],
+    };
+  }
+
+  return {
+    ...common,
+    module: ts.ModuleKind.NodeNext,
+    moduleResolution: ts.ModuleResolutionKind.NodeNext,
+    types: kind === "bun" ? ["node", "bun"] : ["node"],
+  };
+}
+
+function formatTypeScriptDiagnostic(root: string, diagnostic: ts.Diagnostic): string {
+  const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+
+  if (diagnostic.file && diagnostic.start !== undefined) {
+    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+      diagnostic.start,
+    );
+    const filePath = path.relative(root, diagnostic.file.fileName);
+    return `${filePath}:${line + 1}:${character + 1} ${message}`;
+  }
+
+  return message;
+}
+
+async function typecheckTemplateValidationProject(
+  kind: TemplateValidationProjectKind,
+  root: string,
+): Promise<void> {
+  const sourceFiles = await collectTypeScriptFiles(root);
+
+  if (sourceFiles.length === 0) {
+    throw new Error(`No TypeScript files were generated for ${kind}.`);
+  }
+
+  const program = ts.createProgram({
+    rootNames: sourceFiles,
+    options: templateValidationCompilerOptions(kind),
+  });
+  const diagnostics = ts.getPreEmitDiagnostics(program);
+
+  if (diagnostics.length > 0) {
+    throw new Error(
+      [
+        `${kind} generated template project has TypeScript errors:`,
+        ...diagnostics.map((diagnostic) =>
+          formatTypeScriptDiagnostic(root, diagnostic),
+        ),
+      ].join("\n"),
+    );
   }
 }
 
@@ -668,6 +951,290 @@ test("list falls back to flat ordering for registries without catalog metadata",
   expect(output.indexOf("ts-runtime")).toBeLessThan(output.indexOf("utility-a"));
   expect(output.indexOf("utility-a")).toBeLessThan(output.indexOf("utility-b"));
   expect(output.indexOf("utility-b")).toBeLessThan(output.indexOf("broken-preset"));
+});
+
+test("env-config does not require Bun ambient types in Next projects", async () => {
+  const projectRoot = await createTempProject({ next: true });
+  const registry = await loadRegistryDocument(registryPath);
+
+  await installItem(registry, projectRoot, "env-config", {
+    instanceId: "env",
+  });
+
+  const envConfig = await fs.readFile(
+    path.join(projectRoot, "src", "ucr", "env", "config", "env.ts"),
+    "utf8",
+  );
+
+  expect(envConfig).toContain("process.env.PORT");
+  expect(envConfig).toContain("process.env.NODE_ENV");
+  expect(envConfig).not.toContain("Bun.env");
+});
+
+test("official registry templates render and typecheck for every supported adapter", async () => {
+  const registry = await loadRegistryDocument(registryPath);
+  const fields = await fs.readFile(fieldsPath, "utf8");
+  const coveredTemplates = new Set<string>();
+  const projectRoots: string[] = [];
+  const entityWithFieldsInputs = {
+    ...entityInputs,
+    fields,
+  };
+
+  async function createValidationProject(
+    kind: TemplateValidationProjectKind,
+  ): Promise<string> {
+    const projectRoot = await createTemplateValidationProject(kind);
+    projectRoots.push(projectRoot);
+
+    await expect(inspectProjectProfile(projectRoot)).resolves.toMatchObject({
+      adapterId: templateValidationAdapterIds[kind],
+    });
+
+    return projectRoot;
+  }
+
+  try {
+    const bunRoot = await createValidationProject("bun");
+    await installTemplateValidationBase(registry, bunRoot, coveredTemplates);
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "env-config",
+      { instanceId: "env" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "logger",
+      { instanceId: "logger" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "result-errors",
+      { instanceId: "result-errors" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "request-context",
+      { instanceId: "request" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "health-route",
+      { instanceId: "health" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "bun-crud-resource",
+      {
+        instanceId: "posts",
+        rawInputs: entityWithFieldsInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      bunRoot,
+      coveredTemplates,
+      "bun-server",
+      {
+        instanceId: "server",
+        rawInputs: { routeModules },
+      },
+    );
+    await typecheckTemplateValidationProject("bun", bunRoot);
+
+    const nodeRoot = await createValidationProject("node");
+    await installTemplateValidationBase(registry, nodeRoot, coveredTemplates);
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "env-config",
+      { instanceId: "env" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "logger",
+      { instanceId: "logger" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "result-errors",
+      { instanceId: "result-errors" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "node-health-route",
+      { instanceId: "health" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "entity-contract",
+      {
+        instanceId: "posts",
+        rawInputs: entityWithFieldsInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "service-layer",
+      {
+        instanceId: "posts",
+        rawInputs: entityInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "memory-repository",
+      {
+        instanceId: "posts",
+        rawInputs: entityInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "input-validation",
+      {
+        instanceId: "posts",
+        rawInputs: {
+          entity: entityInputs.entity,
+          fields,
+        },
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "node-collection-route",
+      {
+        instanceId: "posts",
+        rawInputs: entityInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "node-item-route",
+      {
+        instanceId: "posts",
+        rawInputs: entityInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nodeRoot,
+      coveredTemplates,
+      "node-server",
+      {
+        instanceId: "server",
+        rawInputs: { routeModules },
+      },
+    );
+    await typecheckTemplateValidationProject("node", nodeRoot);
+
+    const nodeCrudRoot = await createValidationProject("node");
+    await installTemplateValidationBase(registry, nodeCrudRoot, coveredTemplates);
+    await installTemplateValidationItem(
+      registry,
+      nodeCrudRoot,
+      coveredTemplates,
+      "node-crud-resource",
+      {
+        instanceId: "posts",
+        rawInputs: entityWithFieldsInputs,
+      },
+    );
+    await typecheckTemplateValidationProject("node", nodeCrudRoot);
+
+    const nextRoot = await createValidationProject("next");
+    await installTemplateValidationBase(registry, nextRoot, coveredTemplates);
+    await installTemplateValidationNextUiBase(
+      registry,
+      nextRoot,
+      coveredTemplates,
+    );
+    await installTemplateValidationItem(
+      registry,
+      nextRoot,
+      coveredTemplates,
+      "env-config",
+      { instanceId: "env" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nextRoot,
+      coveredTemplates,
+      "logger",
+      { instanceId: "logger" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nextRoot,
+      coveredTemplates,
+      "result-errors",
+      { instanceId: "result-errors" },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nextRoot,
+      coveredTemplates,
+      "next-crud-resource",
+      {
+        instanceId: "posts",
+        rawInputs: entityWithFieldsInputs,
+      },
+    );
+    await installTemplateValidationItem(
+      registry,
+      nextRoot,
+      coveredTemplates,
+      "entity-detail-page",
+      {
+        instanceId: "posts",
+        rawInputs: entityInputs,
+      },
+    );
+    await typecheckTemplateValidationProject("next", nextRoot);
+
+    const expectedTemplates = new Set(
+      registry.document.items.flatMap((item) =>
+        item.outputs.map((output) => output.template),
+      ),
+    );
+
+    expect([...coveredTemplates].sort()).toEqual(
+      [...expectedTemplates].sort(),
+    );
+  } finally {
+    await Promise.all(projectRoots.map(removeTemplateValidationProject));
+  }
 });
 
 test("starter CRUD blocks render the full Bun, Node, and Next resource chains", async () => {
